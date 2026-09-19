@@ -1,8 +1,3 @@
-Full payment complete (paid) aaya orderukalkku maatram net profit calculate cheyyunnathenaayum, Dashboard-il Anu Profit lekku eedennum mātram update aagunna reethiyil code update cheythal thazhe nalkunnu.
-Cheytha Mattangal (Changes Made):
- * calculateBrandFinancials Function: Full payment complete aaya (o.isFullyPaid === true) orderukalkku maatram profit & expense calculate cheyyunnu.
- * overallNetProfit Calculation: Complete payment vannittulla orderukal maathram eduthu net profit calculate cheyyunnu.
-Complete updated code thazhe nalkunnu:
 <!DOCTYPE html>
 <html lang="en">
 <head>
