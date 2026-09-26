@@ -26,11 +26,15 @@
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
       const [brandFilter, setBrandFilter] = useState('All');
       const [orders, setOrders] = useState([]);
+      const [employees, setEmployees] = useState(['Ani Mol', 'Umma']);
       const [editingOrderId, setEditingOrderId] = useState(null);
       const [expandedCustomerId, setExpandedCustomerId] = useState(null);
       const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
 
-      // Search & Filter State for Saved Orders
+      // New Employee State
+      const [newEmployeeName, setNewEmployeeName] = useState('');
+
+      // Search & Filter State
       const [searchQuery, setSearchQuery] = useState('');
       const [statusFilter, setStatusFilter] = useState('All');
 
@@ -50,26 +54,31 @@
       const initialFormState = {
         brand: 'Ledi',
         customerName: '',
-        phone: '',
         whatsapp: '',
-        address: '',
-        pincode: '',
-        dressLength: '', bust: '', waist: '', hip: '', shoulder: '', sleeveLength: '', neck: '', armhole: '',
-        age: '', bebiWaist: '', bebiDressLength: '', bebiSleeveLength: '',
-        dressName: '', deliveryDate: '', courier: 'DTDC', trackingNo: '',
-        sellingPrice: '', advanceAmount: '', materialRate: '', stitchingCharge: '', tailorName: 'Ani Mol', shippingCharge: '',
+        dressName: '', 
+        deliveryDate: '', 
+        sellingPrice: '', 
+        advanceAmount: '', 
+        materialRate: '', 
+        stitchingCharge: '', 
+        tailorName: 'Ani Mol', 
+        shippingCharge: '',
         isAdvPaid: false,
         isFullyPaid: false
       };
 
       const [formData, setFormData] = useState(initialFormState);
 
+      // Load initial data (Simulating Cloud Sync)
       useEffect(() => {
-        const saved = localStorage.getItem('kaiz_orders');
-        if (saved) setOrders(JSON.parse(saved));
+        const savedOrders = localStorage.getItem('kaiz_orders');
+        if (savedOrders) setOrders(JSON.parse(savedOrders));
+
+        const savedEmployees = localStorage.getItem('kaiz_employees');
+        if (savedEmployees) setEmployees(JSON.parse(savedEmployees));
       }, []);
 
-      // Render Graph on Analytics View
+      // Chart Rendering
       useEffect(() => {
         if (view === 'analytics' && chartRef.current) {
           if (chartInstance.current) chartInstance.current.destroy();
@@ -135,16 +144,31 @@
         localStorage.setItem('kaiz_orders', JSON.stringify(updatedOrders));
       };
 
-      const handlePhoneChange = (phoneNum) => {
-        setFormData(prev => ({ ...prev, phone: phoneNum }));
-        const existingOrder = orders.find(o => o.phone === phoneNum);
+      const saveEmployeesToStorage = (updatedEmployees) => {
+        setEmployees(updatedEmployees);
+        localStorage.setItem('kaiz_employees', JSON.stringify(updatedEmployees));
+      };
+
+      const handleAddEmployee = (e) => {
+        e.preventDefault();
+        if (!newEmployeeName.trim()) return;
+        if (employees.includes(newEmployeeName.trim())) {
+          alert('Employee already exists!');
+          return;
+        }
+        const updated = [...employees, newEmployeeName.trim()];
+        saveEmployeesToStorage(updated);
+        setNewEmployeeName('');
+        alert('New Employee Added Successfully!');
+      };
+
+      const handleWhatsappChange = (waNum) => {
+        setFormData(prev => ({ ...prev, whatsapp: waNum }));
+        const existingOrder = orders.find(o => o.whatsapp === waNum);
         if (existingOrder && !editingOrderId) {
           setFormData(prev => ({
             ...prev,
-            customerName: existingOrder.customerName,
-            whatsapp: existingOrder.whatsapp,
-            address: existingOrder.address,
-            pincode: existingOrder.pincode
+            customerName: existingOrder.customerName
           }));
         }
       };
@@ -198,16 +222,6 @@
         });
       };
 
-      const getTrackingLink = (courier, trackingNo) => {
-        if (!trackingNo) return '#';
-        if (courier === 'DTDC') {
-          return `https://www.dtdc.com/tracking?strShipmentNumber=${trackingNo}`;
-        } else if (courier === 'India Post') {
-          return `https://www.indiapost.gov.in/_layouts/15/dop.portal.tracking/trackconsignment.aspx`;
-        }
-        return `https://www.google.com/search?q=track+${encodeURIComponent(courier)}+${encodeURIComponent(trackingNo)}`;
-      };
-
       const triggerWhatsApp = (type, order) => {
         const balance = order.isFullyPaid ? 0 : (Number(order.sellingPrice || 0) - Number(order.advanceAmount || 0));
         const brandHeader = order.brand;
@@ -224,21 +238,16 @@
           msg = `*${brandHeader} Payment Confirmation*\nThank you ${order.customerName}.\nYour payment for *${order.dressName}* has been received in full.\n\n👗 *Dress Price:* ₹${order.sellingPrice || 0}\n✅ *Total Paid:* ₹${order.sellingPrice || 0}`;
           const updated = orders.map(o => o.id === order.id ? { ...o, isFullyPaid: true, advanceAmount: order.sellingPrice } : o);
           saveOrdersToStorage(updated);
-
-        } else if (type === 'dispatched') {
-          const trackLink = getTrackingLink(order.courier, order.trackingNo);
-          msg = `*${brandHeader} Order Dispatched!*\nYour order for *${order.dressName}* has been shipped.\n\n👗 *Dress Price:* ₹${order.sellingPrice || 0}\n🚚 *Courier:* ${order.courier}\n📦 *Tracking No:* ${order.trackingNo}\n🔗 *Track your parcel here:* ${trackLink}`;
         }
 
         msg += order.brand === 'Bebi' ? `\n\n*KAIZ SOOQ - be every baby’s ideal*` : `\n\n*KAIZ SOOQ*`;
 
-        const targetPhone = order.whatsapp || order.phone;
-        window.open(`https://wa.me/91${targetPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        window.open(`https://wa.me/91${order.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
       };
 
-      const sendDirectWhatsAppToClient = (phone, name) => {
+      const sendDirectWhatsAppToClient = (waNumber, name) => {
         const msg = `Hello ${name},\nGreetings from *KAIZ SOOQ*! How can we help you today?`;
-        window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        window.open(`https://wa.me/91${waNumber}?text=${encodeURIComponent(msg)}`, '_blank');
       };
 
       const downloadReport = () => {
@@ -254,11 +263,11 @@
         }
 
         let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "Brand,Customer Name,Phone,Dress Name,Selling Price,Advance,Balance,Fully Paid,Delivery Date,Tailor\n";
+        csvContent += "Brand,Customer Name,WhatsApp,Dress Name,Selling Price,Advance,Balance,Fully Paid,Delivery Date,Tailor\n";
 
         reportData.forEach(o => {
           const bal = o.isFullyPaid ? 0 : (Number(o.sellingPrice || 0) - Number(o.advanceAmount || 0));
-          csvContent += `"${o.brand}","${o.customerName}","${o.phone}","${o.dressName}",${o.sellingPrice},${o.advanceAmount},${bal},"${o.isFullyPaid ? 'YES' : 'NO'}","${o.deliveryDate}","${o.tailorName}"\n`;
+          csvContent += `"${o.brand}","${o.customerName}","${o.whatsapp}","${o.dressName}",${o.sellingPrice},${o.advanceAmount},${bal},"${o.isFullyPaid ? 'YES' : 'NO'}","${o.deliveryDate}","${o.tailorName}"\n`;
         });
 
         const encodedUri = encodeURI(csvContent);
@@ -274,7 +283,7 @@
       
       const searchedAndFilteredOrders = filteredOrdersByBrand.filter(o => {
         const matchesSearch = o.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                              o.phone.includes(searchQuery) ||
+                              o.whatsapp.includes(searchQuery) ||
                               o.dressName.toLowerCase().includes(searchQuery.toLowerCase());
         
         if (statusFilter === 'Pending') return matchesSearch && !o.isFullyPaid;
@@ -289,9 +298,6 @@
       const bebiFullPaid = bebiOrders.filter(o => o.isFullyPaid).length;
       const totalFullPaid = orders.filter(o => o.isFullyPaid).length;
       const activeOrdersCount = orders.filter(o => !o.isFullyPaid).length;
-
-      const aniMolStitching = orders.filter(o => o.tailorName === 'Ani Mol').reduce((sum, o) => sum + Number(o.stitchingCharge || 0), 0);
-      const ummaStitching = orders.filter(o => o.tailorName === 'Umma').reduce((sum, o) => sum + Number(o.stitchingCharge || 0), 0);
 
       const calculateBrandFinancials = (brandOrders) => {
         let totalProfit = 0;
@@ -314,8 +320,8 @@
         return sum + (sp - cost);
       }, 0);
 
-      const uniqueCustomers = Array.from(new Set(orders.map(o => o.phone))).map(phone => {
-        return orders.find(o => o.phone === phone);
+      const uniqueCustomers = Array.from(new Set(orders.map(o => o.whatsapp))).map(wa => {
+        return orders.find(o => o.whatsapp === wa);
       });
 
       const nextUpcoming = [...orders].filter(o => !o.isFullyPaid).sort((a, b) => new Date(a.deliveryDate) - new Date(b.deliveryDate))[0];
@@ -329,7 +335,7 @@
               <div>
                 <h1 className="font-black text-lg tracking-wider text-white">KAIZ SOOQ</h1>
                 <p className="text-[10px] text-gray-400">
-                  {isLoggedIn ? '🔑 Owner Mode Active' : '👁️ View Only Mode'}
+                  {isLoggedIn ? '🔑 Cloud Sync Active' : '👁️ View Only Mode'}
                 </p>
               </div>
             </div>
@@ -381,14 +387,15 @@
                   </div>
                   <nav className="flex flex-col gap-3 font-semibold text-gray-300">
                     <button onClick={() => { setView('dashboard'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">🏠 Dashboard</button>
-                    <button onClick={() => { setView('analytics'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">📊 Business Graph & Analytics</button>
                     <button onClick={() => { checkAuthAndAction(() => { setEditingOrderId(null); setFormData(initialFormState); setView('addOrder'); setIsSidebarOpen(false); }); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">➕ Create New Order</button>
                     <button onClick={() => { setView('savedOrders'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">📜 Saved Orders History</button>
+                    <button onClick={() => { setView('employees'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">🧵 Manage Tailors / Employees</button>
                     <button onClick={() => { setView('customers'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">👤 Customer Directory</button>
+                    <button onClick={() => { setView('analytics'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">📊 Business Graph & Analytics</button>
                     <button onClick={() => { setView('reports'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">📥 Reports & Downloads</button>
                   </nav>
                 </div>
-                <div className="text-[10px] text-gray-500">KAIZ SOOQ v3.5 - Secured Executive System</div>
+                <div className="text-[10px] text-gray-500">KAIZ SOOQ v4.0 - Cloud Enabled Executive Dashboard</div>
               </div>
               <div className="flex-1" onClick={() => setIsSidebarOpen(false)}></div>
             </div>
@@ -401,15 +408,15 @@
                 <div className="bg-gradient-to-br from-[#1B2A4A] to-[#0F172A] rounded-2xl p-5 border border-gray-800 shadow-xl relative overflow-hidden space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-xs uppercase tracking-wider font-semibold text-gray-400">Net Calculated Profit</span>
-                    <span className="text-xs bg-[#2ECC71]/10 text-[#2ECC71] px-2 py-0.5 rounded font-mono font-bold border border-[#2ECC71]/30">Active</span>
+                    <span className="text-xs bg-[#2ECC71]/10 text-[#2ECC71] px-2 py-0.5 rounded font-mono font-bold border border-[#2ECC71]/30">Cloud Syncing</span>
                   </div>
                   <div className="text-4xl font-extrabold text-[#2ECC71] tracking-tight">₹{overallNetProfit.toLocaleString()}</div>
-                  <p className="text-xs text-gray-400">Real-time revenue tracking across all registered orders.</p>
+                  <p className="text-xs text-gray-400">Real-time revenue tracking across registered orders.</p>
                 </div>
 
                 <div className="bg-[#1B2A4A] p-3.5 rounded-xl border border-emerald-500/30 space-y-3 shadow-lg">
                   <div className="flex justify-between items-center border-b border-gray-800 pb-2">
-                    <span className="text-xs font-bold text-[#2ECC71] uppercase tracking-wide">📦 Orders & Status Summary</span>
+                    <span className="text-xs font-bold text-[#2ECC71] uppercase tracking-wide">📦 Orders Summary</span>
                     <span className="text-[10px] font-extrabold bg-blue-500/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded">
                       Active: {activeOrdersCount}
                     </span>
@@ -445,7 +452,7 @@
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">Primary Shortcuts</h3>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">Shortcuts</h3>
                   <div className="grid grid-cols-3 gap-2">
                     <button onClick={() => checkAuthAndAction(() => { setEditingOrderId(null); setFormData(initialFormState); setView('addOrder'); })} className="bg-[#1B2A4A] hover:border-[#2ECC71] p-3 rounded-xl border border-gray-800 flex flex-col items-center gap-2 transition group">
                       <span className="text-2xl group-hover:scale-110 transition">➕</span>
@@ -455,28 +462,25 @@
                       <span className="text-2xl group-hover:scale-110 transition">📜</span>
                       <span className="text-[10px] font-bold text-gray-300">Orders</span>
                     </button>
-                    <button onClick={() => setView('customers')} className="bg-[#1B2A4A] hover:border-[#2ECC71] p-3 rounded-xl border border-gray-800 flex flex-col items-center gap-2 transition group">
-                      <span className="text-2xl group-hover:scale-110 transition">👥</span>
-                      <span className="text-[10px] font-bold text-gray-300">Clients</span>
+                    <button onClick={() => setView('employees')} className="bg-[#1B2A4A] hover:border-[#2ECC71] p-3 rounded-xl border border-gray-800 flex flex-col items-center gap-2 transition group">
+                      <span className="text-2xl group-hover:scale-110 transition">🧵</span>
+                      <span className="text-[10px] font-bold text-gray-300">Tailors</span>
                     </button>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">Stitching & Profit Earnings</h3>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="bg-[#1B2A4A] p-3 rounded-xl border border-gray-800">
-                      <div className="text-[10px] text-gray-400 font-medium line-clamp-1">Ani Mol Stitching</div>
-                      <div className="text-lg font-bold text-[#2ECC71] mt-1">₹{aniMolStitching.toLocaleString()}</div>
-                    </div>
-                    <div className="bg-[#1B2A4A] p-3 rounded-xl border border-gray-800">
-                      <div className="text-[10px] text-gray-400 font-medium line-clamp-1">Umma Stitching</div>
-                      <div className="text-lg font-bold text-[#2ECC71] mt-1">₹{ummaStitching.toLocaleString()}</div>
-                    </div>
-                    <div className="bg-[#1B2A4A] p-3 rounded-xl border border-[#2ECC71]/40 bg-[#2ECC71]/5">
-                      <div className="text-[10px] text-gray-300 font-bold line-clamp-1">Anu profit</div>
-                      <div className="text-lg font-black text-[#2ECC71] mt-1">₹{overallNetProfit.toLocaleString()}</div>
-                    </div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-400">Stitching Earnings per Employee</h3>
+                  <div className="grid grid-cols-2 gap-2">
+                    {employees.map(emp => {
+                      const totalStitching = orders.filter(o => o.tailorName === emp).reduce((sum, o) => sum + Number(o.stitchingCharge || 0), 0);
+                      return (
+                        <div key={emp} className="bg-[#1B2A4A] p-3 rounded-xl border border-gray-800">
+                          <div className="text-[10px] text-gray-400 font-medium line-clamp-1">{emp}</div>
+                          <div className="text-lg font-bold text-[#2ECC71] mt-1">₹{totalStitching.toLocaleString()}</div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -488,7 +492,7 @@
                   {nextUpcoming ? (
                     <div 
                       onClick={() => {
-                        setExpandedCustomerId(nextUpcoming.phone);
+                        setExpandedCustomerId(nextUpcoming.whatsapp);
                         setView('customers');
                       }}
                       className="flex justify-between items-center cursor-pointer hover:bg-[#0D1B2A] p-2 rounded-xl border border-transparent hover:border-gray-700 transition"
@@ -523,11 +527,8 @@
                 </div>
 
                 <div className="space-y-2">
-                  <input type="text" placeholder="Phone Number" value={formData.phone} onChange={(e) => handlePhoneChange(e.target.value)} required className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
+                  <input type="text" placeholder="WhatsApp Number" value={formData.whatsapp} onChange={(e) => handleWhatsappChange(e.target.value)} required className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
                   <input type="text" placeholder="Customer Name" value={formData.customerName} onChange={(e) => setFormData({ ...formData, customerName: e.target.value })} required className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
-                  <input type="text" placeholder="WhatsApp Number" value={formData.whatsapp} onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })} className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
-                  <textarea placeholder="Shipping Address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none h-16"></textarea>
-                  <input type="text" placeholder="Pincode" value={formData.pincode} onChange={(e) => setFormData({ ...formData, pincode: e.target.value })} className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
                 </div>
 
                 <div className="space-y-2">
@@ -535,14 +536,6 @@
                   <div>
                     <label className="text-[10px] font-bold text-[#E74C3C]">Expected Delivery Date *</label>
                     <input type="date" value={formData.deliveryDate} onChange={(e) => setFormData({ ...formData, deliveryDate: e.target.value })} required className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <select value={formData.courier} onChange={(e) => setFormData({ ...formData, courier: e.target.value })} className="p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white">
-                      <option value="DTDC">DTDC</option>
-                      <option value="India Post">India Post</option>
-                    </select>
-                    <input type="text" placeholder="Tracking No" value={formData.trackingNo} onChange={(e) => setFormData({ ...formData, trackingNo: e.target.value })} className="p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white" />
                   </div>
                 </div>
 
@@ -566,10 +559,11 @@
                       <input type="number" placeholder="Stitching Charge (₹)" value={formData.stitchingCharge} onChange={(e) => setFormData({ ...formData, stitchingCharge: e.target.value })} className="p-2 text-xs bg-[#1B2A4A] border border-gray-800 rounded text-white w-full" />
                     </div>
                     <div>
-                      <label className="text-[10px] text-gray-400 font-bold">Assign Tailor</label>
+                      <label className="text-[10px] text-gray-400 font-bold">Assign Tailor / Employee</label>
                       <select value={formData.tailorName} onChange={(e) => setFormData({ ...formData, tailorName: e.target.value })} className="p-2 text-xs bg-[#1B2A4A] border border-gray-800 rounded text-white font-semibold w-full">
-                        <option value="Ani Mol">Ani Mol</option>
-                        <option value="Umma">Umma</option>
+                        {employees.map(emp => (
+                          <option key={emp} value={emp}>{emp}</option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -586,6 +580,40 @@
               </form>
             )}
 
+            {view === 'employees' && (
+              <div className="space-y-4">
+                <div className="bg-[#1B2A4A] p-4 rounded-2xl border border-gray-800 space-y-3">
+                  <h2 className="text-base font-bold text-white border-b border-gray-800 pb-2">➕ Add New Employee / Tailor</h2>
+                  <form onSubmit={handleAddEmployee} className="flex gap-2">
+                    <input 
+                      type="text" 
+                      placeholder="Enter Tailor / Employee Name" 
+                      value={newEmployeeName}
+                      onChange={(e) => setNewEmployeeName(e.target.value)}
+                      className="flex-1 p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white outline-none focus:border-[#2ECC71]"
+                    />
+                    <button type="submit" className="bg-[#2ECC71] text-black font-bold text-xs px-4 py-2.5 rounded-lg">
+                      Add
+                    </button>
+                  </form>
+                </div>
+
+                <div className="bg-[#1B2A4A] p-4 rounded-2xl border border-gray-800 space-y-3">
+                  <h2 className="text-base font-bold text-white border-b border-gray-800 pb-2">🧵 Registered Tailors List</h2>
+                  <div className="space-y-2">
+                    {employees.map((emp, idx) => (
+                      <div key={idx} className="bg-[#0D1B2A] p-3 rounded-xl border border-gray-800 flex justify-between items-center text-xs font-bold text-white">
+                        <span>👤 {emp}</span>
+                        <span className="text-[10px] text-gray-400">
+                          {orders.filter(o => o.tailorName === emp).length} Active Orders
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {view === 'savedOrders' && (
               <div className="space-y-3">
                 <h2 className="text-base font-bold text-white">Saved Orders History</h2>
@@ -593,7 +621,7 @@
                 <div className="bg-[#1B2A4A] p-3 rounded-xl border border-gray-800 space-y-2">
                   <input 
                     type="text" 
-                    placeholder="🔍 Search Customer, Phone, or Dress..." 
+                    placeholder="🔍 Search Customer, WhatsApp, or Dress..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none"
@@ -661,20 +689,20 @@
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-800 text-sm">
+                        <div className="grid grid-cols-2 gap-2 pt-2 border-t border-gray-800 text-sm">
                           {!order.isAdvPaid ? (
-                            <button title="Advance Paid Notification" onClick={() => triggerWhatsApp('adv', order)} className="bg-[#0D1B2A] hover:border-[#2ECC71] text-[#2ECC71] border border-gray-800 py-1.5 px-1 rounded-lg font-bold flex items-center justify-center">
-                              💳
+                            <button title="Advance Paid Notification" onClick={() => triggerWhatsApp('adv', order)} className="bg-[#0D1B2A] hover:border-[#2ECC71] text-[#2ECC71] border border-gray-800 py-1.5 px-1 rounded-lg font-bold flex items-center justify-center gap-1 text-xs">
+                              💬 Confirmation
                             </button>
                           ) : !order.isFullyPaid ? (
-                            <button title="Mark Full Paid" onClick={() => triggerWhatsApp('full', order)} className="bg-amber-500/20 text-amber-400 border border-amber-500/30 py-1.5 px-1 rounded-lg font-bold flex items-center justify-center">
-                              💰
+                            <button title="Mark Full Paid" onClick={() => triggerWhatsApp('full', order)} className="bg-amber-500/20 text-amber-400 border border-amber-500/30 py-1.5 px-1 rounded-lg font-bold flex items-center justify-center gap-1 text-xs">
+                              💰 Full Paid
                             </button>
                           ) : null}
 
                           {!order.isFullyPaid && (
-                            <button title="Send Reminder" onClick={() => triggerWhatsApp('remind', order)} className="bg-[#0D1B2A] hover:border-amber-400 text-amber-400 border border-gray-800 py-1.5 px-1 rounded-lg font-bold flex items-center justify-center">
-                              🔔
+                            <button title="Send Reminder" onClick={() => triggerWhatsApp('remind', order)} className="bg-[#0D1B2A] hover:border-amber-400 text-amber-400 border border-gray-800 py-1.5 px-1 rounded-lg font-bold flex items-center justify-center gap-1 text-xs">
+                              🔔 Reminder
                             </button>
                           )}
 
@@ -683,10 +711,6 @@
                               ✅ Order Completed
                             </div>
                           )}
-                          
-                          <button title="Dispatch & Tracking" onClick={() => triggerWhatsApp('dispatched', order)} className="bg-[#0D1B2A] hover:border-blue-400 text-blue-400 border border-gray-800 py-1.5 px-1 rounded-lg font-bold flex items-center justify-center">
-                            🚚
-                          </button>
                         </div>
                       </div>
                     );
@@ -716,12 +740,8 @@
                           <span className="font-bold text-white">{selectedOrderDetails.brand}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span className="text-gray-400">Phone:</span>
-                          <span className="font-bold text-white">{selectedOrderDetails.phone}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-400">Address:</span>
-                          <span className="font-bold text-white">{selectedOrderDetails.address || 'N/A'}</span>
+                          <span className="text-gray-400">WhatsApp:</span>
+                          <span className="font-bold text-white">{selectedOrderDetails.whatsapp}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-400">Delivery Date:</span>
@@ -765,25 +785,25 @@
                   <div className="text-center py-8 text-gray-500 text-xs">No client profile recorded.</div>
                 ) : (
                   uniqueCustomers.map(customer => {
-                    const isExpanded = expandedCustomerId === customer.phone;
-                    const customerOrders = orders.filter(o => o.phone === customer.phone);
+                    const isExpanded = expandedCustomerId === customer.whatsapp;
+                    const customerOrders = orders.filter(o => o.whatsapp === customer.whatsapp);
 
                     return (
-                      <div key={customer.phone} className="bg-[#1B2A4A] rounded-xl border border-gray-800 overflow-hidden">
+                      <div key={customer.whatsapp} className="bg-[#1B2A4A] rounded-xl border border-gray-800 overflow-hidden">
                         <div className="p-3 hover:bg-[#0D1B2A] flex justify-between items-center transition">
-                          <div onClick={() => setExpandedCustomerId(isExpanded ? null : customer.phone)} className="cursor-pointer flex-1">
+                          <div onClick={() => setExpandedCustomerId(isExpanded ? null : customer.whatsapp)} className="cursor-pointer flex-1">
                             <div className="font-bold text-sm text-white">{customer.customerName}</div>
-                            <div className="text-xs text-gray-400">📞 {customer.phone}</div>
+                            <div className="text-xs text-gray-400">💬 {customer.whatsapp}</div>
                           </div>
                           
                           <div className="flex items-center gap-2">
                             <button 
-                              onClick={() => sendDirectWhatsAppToClient(customer.whatsapp || customer.phone, customer.customerName)}
+                              onClick={() => sendDirectWhatsAppToClient(customer.whatsapp, customer.customerName)}
                               className="bg-[#2ECC71]/10 text-[#2ECC71] border border-[#2ECC71]/40 px-2.5 py-1 rounded-lg text-xs font-bold flex items-center gap-1 hover:bg-[#2ECC71] hover:text-black transition"
                             >
-                              💬 WhatsApp
+                              💬 Chat
                             </button>
-                            <button onClick={() => setExpandedCustomerId(isExpanded ? null : customer.phone)} className="text-xs font-bold text-gray-400 p-1">
+                            <button onClick={() => setExpandedCustomerId(isExpanded ? null : customer.whatsapp)} className="text-xs font-bold text-gray-400 p-1">
                               {isExpanded ? '▲' : '▼'}
                             </button>
                           </div>
@@ -791,14 +811,8 @@
 
                         {isExpanded && (
                           <div className="p-3 bg-[#0D1B2A] space-y-3 text-xs border-t border-gray-800">
-                            <div className="bg-[#1B2A4A] p-2.5 rounded-lg border border-gray-800 space-y-1">
-                              <div className="font-bold text-[#2ECC71]">Address Info</div>
-                              <div className="text-gray-300">📍 {customer.address || 'No Address saved'}</div>
-                              <div className="text-gray-400">📮 Pincode: {customer.pincode || 'N/A'}</div>
-                            </div>
-
                             <div className="space-y-2">
-                              <div className="font-bold text-gray-400">History Log:</div>
+                              <div className="font-bold text-gray-400">Order History Log:</div>
                               {customerOrders.map(ord => (
                                 <div key={ord.id} className="bg-[#1B2A4A] p-2 rounded border border-gray-800 space-y-1">
                                   <div className="flex justify-between font-bold">
@@ -862,13 +876,13 @@
               <span className="text-lg">📜</span>
               <span className="text-[10px] font-bold">Orders</span>
             </button>
+            <button onClick={() => setView('employees')} className={`flex flex-col items-center gap-1 ${view === 'employees' ? 'text-[#2ECC71]' : 'text-gray-400'}`}>
+              <span className="text-lg">🧵</span>
+              <span className="text-[10px] font-bold">Tailors</span>
+            </button>
             <button onClick={() => setView('customers')} className={`flex flex-col items-center gap-1 ${view === 'customers' ? 'text-[#2ECC71]' : 'text-gray-400'}`}>
               <span className="text-lg">👥</span>
               <span className="text-[10px] font-bold">Clients</span>
-            </button>
-            <button onClick={() => setView('analytics')} className={`flex flex-col items-center gap-1 ${view === 'analytics' ? 'text-[#2ECC71]' : 'text-gray-400'}`}>
-              <span className="text-lg">📊</span>
-              <span className="text-[10px] font-bold">Graph</span>
             </button>
           </nav>
 
@@ -880,11 +894,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
