@@ -241,7 +241,6 @@
         window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(msg)}`, '_blank');
       };
 
-      // Download CSV Report
       const downloadReport = () => {
         let reportData = [...orders];
 
@@ -273,7 +272,6 @@
 
       const filteredOrdersByBrand = brandFilter === 'All' ? orders : orders.filter(o => o.brand === brandFilter);
       
-      // Filter & Search Logic for Saved Orders Page
       const searchedAndFilteredOrders = filteredOrdersByBrand.filter(o => {
         const matchesSearch = o.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                               o.phone.includes(searchQuery) ||
@@ -287,7 +285,6 @@
       const lediOrders = orders.filter(o => o.brand === 'Ledi');
       const bebiOrders = orders.filter(o => o.brand === 'Bebi');
 
-      // Full Paid Counts
       const lediFullPaid = lediOrders.filter(o => o.isFullyPaid).length;
       const bebiFullPaid = bebiOrders.filter(o => o.isFullyPaid).length;
       const totalFullPaid = orders.filter(o => o.isFullyPaid).length;
@@ -326,7 +323,6 @@
       return (
         <div className="min-h-screen">
 
-          <!-- Header Bar -->
           <header className="bg-[#1B2A4A] text-[#E2E8F0] p-4 sticky top-0 z-50 flex justify-between items-center border-b border-gray-800 shadow-md">
             <div className="flex items-center gap-3">
               <button onClick={() => setIsSidebarOpen(true)} className="text-2xl text-[#2ECC71]">☰</button>
@@ -357,7 +353,6 @@
             </div>
           </header>
 
-          <!-- Owner Login Modal -->
           {showLoginModal && (
             <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
               <form onSubmit={handleLogin} className="bg-[#1B2A4A] border border-gray-800 p-5 rounded-2xl w-full max-w-xs space-y-4 shadow-2xl">
@@ -376,7 +371,6 @@
             </div>
           )}
 
-          <!-- Sidebar Drawer (REMOVED STORE & NOTIFY) -->
           {isSidebarOpen && (
             <div className="fixed inset-0 bg-black/70 z-50 flex backdrop-blur-sm">
               <div className="bg-[#1B2A4A] w-64 p-5 h-full flex flex-col justify-between shadow-2xl border-r border-gray-800">
@@ -400,12 +394,10 @@
             </div>
           )}
 
-          <!-- MAIN CONTAINER -->
           <main className="p-4 max-w-md mx-auto space-y-5">
 
-            <!-- VIEW 1: DASHBOARD -->
             {view === 'dashboard' && (
-              <>
+              <React.Fragment>
                 <div className="bg-gradient-to-br from-[#1B2A4A] to-[#0F172A] rounded-2xl p-5 border border-gray-800 shadow-xl relative overflow-hidden space-y-3">
                   <div className="flex justify-between items-center">
                     <span className="text-xs uppercase tracking-wider font-semibold text-gray-400">Net Calculated Profit</span>
@@ -415,7 +407,6 @@
                   <p className="text-xs text-gray-400">Real-time revenue tracking across all registered orders.</p>
                 </div>
 
-                <!-- CONSOLIDATED WIDGET: ACTIVE ORDERS & FULL PAID BREAKDOWN -->
                 <div className="bg-[#1B2A4A] p-3.5 rounded-xl border border-emerald-500/30 space-y-3 shadow-lg">
                   <div className="flex justify-between items-center border-b border-gray-800 pb-2">
                     <span className="text-xs font-bold text-[#2ECC71] uppercase tracking-wide">📦 Orders & Status Summary</span>
@@ -489,7 +480,6 @@
                   </div>
                 </div>
 
-                <!-- UPCOMING DELIVERY WITH DIRECT CLIENT ROUTING -->
                 <div className="bg-[#1B2A4A] p-4 rounded-2xl border border-gray-800 space-y-3">
                   <div className="flex justify-between items-center border-b border-gray-800 pb-2">
                     <span className="text-xs font-bold text-amber-400 uppercase tracking-wide">🗓 Next Pending Delivery</span>
@@ -515,10 +505,9 @@
                     <div className="text-xs text-gray-500 py-2">No pending deliveries found</div>
                   )}
                 </div>
-              </>
+              </React.Fragment>
             )}
 
-            <!-- VIEW 2: ADD / EDIT ORDER FORM -->
             {view === 'addOrder' && (
               <form onSubmit={handleOrderSubmit} className="bg-[#1B2A4A] p-4 rounded-2xl border border-gray-800 space-y-4">
                 <h2 className="text-base font-bold text-white border-b border-gray-800 pb-2">
@@ -597,12 +586,10 @@
               </form>
             )}
 
-            <!-- VIEW 3: SAVED ORDERS HISTORY WITH SEARCH, FILTERS, AND FULL PAID DETAILS MODAL -->
             {view === 'savedOrders' && (
               <div className="space-y-3">
                 <h2 className="text-base font-bold text-white">Saved Orders History</h2>
 
-                <!-- SEARCH AND FILTER CONTROLS -->
                 <div className="bg-[#1B2A4A] p-3 rounded-xl border border-gray-800 space-y-2">
                   <input 
                     type="text" 
@@ -656,7 +643,6 @@
                               {balance > 0 ? `Bal: ₹${balance}` : 'Bal: ₹0 (Paid)'}
                             </div>
 
-                            {/* IF FULLY PAID: SHOW "SEE DETAILS" BUTTON, ELSE SHOW DIRECT EDIT & DELETE */}
                             <div className="flex gap-2 mt-2 justify-end">
                               {order.isFullyPaid ? (
                                 <button 
@@ -666,16 +652,15 @@
                                   👁️ Details
                                 </button>
                               ) : (
-                                <>
+                                <React.Fragment>
                                   <button onClick={() => handleEditOrder(order)} className="text-[11px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/30">✏️</button>
                                   <button onClick={() => handleDeleteOrder(order.id)} className="text-[11px] bg-[#E74C3C]/10 text-[#E74C3C] px-2 py-0.5 rounded border border-[#E74C3C]/30">🗑️</button>
-                                </>
+                                </React.Fragment>
                               )}
                             </div>
                           </div>
                         </div>
 
-                        {/* ICON-ONLY BUTTON ACTIONS */}
                         <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-800 text-sm">
                           {!order.isAdvPaid ? (
                             <button title="Advance Paid Notification" onClick={() => triggerWhatsApp('adv', order)} className="bg-[#0D1B2A] hover:border-[#2ECC71] text-[#2ECC71] border border-gray-800 py-1.5 px-1 rounded-lg font-bold flex items-center justify-center">
@@ -687,14 +672,12 @@
                             </button>
                           ) : null}
 
-                          {/* REMIND BUTTON (REMOVED IF FULLY PAID) */}
                           {!order.isFullyPaid && (
                             <button title="Send Reminder" onClick={() => triggerWhatsApp('remind', order)} className="bg-[#0D1B2A] hover:border-amber-400 text-amber-400 border border-gray-800 py-1.5 px-1 rounded-lg font-bold flex items-center justify-center">
                               🔔
                             </button>
                           )}
 
-                          {/* IF FULLY PAID -> REPLACE FULL PAID & REMIND BUTTONS WITH ORDER COMPLETED ICON */}
                           {order.isFullyPaid && (
                             <div className="col-span-2 bg-emerald-500/10 text-[#2ECC71] border border-emerald-500/30 py-1.5 px-2 rounded-lg font-extrabold flex items-center justify-center gap-1.5 text-xs">
                               ✅ Order Completed
@@ -710,7 +693,6 @@
                   })
                 )}
 
-                <!-- FULLY PAID ORDER DETAILS MODAL -->
                 {selectedOrderDetails && (
                   <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
                     <div className="bg-[#1B2A4A] border border-gray-800 p-5 rounded-2xl w-full max-w-sm space-y-4 shadow-2xl relative max-h-[90vh] overflow-y-auto">
@@ -776,7 +758,6 @@
               </div>
             )}
 
-            <!-- VIEW 4: CUSTOMER DIRECTORY -->
             {view === 'customers' && (
               <div className="space-y-3">
                 <h2 className="text-base font-bold text-white">Customer Directory (CRM)</h2>
@@ -837,7 +818,6 @@
               </div>
             )}
 
-            <!-- VIEW 5: BUSINESS GRAPH & ANALYTICS -->
             {view === 'analytics' && (
               <div className="bg-[#1B2A4A] p-4 rounded-2xl border border-gray-800 space-y-4">
                 <h2 className="text-base font-bold text-white border-b border-gray-800 pb-2">📊 Business Performance Graph</h2>
@@ -848,7 +828,6 @@
               </div>
             )}
 
-            <!-- VIEW 6: REPORTS & CSV DOWNLOAD -->
             {view === 'reports' && (
               <div className="bg-[#1B2A4A] p-4 rounded-2xl border border-gray-800 space-y-4">
                 <h2 className="text-base font-bold text-white border-b border-gray-800 pb-2">📥 Download Business Reports</h2>
@@ -874,7 +853,6 @@
 
           </main>
 
-          <!-- FLOATING BOTTOM NAVIGATION BAR -->
           <nav className="fixed bottom-0 left-0 right-0 bg-[#1B2A4A] border-t border-gray-800 py-3 px-6 flex justify-around items-center z-40 shadow-2xl">
             <button onClick={() => setView('dashboard')} className={`flex flex-col items-center gap-1 ${view === 'dashboard' ? 'text-[#2ECC71]' : 'text-gray-400'}`}>
               <span className="text-lg">🏠</span>
@@ -902,6 +880,7 @@
   </script>
 </body>
 </html>
+
 
 
 
