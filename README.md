@@ -105,11 +105,27 @@
         .hint.positive { color: green; }
         .hint.negative { color: red; }
 
-        .img-preview {
-            max-width: 100px;
-            max-height: 100px;
-            margin-top: 10px;
-            display: block;
+        /* Item Store Gallery */
+        .item-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .item-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            background: #fafafa;
+        }
+
+        .item-card img {
+            max-width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 4px;
         }
 
         /* Nav Tabs */
@@ -139,6 +155,21 @@
         .tab-content.active {
             display: block;
         }
+
+        .employee-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .employee-badge {
+            background: #e2e8f0;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
     </style>
 </head>
 <body>
@@ -157,20 +188,24 @@
 
         <!-- Add Employee Section -->
         <div class="card">
-            <h3>Add New Employee (Tailor)</h3>
+            <h3>1. Add New Employee (Tailor)</h3>
             <div class="grid-2">
                 <div>
                     <input type="text" id="newTailorName" placeholder="Enter Employee Name">
                 </div>
                 <div>
-                    <button onclick="addTailor()">Add Employee</button>
+                    <button type="button" onclick="addTailor()">Add Employee</button>
                 </div>
+            </div>
+            <div style="margin-top: 10px;">
+                <label>Current Employees:</label>
+                <div id="employeeBadgeContainer" class="employee-list"></div>
             </div>
         </div>
 
         <!-- Order Form -->
         <div class="card">
-            <h3>Create New Order</h3>
+            <h3>2. Create New Order</h3>
             <form id="orderForm" onsubmit="event.preventDefault(); saveOrder();">
                 <div class="grid-3">
                     <div class="form-group">
@@ -182,7 +217,7 @@
                         <input type="date" id="orderDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Tailor Name:</label>
+                        <label>Select Tailor:</label>
                         <select id="tailorSelect" required></select>
                     </div>
                 </div>
@@ -218,46 +253,30 @@
             </form>
         </div>
 
-        <!-- Item Store (Max 5MB Image) -->
+        <!-- Item Store Section -->
         <div class="card">
-            <h3>Item Store (Image Upload)</h3>
+            <h3>3. Item Store (Upload & Display Items)</h3>
             <div class="grid-2">
                 <div class="form-group">
                     <label>Item Name:</label>
-                    <input type="text" id="itemName" placeholder="Item Name">
+                    <input type="text" id="itemName" placeholder="e.g., Silk Saree, Blouse Design">
                 </div>
                 <div class="form-group">
-                    <label>Select Image (Max: 5MB):</label>
+                    <label>Select Image (Max 5MB):</label>
                     <input type="file" id="itemImage" accept="image/*" onchange="handleImageUpload(event)">
-                    <img id="imagePreview" class="img-preview" src="" style="display:none;">
                 </div>
             </div>
-            <button onclick="saveItem()">Add to Item Store</button>
+            <button type="button" onclick="saveItem()">Save to Item Store</button>
+
+            <!-- Store Display Gallery -->
+            <h4 style="margin-top: 20px;">Saved Items Gallery</h4>
+            <div id="itemGallery" class="item-gallery"></div>
         </div>
 
         <!-- Employee Earnings -->
         <div class="card">
-            <h3>Employee Stitching Earnings</h3>
+            <h3>4. Employee Stitching Earnings</h3>
             <div id="tailorEarningsList"></div>
-        </div>
-
-        <!-- Date-based Financial Analysis -->
-        <div class="card">
-            <h3>Financial Analysis by Date</h3>
-            <div class="grid-3">
-                <div>
-                    <label>From Date:</label>
-                    <input type="date" id="startDate">
-                </div>
-                <div>
-                    <label>To Date:</label>
-                    <input type="date" id="endDate">
-                </div>
-                <div style="display: flex; align-items: flex-end;">
-                    <button onclick="analyzeFinancials()">Analyze</button>
-                </div>
-            </div>
-            <div id="analysisResult" style="margin-top: 15px;"></div>
         </div>
 
         <!-- Active / Pending Orders Table -->
@@ -272,7 +291,7 @@
                         <th>Stitching Charge</th>
                         <th>Reserved Amount (₹300)</th>
                         <th>Net Profit</th>
-                        <th>Transferred Amount (< ₹300)</th>
+                        <th>Transferred (< ₹300)</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -285,7 +304,7 @@
     <!-- COMPLETED ORDERS TAB -->
     <div id="completedTab" class="tab-content">
         <div class="card">
-            <h3>Completed Orders (Sorted by Date)</h3>
+            <h3>Completed Orders (Sorted by Date - Newest First)</h3>
             <table id="completedOrdersTable">
                 <thead>
                     <tr>
@@ -295,7 +314,7 @@
                         <th>Stitching Charge</th>
                         <th>Reserved Amount (₹300)</th>
                         <th>Net Profit</th>
-                        <th>Transferred Amount (< ₹300)</th>
+                        <th>Transferred (< ₹300)</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -313,8 +332,10 @@
 
     window.onload = function() {
         updateTailorDropdown();
+        renderEmployeeBadges();
         renderTailorEarnings();
         renderOrders();
+        renderItemGallery();
     };
 
     function switchTab(tabName) {
@@ -345,6 +366,17 @@
         });
     }
 
+    function renderEmployeeBadges() {
+        const container = document.getElementById('employeeBadgeContainer');
+        container.innerHTML = '';
+        tailors.forEach(t => {
+            let badge = document.createElement('span');
+            badge.className = 'employee-badge';
+            badge.textContent = t;
+            container.appendChild(badge);
+        });
+    }
+
     function addTailor() {
         const nameInput = document.getElementById('newTailorName');
         const name = nameInput.value.trim();
@@ -352,11 +384,12 @@
             tailors.push(name);
             localStorage.setItem('tailors', JSON.stringify(tailors));
             updateTailorDropdown();
+            renderEmployeeBadges();
             renderTailorEarnings();
             nameInput.value = '';
             alert('Employee added successfully!');
         } else {
-            alert('Please enter a valid name or employee already exists.');
+            alert('Please enter a valid name or the employee already exists.');
         }
     }
 
@@ -451,7 +484,7 @@
             }
         });
 
-        let html = '<ul>';
+        let html = '<ul style="margin:0; padding-left:20px;">';
         for (let t in earningsMap) {
             html += `<li><strong>${t}:</strong> Earned ₹${earningsMap[t]} from stitching.</li>`;
         }
@@ -504,6 +537,7 @@
         });
     }
 
+    /* Item Store Image Handling */
     function handleImageUpload(event) {
         const file = event.target.files[0];
         if (file) {
@@ -515,65 +549,57 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 currentBase64Image = e.target.result;
-                const img = document.getElementById('imagePreview');
-                img.src = currentBase64Image;
-                img.style.display = 'block';
             };
             reader.readAsDataURL(file);
         }
     }
 
     function saveItem() {
-        const name = document.getElementById('itemName').value;
+        const name = document.getElementById('itemName').value.trim();
         if (!name) {
             alert('Please enter Item Name');
             return;
         }
-        items.push({ name, image: currentBase64Image });
-        localStorage.setItem('items', JSON.stringify(items));
-        alert('Item saved successfully!');
-        document.getElementById('itemName').value = '';
-        document.getElementById('itemImage').value = '';
-        document.getElementById('imagePreview').style.display = 'none';
-        currentBase64Image = "";
-    }
-
-    function analyzeFinancials() {
-        const start = document.getElementById('startDate').value;
-        const end = document.getElementById('endDate').value;
-
-        if (!start || !end) {
-            alert('Please select both dates');
+        if (!currentBase64Image) {
+            alert('Please select an image for the item');
             return;
         }
 
-        const filteredOrders = orders.filter(o => o.orderDate >= start && o.orderDate <= end);
+        items.push({ id: Date.now(), name: name, image: currentBase64Image });
+        localStorage.setItem('items', JSON.stringify(items));
+        
+        alert('Item added to Item Store!');
+        document.getElementById('itemName').value = '';
+        document.getElementById('itemImage').value = '';
+        currentBase64Image = "";
+        
+        renderItemGallery();
+    }
 
-        let totalRevenue = 0;
-        let totalStitching = 0;
-        let total300Reserved = 0;
-        let totalNetProfit = 0;
+    function renderItemGallery() {
+        const gallery = document.getElementById('itemGallery');
+        gallery.innerHTML = '';
 
-        filteredOrders.forEach(o => {
-            totalRevenue += o.total;
-            totalStitching += o.stitchCharge;
-            total300Reserved += o.profit300Column;
-            totalNetProfit += o.netProfit;
+        if (items.length === 0) {
+            gallery.innerHTML = '<p style="color:#777;">No items added to the store yet.</p>';
+            return;
+        }
+
+        items.forEach(item => {
+            let card = document.createElement('div');
+            card.className = 'item-card';
+            card.innerHTML = `
+                <img src="${item.image}" alt="${item.name}">
+                <p style="margin:5px 0 0 0; font-weight:bold;">${item.name}</p>
+            `;
+            gallery.appendChild(card);
         });
-
-        const resultDiv = document.getElementById('analysisResult');
-        resultDiv.innerHTML = `
-            <p><strong>Total Orders:</strong> ${filteredOrders.length}</p>
-            <p><strong>Total Revenue:</strong> ₹${totalRevenue}</p>
-            <p><strong>Total Stitching Paid:</strong> ₹${totalStitching}</p>
-            <p><strong>Total Reserved (₹300/order):</strong> ₹${total300Reserved}</p>
-            <p><strong>Total Net Profit:</strong> ₹${totalNetProfit}</p>
-        `;
     }
 </script>
 
 </body>
 </html>
+
 
 
 
