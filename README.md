@@ -3,11 +3,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Order & Financial Management System</title>
+    <!-- Chart.js library for Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* Classic Original Blue Theme */
         :root {
-            --primary-color: #4a90e2;
-            --success-color: #2ecc71;
-            --bg-color: #f4f7f6;
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --accent-color: #2ecc71;
+            --bg-color: #eef2f5;
             --card-bg: #ffffff;
             --text-color: #333333;
         }
@@ -17,23 +21,46 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
+            padding: 0;
+        }
+
+        /* Classic Top Header Banner */
+        .header-banner {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
             padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-banner h1 {
+            margin: 0;
+            font-size: 24px;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 0 15px;
         }
 
+        /* Original Classic Card Layout */
         .card {
             background: var(--card-bg);
             padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            border-radius: 6px;
+            border-left: 5px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
-        h2, h3 { color: #2c3e50; }
+        .card h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 8px;
+            font-size: 18px;
+        }
 
         .form-group {
             margin-bottom: 15px;
@@ -42,15 +69,23 @@
         label {
             display: block;
             margin-bottom: 5px;
-            font-weight: bold;
+            font-weight: 600;
+            font-size: 14px;
+            color: #444;
         }
 
         input, select, button {
             width: 100%;
-            padding: 10px;
+            padding: 9px 12px;
             border: 1px solid #ccc;
             border-radius: 4px;
             box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary-color);
+            outline: none;
         }
 
         button {
@@ -59,16 +94,23 @@
             border: none;
             cursor: pointer;
             font-weight: bold;
-            margin-top: 10px;
+            transition: background 0.3s ease;
         }
 
-        button:hover { opacity: 0.9; }
+        button:hover {
+            background-color: var(--secondary-color);
+        }
 
         .btn-complete {
-            background-color: var(--success-color);
+            background-color: var(--accent-color);
+            color: white;
             padding: 6px 12px;
-            margin-top: 0;
-            font-size: 0.9em;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .btn-complete:hover {
+            background-color: #27ae60;
         }
 
         .grid-2 {
@@ -83,52 +125,40 @@
             gap: 15px;
         }
 
+        /* Classic Table Styling */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            background: white;
         }
 
         th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #e0e0e0;
             padding: 10px;
             text-align: left;
+            font-size: 13px;
         }
 
-        th { background-color: #f2f2f2; }
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fcfcfc;
+        }
 
         .hint {
-            font-size: 0.85em;
+            font-size: 12px;
             margin-top: 4px;
             font-weight: bold;
         }
-        .hint.positive { color: green; }
-        .hint.negative { color: red; }
+        .hint.positive { color: #27ae60; }
+        .hint.negative { color: #c0392b; }
 
-        /* Item Store Gallery */
-        .item-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .item-card {
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            background: #fafafa;
-        }
-
-        .item-card img {
-            max-width: 100%;
-            height: 120px;
-            object-fit: cover;
-            border-radius: 4px;
-        }
-
-        /* Nav Tabs */
+        /* Navigation Tabs */
         .nav-tabs {
             display: flex;
             gap: 10px;
@@ -138,9 +168,11 @@
         .nav-tabs button {
             flex: 1;
             padding: 12px;
-            background-color: #e0e0e0;
+            background-color: #dcdfe3;
             color: #333;
-            font-size: 1em;
+            font-size: 15px;
+            border-radius: 5px 5px 0 0;
+            border: none;
         }
 
         .nav-tabs button.active {
@@ -156,26 +188,56 @@
             display: block;
         }
 
-        .employee-list {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
+        /* Gallery Layout */
+        .item-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .item-card {
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 5px;
+            text-align: center;
+            background: #fff;
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
         }
 
         .employee-badge {
-            background: #e2e8f0;
-            padding: 5px 12px;
-            border-radius: 15px;
+            display: inline-block;
+            background: #e1e8f0;
+            color: #1e3c72;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
             font-weight: bold;
-            font-size: 0.9em;
+            margin-right: 5px;
+            margin-top: 5px;
+        }
+
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 100%;
         }
     </style>
 </head>
 <body>
 
+<div class="header-banner">
+    <h1>Order & Financial Management System</h1>
+</div>
+
 <div class="container">
-    <h2>Order & Financial Management System</h2>
 
     <!-- Navigation Tabs -->
     <div class="nav-tabs">
@@ -188,7 +250,7 @@
 
         <!-- Add Employee Section -->
         <div class="card">
-            <h3>1. Add New Employee (Tailor)</h3>
+            <h3>Add New Employee</h3>
             <div class="grid-2">
                 <div>
                     <input type="text" id="newTailorName" placeholder="Enter Employee Name">
@@ -199,13 +261,13 @@
             </div>
             <div style="margin-top: 10px;">
                 <label>Current Employees:</label>
-                <div id="employeeBadgeContainer" class="employee-list"></div>
+                <div id="employeeBadgeContainer"></div>
             </div>
         </div>
 
-        <!-- Order Form -->
+        <!-- Order Entry Form -->
         <div class="card">
-            <h3>2. Create New Order</h3>
+            <h3>Create New Order</h3>
             <form id="orderForm" onsubmit="event.preventDefault(); saveOrder();">
                 <div class="grid-3">
                     <div class="form-group">
@@ -217,79 +279,103 @@
                         <input type="date" id="orderDate" required>
                     </div>
                     <div class="form-group">
-                        <label>Select Tailor:</label>
+                        <label>Assign Employee:</label>
                         <select id="tailorSelect" required></select>
                     </div>
                 </div>
 
                 <div class="grid-3">
                     <div class="form-group">
-                        <label>Total Amount:</label>
+                        <label>Total Amount (₹):</label>
                         <input type="number" id="totalAmount" oninput="calculateFinancials()" value="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Material Cost:</label>
+                        <label>Material Cost (₹):</label>
                         <input type="number" id="materialCost" oninput="calculateFinancials()" value="0" required>
                     </div>
                     <div class="form-group">
-                        <label>Stitching Charge:</label>
+                        <label>Stitching Charge (₹):</label>
                         <input type="number" id="stitchingCharge" oninput="calculateFinancials()" value="0" required>
                     </div>
                 </div>
 
                 <div class="grid-2">
                     <div class="form-group">
-                        <label>Advance Paid:</label>
+                        <label>Advance Paid (₹):</label>
                         <input type="number" id="advancePaid" oninput="calculateFinancials()" value="0" required>
                         <div id="advanceHint" class="hint">Advance Balance: 0</div>
                     </div>
                     <div class="form-group">
-                        <label>Other Expenses:</label>
+                        <label>Other Expenses (₹):</label>
                         <input type="number" id="otherExpenses" oninput="calculateFinancials()" value="0">
                     </div>
                 </div>
 
-                <button type="submit">Save Order</button>
+                <button type="submit" style="padding: 12px; font-size: 15px;">Save Order</button>
             </form>
         </div>
 
-        <!-- Item Store Section -->
+        <!-- Item Store -->
         <div class="card">
-            <h3>3. Item Store (Upload & Display Items)</h3>
+            <h3>Item Store (Upload & Gallery)</h3>
             <div class="grid-2">
                 <div class="form-group">
                     <label>Item Name:</label>
-                    <input type="text" id="itemName" placeholder="e.g., Silk Saree, Blouse Design">
+                    <input type="text" id="itemName" placeholder="Item Name">
                 </div>
                 <div class="form-group">
-                    <label>Select Image (Max 5MB):</label>
+                    <label>Select Image:</label>
                     <input type="file" id="itemImage" accept="image/*" onchange="handleImageUpload(event)">
                 </div>
             </div>
-            <button type="button" onclick="saveItem()">Save to Item Store</button>
+            <button type="button" onclick="saveItem()">Add to Store</button>
 
-            <!-- Store Display Gallery -->
-            <h4 style="margin-top: 20px;">Saved Items Gallery</h4>
+            <h4 style="margin-top: 15px; margin-bottom: 5px;">Stored Items</h4>
             <div id="itemGallery" class="item-gallery"></div>
         </div>
 
         <!-- Employee Earnings -->
         <div class="card">
-            <h3>4. Employee Stitching Earnings</h3>
+            <h3>Employee Stitching Earnings</h3>
             <div id="tailorEarningsList"></div>
         </div>
 
-        <!-- Active / Pending Orders Table -->
+        <!-- Financial Analysis with Graph -->
         <div class="card">
-            <h3>Active Orders (Pending)</h3>
+            <h3>Date-Based Financial Analysis & Graph</h3>
+            <div class="grid-3">
+                <div>
+                    <label>From Date:</label>
+                    <input type="date" id="startDate">
+                </div>
+                <div>
+                    <label>To Date:</label>
+                    <input type="date" id="endDate">
+                </div>
+                <div style="display: flex; align-items: flex-end;">
+                    <button type="button" onclick="analyzeFinancials()">Analyze & Show Graph</button>
+                </div>
+            </div>
+
+            <div id="analysisResult" style="margin-top: 15px; font-weight: 500;"></div>
+
+            <!-- Graph Container -->
+            <div class="chart-container" style="margin-top: 20px;">
+                <canvas id="financialChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Active Orders Table -->
+        <div class="card">
+            <h3>Active Orders (Pending Completion)</h3>
             <table id="activeOrdersTable">
                 <thead>
                     <tr>
                         <th>Customer</th>
                         <th>Date</th>
                         <th>Tailor</th>
-                        <th>Stitching Charge</th>
-                        <th>Reserved Amount (₹300)</th>
+                        <th>Stitching</th>
+                        <th>Reserved (₹300)</th>
                         <th>Net Profit</th>
                         <th>Transferred (< ₹300)</th>
                         <th>Action</th>
@@ -311,8 +397,8 @@
                         <th>Date</th>
                         <th>Customer</th>
                         <th>Tailor</th>
-                        <th>Stitching Charge</th>
-                        <th>Reserved Amount (₹300)</th>
+                        <th>Stitching</th>
+                        <th>Reserved (₹300)</th>
                         <th>Net Profit</th>
                         <th>Transferred (< ₹300)</th>
                     </tr>
@@ -329,6 +415,7 @@
     let orders = JSON.parse(localStorage.getItem('orders')) || [];
     let items = JSON.parse(localStorage.getItem('items')) || [];
     let currentBase64Image = "";
+    let chartInstance = null;
 
     window.onload = function() {
         updateTailorDropdown();
@@ -387,7 +474,7 @@
             renderEmployeeBadges();
             renderTailorEarnings();
             nameInput.value = '';
-            alert('Employee added successfully!');
+            alert('Employee Added Successfully!');
         } else {
             alert('Please enter a valid name or the employee already exists.');
         }
@@ -451,7 +538,7 @@
         orders.push(newOrder);
         localStorage.setItem('orders', JSON.stringify(orders));
 
-        alert('Order saved successfully!');
+        alert('Order Saved Successfully!');
         document.getElementById('orderForm').reset();
         document.getElementById('advanceHint').textContent = 'Advance Balance: 0';
         
@@ -465,7 +552,7 @@
             order.status = 'completed';
             localStorage.setItem('orders', JSON.stringify(orders));
             renderOrders();
-            alert('Order moved to Completed Orders!');
+            alert('Order Shifted to Completed Orders!');
         }
     }
 
@@ -486,7 +573,7 @@
 
         let html = '<ul style="margin:0; padding-left:20px;">';
         for (let t in earningsMap) {
-            html += `<li><strong>${t}:</strong> Earned ₹${earningsMap[t]} from stitching.</li>`;
+            html += `<li><strong>${t}:</strong> Earned ₹${earningsMap[t]}</li>`;
         }
         html += '</ul>';
         container.innerHTML = html;
@@ -508,7 +595,7 @@
                 <td>₹${o.profit300Column}</td>
                 <td>₹${o.netProfit}</td>
                 <td>₹${o.transferredToOther}</td>
-                <td><button class="btn-complete" onclick="markAsCompleted(${o.id})">Mark Completed</button></td>
+                <td><button type="button" class="btn-complete" onclick="markAsCompleted(${o.id})">Mark Completed</button></td>
             `;
             tbody.appendChild(tr);
         });
@@ -537,7 +624,6 @@
         });
     }
 
-    /* Item Store Image Handling */
     function handleImageUpload(event) {
         const file = event.target.files[0];
         if (file) {
@@ -561,14 +647,14 @@
             return;
         }
         if (!currentBase64Image) {
-            alert('Please select an image for the item');
+            alert('Please select an image');
             return;
         }
 
         items.push({ id: Date.now(), name: name, image: currentBase64Image });
         localStorage.setItem('items', JSON.stringify(items));
         
-        alert('Item added to Item Store!');
+        alert('Item Added to Store!');
         document.getElementById('itemName').value = '';
         document.getElementById('itemImage').value = '';
         currentBase64Image = "";
@@ -581,7 +667,7 @@
         gallery.innerHTML = '';
 
         if (items.length === 0) {
-            gallery.innerHTML = '<p style="color:#777;">No items added to the store yet.</p>';
+            gallery.innerHTML = '<p style="color:#777; font-size:13px;">No items added yet.</p>';
             return;
         }
 
@@ -590,15 +676,85 @@
             card.className = 'item-card';
             card.innerHTML = `
                 <img src="${item.image}" alt="${item.name}">
-                <p style="margin:5px 0 0 0; font-weight:bold;">${item.name}</p>
+                <p style="margin:5px 0 0 0; font-size:12px; font-weight:bold;">${item.name}</p>
             `;
             gallery.appendChild(card);
+        });
+    }
+
+    function analyzeFinancials() {
+        const start = document.getElementById('startDate').value;
+        const end = document.getElementById('endDate').value;
+
+        if (!start || !end) {
+            alert('Please select both From and To dates');
+            return;
+        }
+
+        const filteredOrders = orders.filter(o => o.orderDate >= start && o.orderDate <= end);
+
+        let totalRevenue = 0;
+        let totalStitching = 0;
+        let total300Reserved = 0;
+        let totalNetProfit = 0;
+
+        filteredOrders.forEach(o => {
+            totalRevenue += o.total;
+            totalStitching += o.stitchCharge;
+            total300Reserved += o.profit300Column;
+            totalNetProfit += o.netProfit;
+        });
+
+        const resultDiv = document.getElementById('analysisResult');
+        resultDiv.innerHTML = `
+            <p><strong>Total Orders:</strong> ${filteredOrders.length} | 
+            <strong>Total Revenue:</strong> ₹${totalRevenue} | 
+            <strong>Stitching Paid:</strong> ₹${totalStitching} | 
+            <strong>Net Profit:</strong> ₹${totalNetProfit}</p>
+        `;
+
+        renderGraph(totalRevenue, totalStitching, total300Reserved, totalNetProfit);
+    }
+
+    function renderGraph(revenue, stitching, reserved, netProfit) {
+        const ctx = document.getElementById('financialChart').getContext('2d');
+
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        chartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Total Revenue', 'Stitching Charges', 'Reserved (₹300)', 'Net Profit'],
+                datasets: [{
+                    label: 'Financial Breakdown (₹)',
+                    data: [revenue, stitching, reserved, netProfit],
+                    backgroundColor: [
+                        '#1e3c72',
+                        '#f39c12',
+                        '#3498db',
+                        '#2ecc71'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
         });
     }
 </script>
 
 </body>
 </html>
+
 
 
 
