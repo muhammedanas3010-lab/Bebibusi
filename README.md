@@ -58,7 +58,6 @@
       const [isSidebarOpen, setIsSidebarOpen] = useState(false);
       const [brandFilter, setBrandFilter] = useState('All');
       const [orders, setOrders] = useState([]);
-      const [items, setItems] = useState([]);
       const [editingOrderId, setEditingOrderId] = useState(null);
       const [selectedOrderDetails, setSelectedOrderDetails] = useState(null);
 
@@ -72,12 +71,9 @@
       const [loginPass, setLoginPass] = useState('');
       const [showLoginModal, setShowLoginModal] = useState(false);
 
-      // Item Store Form State
-      const [itemData, setItemData] = useState({
-        modelName: '',
-        description: '',
-        imageUrl: ''
-      });
+      // Report Dates
+      const [fromDate, setFromDate] = useState('');
+      const [toDate, setToDate] = useState('');
 
       // HARDCODED TAILOR NUMBERS
       const TAILOR_NUMBERS = {
@@ -91,7 +87,11 @@
         customerName: '',
         whatsapp: '',
         address: '',
-        dressName: '', deliveryDate: '',
+        dressName: '', 
+        itemModel: '',
+        imageUrl: '',
+        itemDescription: '',
+        deliveryDate: '',
         sellingPrice: '', advanceAmount: '', materialRate: '', stitchingCharge: '', tailorName: 'Ani Mol', shippingCharge: '',
         isAdvPaid: false,
         isFullyPaid: false,
@@ -100,38 +100,27 @@
 
       const [formData, setFormData] = useState(initialFormState);
 
-      // Realtime Firebase Firestore Sync for Orders and Items
+      // Realtime Firebase Firestore Sync
       useEffect(() => {
         const checkAndSubscribe = () => {
           if (window.db && window.firestoreModule) {
             const { collection, onSnapshot } = window.firestoreModule;
-            
-            // Orders Firestore Sync
             const ordersRef = collection(window.db, 'orders');
-            const unsubOrders = onSnapshot(ordersRef, (snapshot) => {
+
+            const unsubscribe = onSnapshot(ordersRef, (snapshot) => {
               const fetchedOrders = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
               }));
+              
+              // Sort by ID / Created date descending
               fetchedOrders.sort((a, b) => Number(b.id) - Number(a.id));
               setOrders(fetchedOrders);
+            }, (error) => {
+              console.error("Firestore Listen Error:", error);
             });
 
-            // Items Firestore Sync
-            const itemsRef = collection(window.db, 'items');
-            const unsubItems = onSnapshot(itemsRef, (snapshot) => {
-              const fetchedItems = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-              }));
-              fetchedItems.sort((a, b) => Number(b.id) - Number(a.id));
-              setItems(fetchedItems);
-            });
-
-            return () => {
-              unsubOrders();
-              unsubItems();
-            };
+            return unsubscribe;
           } else {
             setTimeout(checkAndSubscribe, 200);
           }
@@ -160,7 +149,7 @@
         }
       };
 
-      // Save Order in Firestore
+      // Save or Update Order in Firestore
       const saveOrderToFirestore = async (orderData) => {
         try {
           const { doc, setDoc } = window.firestoreModule;
@@ -181,58 +170,6 @@
           console.error("Error deleting from Firestore: ", error);
           alert("Error deleting order: " + error.message);
         }
-      };
-
-      // Save Item to Firestore
-      const saveItemToFirestore = async (item) => {
-        try {
-          const { doc, setDoc } = window.firestoreModule;
-          const itemId = String(item.id);
-          await setDoc(doc(window.db, 'items', itemId), item);
-        } catch (error) {
-          console.error("Error saving item: ", error);
-          alert("Error saving item: " + error.message);
-        }
-      };
-
-      // Delete Item from Firestore
-      const deleteItemFromFirestore = async (id) => {
-        try {
-          const { doc, deleteDoc } = window.firestoreModule;
-          await deleteDoc(doc(window.db, 'items', String(id)));
-        } catch (error) {
-          console.error("Error deleting item: ", error);
-          alert("Error deleting item: " + error.message);
-        }
-      };
-
-      const handleImageUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setItemData(prev => ({ ...prev, imageUrl: reader.result }));
-          };
-          reader.readAsDataURL(file);
-        }
-      };
-
-      const handleItemSubmit = async (e) => {
-        e.preventDefault();
-        checkAuthAndAction(async () => {
-          const newItem = { ...itemData, id: Date.now() };
-          await saveItemToFirestore(newItem);
-          alert('New Item Added Successfully!');
-          setItemData({ modelName: '', description: '', imageUrl: '' });
-        });
-      };
-
-      const handleDeleteItem = (id) => {
-        checkAuthAndAction(async () => {
-          if (confirm('Are you sure you want to delete this item?')) {
-            await deleteItemFromFirestore(id);
-          }
-        });
       };
 
       const handleWhatsappChange = (waNum) => {
@@ -314,22 +251,22 @@
         let msg = '';
 
         if (type === 'adv') {
-          msg = `*${brandHeader} - Order Confirmed! 🎉*\n\nHello *${order.customerName}*,\nYour order for *${order.dressName}* has been confirmed.\n\n👗 *Dress Price:* ₹${order.sellingPrice || 0}\n💳 *Advance Paid:* ₹${order.advanceAmount || 0}\n💵 *Remaining Balance:* ₹${balance}\n📅 *Expected Delivery:* ${order.deliveryDate}`;
+          msg = `*${brandHeader} - Order Confirmed! 🎉*\n\nHello *${order.customerName}*,\nYour order for *${order.dressName}* ${order.itemModel ? `(Model: ${order.itemModel})` : ''} has been confirmed.\n\n👗 *Dress Price:* ₹${order.sellingPrice || 0}\n💳 *Advance Paid:* ₹${order.advanceAmount || 0}\n💵 *Remaining Balance:* ₹${balance}\n📅 *Expected Delivery:* ${order.deliveryDate}`;
+          
+          await saveOrderToFirestore({ ...order, isAdvPaid: true });
+
         } else if (type === 'remind') {
           msg = `*${brandHeader} - Payment Reminder 🔔*\n\nHello *${order.customerName}*,\nThis is a friendly reminder regarding your order for *${order.dressName}*.\n\n👗 *Total Price:* ₹${order.sellingPrice || 0}\n💳 *Advance Paid:* ₹${order.advanceAmount || 0}\n💵 *Pending Balance:* ₹${balance}\n\nPlease pay the remaining balance via GPay/PhonePe to:\n👉 *Muhammedanas3010-1@oksbi*`;
+        
         } else if (type === 'full') {
           msg = `*${brandHeader} - Payment Received! ✅*\n\nHello *${order.customerName}*,\nThank you! We have received full payment for your dress *${order.dressName}*.\n\n👗 *Total Amount:* ₹${order.sellingPrice || 0}\n✅ *Status:* Fully Paid\n🚚 *Transit Update:* Your dress is currently in transit and will reach you shortly!\n\nThank you for shopping with us!`;
+          
+          await saveOrderToFirestore({ ...order, isFullyPaid: true, advanceAmount: order.sellingPrice });
         }
 
         msg += order.brand === 'Bebi' ? `\n\n*KAIZ SOOQ - Be Every Baby’s Ideal*` : `\n\n*KAIZ SOOQ*`;
 
         window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
-
-        if (type === 'adv') {
-          await saveOrderToFirestore({ ...order, isAdvPaid: true });
-        } else if (type === 'full') {
-          await saveOrderToFirestore({ ...order, isFullyPaid: true, advanceAmount: order.sellingPrice });
-        }
       };
 
       // TAILOR WHATSAPP MESSAGE FUNCTION
@@ -342,10 +279,39 @@
         
         const msg = `Hello ${tailorName},\n\nThank you so much for your excellent work on *${order.dressName}* (Customer: *${customerName}*)! The stitching was outstanding and awesome.\n\nYour stitching charge of *₹${stitchingCharge}* has been credited to your account.\n\nBest regards,\n*KAIZ SOOQ*`;
 
-        window.open(`https://wa.me/${targetNumber}?text=${encodeURIComponent(msg)}`, '_blank');
-
         await saveOrderToFirestore({ ...order, isTailorNotified: true });
         setSelectedOrderDetails(prev => prev ? { ...prev, isTailorNotified: true } : null);
+
+        window.open(`https://wa.me/${targetNumber}?text=${encodeURIComponent(msg)}`, '_blank');
+      };
+
+      const downloadReport = () => {
+        let reportData = [...orders];
+
+        if (fromDate && toDate) {
+          reportData = reportData.filter(o => o.deliveryDate >= fromDate && o.deliveryDate <= toDate);
+        }
+
+        if (reportData.length === 0) {
+          alert('No orders found for the selected criteria!');
+          return;
+        }
+
+        let csvContent = "data:text/csv;charset=utf-8,";
+        csvContent += "Brand,Customer Name,WhatsApp,Dress Name,Model,Selling Price,Advance,Balance,Fully Paid,Delivery Date,Tailor\n";
+
+        reportData.forEach(o => {
+          const bal = o.isFullyPaid ? 0 : (Number(o.sellingPrice || 0) - Number(o.advanceAmount || 0));
+          csvContent += `"${o.brand}","${o.customerName}","${o.whatsapp}","${o.dressName}","${o.itemModel || ''}",${o.sellingPrice},${o.advanceAmount},${bal},"${o.isFullyPaid ? 'YES' : 'NO'}","${o.deliveryDate}","${o.tailorName}"\n`;
+        });
+
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `KAIZ_SOOQ_Report_${fromDate || 'All'}_to_${toDate || 'All'}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
       };
 
       const filteredOrdersByBrand = brandFilter === 'All' ? orders : orders.filter(o => o.brand === brandFilter);
@@ -353,7 +319,8 @@
       const searchedAndFilteredOrders = filteredOrdersByBrand.filter(o => {
         const matchesSearch = (o.customerName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
                               (o.whatsapp || '').includes(searchQuery) ||
-                              (o.dressName || '').toLowerCase().includes(searchQuery.toLowerCase());
+                              (o.dressName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                              (o.itemModel || '').toLowerCase().includes(searchQuery.toLowerCase());
         
         if (statusFilter === 'Pending') return matchesSearch && !o.isFullyPaid;
         if (statusFilter === 'Completed') return matchesSearch && o.isFullyPaid;
@@ -372,19 +339,16 @@
       const ummaStitching = orders.filter(o => o.tailorName === 'Umma').reduce((sum, o) => sum + Number(o.stitchingCharge || 0), 0);
       const nusrathStitching = orders.filter(o => o.tailorName === 'Nusrath').reduce((sum, o) => sum + Number(o.stitchingCharge || 0), 0);
 
-      // UPDATED: Calculate profit/expense ONLY for FULLY PAID orders
       const calculateBrandFinancials = (brandOrders) => {
         let totalProfit = 0;
         let totalExpense = 0;
         let totalRevenue = 0;
         brandOrders.forEach(o => {
-          if (o.isFullyPaid) {
-            const sp = Number(o.sellingPrice || 0);
-            const exp = Number(o.materialRate || 0) + Number(o.stitchingCharge || 0) + Number(o.shippingCharge || 0);
-            totalRevenue += sp;
-            totalExpense += exp;
-            totalProfit += (sp - exp);
-          }
+          const sp = Number(o.sellingPrice || 0);
+          const exp = Number(o.materialRate || 0) + Number(o.stitchingCharge || 0) + Number(o.shippingCharge || 0);
+          totalRevenue += sp;
+          totalExpense += exp;
+          totalProfit += (sp - exp);
         });
         return { totalProfit, totalExpense, totalRevenue };
       };
@@ -392,19 +356,11 @@
       const lediFinancials = calculateBrandFinancials(lediOrders);
       const bebiFinancials = calculateBrandFinancials(bebiOrders);
 
-      // Total revenue across all selected brands (only fully paid orders)
-      const overallTotalRevenue = filteredOrdersByBrand.reduce((sum, o) => {
-        return o.isFullyPaid ? sum + Number(o.sellingPrice || 0) : sum;
-      }, 0);
-
-      // UPDATED: Calculate overall Net Profit ONLY for FULLY PAID orders (Anu Profit)
+      const overallTotalRevenue = filteredOrdersByBrand.reduce((sum, o) => sum + Number(o.sellingPrice || 0), 0);
       const overallNetProfit = filteredOrdersByBrand.reduce((sum, o) => {
-        if (o.isFullyPaid) {
-          const sp = Number(o.sellingPrice || 0);
-          const cost = Number(o.materialRate || 0) + Number(o.stitchingCharge || 0) + Number(o.shippingCharge || 0);
-          return sum + (sp - cost);
-        }
-        return sum;
+        const sp = Number(o.sellingPrice || 0);
+        const cost = Number(o.materialRate || 0) + Number(o.stitchingCharge || 0) + Number(o.shippingCharge || 0);
+        return sum + (sp - cost);
       }, 0);
 
       const currentFormProfit = (Number(formData.sellingPrice) || 0) - (
@@ -481,10 +437,10 @@
                     <button onClick={() => { setView('dashboard'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">🏠 Dashboard</button>
                     <button onClick={() => { checkAuthAndAction(() => { setEditingOrderId(null); setFormData(initialFormState); setView('addOrder'); setIsSidebarOpen(false); }); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">➕ Create New Order</button>
                     <button onClick={() => { setView('savedOrders'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">📜 Saved Orders History</button>
-                    <button onClick={() => { setView('itemStore'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">🛍️ Item Store</button>
+                    <button onClick={() => { setView('reports'); setIsSidebarOpen(false); }} className="text-left p-2 hover:bg-[#0D1B2A] hover:text-[#2ECC71] rounded-lg transition">📥 Reports & Downloads</button>
                   </nav>
                 </div>
-                <div className="text-[10px] text-gray-500">KAIZ SOOQ v3.6 - Cloud Firebase Active</div>
+                <div className="text-[10px] text-gray-500">KAIZ SOOQ v3.7 - Cloud Store Active</div>
               </div>
               <div className="flex-1" onClick={() => setIsSidebarOpen(false)}></div>
             </div>
@@ -513,7 +469,7 @@
                     </div>
                   </div>
 
-                  <p className="text-[11px] text-gray-400">Real-time profit tracking (fully paid orders only).</p>
+                  <p className="text-[11px] text-gray-400">Real-time cloud database revenue and profit tracking across all orders.</p>
                 </div>
 
                 <div className="bg-[#1B2A4A] p-3.5 rounded-xl border border-emerald-500/30 space-y-3 shadow-lg">
@@ -618,7 +574,7 @@
             {view === 'addOrder' && (
               <form onSubmit={handleOrderSubmit} className="bg-[#1B2A4A] p-4 rounded-2xl border border-gray-800 space-y-4">
                 <h2 className="text-base font-bold text-white border-b border-gray-800 pb-2">
-                  {editingOrderId ? 'Edit Order Details' : 'Create New Order'}
+                  {editingOrderId ? 'Edit Order Details' : 'Create New Order / Store Item'}
                 </h2>
                 
                 <div>
@@ -635,11 +591,34 @@
                   <textarea placeholder="Shipping Address" value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none h-16"></textarea>
                 </div>
 
-                <div className="space-y-2">
-                  <input type="text" placeholder="Dress Name / Item Code" value={formData.dressName} onChange={(e) => setFormData({ ...formData, dressName: e.target.value })} required className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
+                {/* ITEM STORE SPECIFIC DETAILS */}
+                <div className="space-y-2 bg-[#0D1B2A] p-3 rounded-xl border border-gray-800">
+                  <h3 className="text-xs font-bold text-[#2ECC71]">🛍️ Item & Store Information</h3>
+                  
+                  <input type="text" placeholder="Dress Name / Item Title *" value={formData.dressName} onChange={(e) => setFormData({ ...formData, dressName: e.target.value })} required className="w-full p-2.5 text-xs bg-[#1B2A4A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
+                  
+                  <input type="text" placeholder="Model Number / Code (e.g. MOD-2026-X)" value={formData.itemModel || ''} onChange={(e) => setFormData({ ...formData, itemModel: e.target.value })} className="w-full p-2.5 text-xs bg-[#1B2A4A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
+                  
+                  <input type="url" placeholder="Image URL (e.g. https://example.com/image.jpg)" value={formData.imageUrl || ''} onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })} className="w-full p-2.5 text-xs bg-[#1B2A4A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
+
+                  {/* Image Preview */}
+                  {formData.imageUrl && (
+                    <div className="p-2 bg-[#1B2A4A] border border-gray-800 rounded-lg flex items-center gap-3">
+                      <img 
+                        src={formData.imageUrl} 
+                        alt="Item Preview" 
+                        className="w-12 h-12 object-cover rounded-md border border-gray-700"
+                        onError={(e) => e.target.style.display='none'} 
+                      />
+                      <span className="text-[10px] text-gray-400">Image Preview Loaded</span>
+                    </div>
+                  )}
+
+                  <textarea placeholder="Item Description (Fabric details, color, sizes...)" value={formData.itemDescription || ''} onChange={(e) => setFormData({ ...formData, itemDescription: e.target.value })} className="w-full p-2.5 text-xs bg-[#1B2A4A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none h-16"></textarea>
+
                   <div>
                     <label className="text-[10px] font-bold text-[#E74C3C]">Expected Delivery Date *</label>
-                    <input type="date" value={formData.deliveryDate} onChange={(e) => setFormData({ ...formData, deliveryDate: e.target.value })} required className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
+                    <input type="date" value={formData.deliveryDate} onChange={(e) => setFormData({ ...formData, deliveryDate: e.target.value })} required className="w-full p-2.5 text-xs bg-[#1B2A4A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none" />
                   </div>
                 </div>
 
@@ -705,7 +684,7 @@
                 <div className="bg-[#1B2A4A] p-3 rounded-xl border border-gray-800 space-y-2">
                   <input 
                     type="text" 
-                    placeholder="🔍 Search Customer, WhatsApp, or Dress..." 
+                    placeholder="🔍 Search Customer, Model, Dress..." 
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none"
@@ -743,14 +722,19 @@
                     if (order.isFullyPaid) {
                       return (
                         <div key={order.id} className="bg-[#1B2A4A] p-4 rounded-xl border border-emerald-500/40 flex justify-between items-center shadow-md">
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold bg-emerald-500/20 text-[#2ECC71] border border-emerald-500/40 px-2 py-0.5 rounded">
-                                Completed
-                              </span>
-                              <h3 className="font-bold text-base text-white">{order.customerName}</h3>
+                          <div className="flex items-center gap-3">
+                            {order.imageUrl && (
+                              <img src={order.imageUrl} alt="" className="w-10 h-10 object-cover rounded-lg border border-gray-700" />
+                            )}
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-bold bg-emerald-500/20 text-[#2ECC71] border border-emerald-500/40 px-2 py-0.5 rounded">
+                                  Completed
+                                </span>
+                                <h3 className="font-bold text-base text-white">{order.customerName}</h3>
+                              </div>
+                              <p className="text-[10px] text-gray-400 mt-0.5">📱 {order.whatsapp} {order.itemModel ? `| Model: ${order.itemModel}` : ''}</p>
                             </div>
-                            <p className="text-[10px] text-gray-400 mt-0.5">📱 {order.whatsapp}</p>
                           </div>
                           <div className="text-right flex items-center gap-2">
                             <div className="text-base font-black text-[#2ECC71]">₹{order.sellingPrice}</div>
@@ -768,15 +752,20 @@
                     // PENDING ORDERS CARD
                     return (
                       <div key={order.id} className="bg-[#1B2A4A] p-4 rounded-xl border border-gray-800 space-y-3 shadow-md relative">
-                        <div className="flex justify-between items-start">
-                          <div>
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded text-white ${order.brand === 'Ledi' ? 'bg-blue-600' : 'bg-purple-600'}`}>
-                              {order.brand}
-                            </span>
-                            <h3 className="font-bold text-base text-white mt-1">{order.customerName}</h3>
-                            <p className="text-xs text-gray-300">📱 WA: {order.whatsapp}</p>
-                            <p className="text-xs text-gray-400">{order.dressName} | Delivery: <span className="text-gray-200">{order.deliveryDate}</span></p>
-                            <p className="text-[11px] text-gray-400">🧵 Tailor: <span className="text-[#2ECC71] font-bold">{order.tailorName || 'Ani Mol'}</span></p>
+                        <div className="flex justify-between items-start gap-3">
+                          <div className="flex gap-3">
+                            {order.imageUrl && (
+                              <img src={order.imageUrl} alt="" className="w-12 h-12 object-cover rounded-lg border border-gray-700 mt-1" />
+                            )}
+                            <div>
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded text-white ${order.brand === 'Ledi' ? 'bg-blue-600' : 'bg-purple-600'}`}>
+                                {order.brand}
+                              </span>
+                              <h3 className="font-bold text-base text-white mt-1">{order.customerName}</h3>
+                              <p className="text-xs text-gray-300">📱 WA: {order.whatsapp}</p>
+                              <p className="text-xs text-gray-400">{order.dressName} {order.itemModel ? `(${order.itemModel})` : ''} | Delivery: <span className="text-gray-200">{order.deliveryDate}</span></p>
+                              <p className="text-[11px] text-gray-400">🧵 Tailor: <span className="text-[#2ECC71] font-bold">{order.tailorName || 'Ani Mol'}</span></p>
+                            </div>
                           </div>
                           <div className="text-right">
                             <div className="text-base font-black text-[#2ECC71]">₹{order.sellingPrice}</div>
@@ -819,23 +808,50 @@
                       <div className="flex justify-between items-center border-b border-gray-800 pb-2">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold bg-emerald-500/20 text-[#2ECC71] border border-emerald-500/40 px-2 py-0.5 rounded">
-                            ✅ Completed Order
+                            ✅ Order Details
                           </span>
                           <h3 className="font-bold text-white text-base">{selectedOrderDetails.customerName}</h3>
                         </div>
                         <button onClick={() => setSelectedOrderDetails(null)} className="text-gray-400 font-bold text-lg">✕</button>
                       </div>
 
+                      {/* Product Image Display */}
+                      {selectedOrderDetails.imageUrl && (
+                        <div className="w-full h-44 bg-[#0D1B2A] rounded-xl overflow-hidden border border-gray-800 flex items-center justify-center">
+                          <img 
+                            src={selectedOrderDetails.imageUrl} 
+                            alt={selectedOrderDetails.dressName} 
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+
                       <div className="space-y-2 text-xs text-gray-300 bg-[#0D1B2A] p-3 rounded-xl border border-gray-800">
                         <div className="flex justify-between">
                           <span className="text-gray-400">Dress / Item:</span>
                           <span className="font-bold text-white">{selectedOrderDetails.dressName}</span>
                         </div>
+                        {selectedOrderDetails.itemModel && (
+                          <div className="flex justify-between">
+                            <span className="text-gray-400">Model No:</span>
+                            <span className="font-bold text-amber-400">{selectedOrderDetails.itemModel}</span>
+                          </div>
+                        )}
                         <div className="flex justify-between">
                           <span className="text-gray-400">Brand:</span>
                           <span className="font-bold text-white">{selectedOrderDetails.brand}</span>
                         </div>
-                        <div className="flex justify-between">
+
+                        {selectedOrderDetails.itemDescription && (
+                          <div className="border-t border-gray-800 pt-2 mt-1">
+                            <span className="text-gray-400 block mb-0.5">Item Description:</span>
+                            <p className="text-[11px] text-gray-300 bg-[#1B2A4A] p-2 rounded border border-gray-800">
+                              {selectedOrderDetails.itemDescription}
+                            </p>
+                          </div>
+                        )}
+
+                        <div className="flex justify-between border-t border-gray-800 pt-1 mt-1">
                           <span className="text-gray-400">WhatsApp:</span>
                           <span className="font-bold text-white">{selectedOrderDetails.whatsapp}</span>
                         </div>
@@ -892,84 +908,26 @@
               </div>
             )}
 
-            {/* VIEW 4: ITEM STORE */}
-            {view === 'itemStore' && (
-              <div className="space-y-4">
-                <form onSubmit={handleItemSubmit} className="bg-[#1B2A4A] p-4 rounded-2xl border border-gray-800 space-y-3">
-                  <h2 className="text-base font-bold text-white border-b border-gray-800 pb-2">🛍️ Add New Item to Store</h2>
+            {/* VIEW 4: REPORTS & CSV DOWNLOAD */}
+            {view === 'reports' && (
+              <div className="bg-[#1B2A4A] p-4 rounded-2xl border border-gray-800 space-y-4">
+                <h2 className="text-base font-bold text-white border-b border-gray-800 pb-2">📥 Download Business Reports</h2>
+                <p className="text-xs text-gray-400">Export order records to Excel/CSV. Filter by delivery dates if needed.</p>
+
+                <div className="space-y-3 bg-[#0D1B2A] p-3 rounded-xl border border-gray-800">
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400">From Date</label>
+                    <input type="date" value={fromDate} onChange={(e) => setFromDate(e.target.value)} className="w-full p-2 text-xs bg-[#1B2A4A] border border-gray-800 rounded text-white mt-1" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold text-gray-400">To Date</label>
+                    <input type="date" value={toDate} onChange={(e) => setToDate(e.target.value)} className="w-full p-2 text-xs bg-[#1B2A4A] border border-gray-800 rounded text-white mt-1" />
+                  </div>
                   
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-400">Model Name *</label>
-                    <input 
-                      type="text" 
-                      placeholder="Enter Model Name" 
-                      value={itemData.modelName} 
-                      onChange={(e) => setItemData({ ...itemData, modelName: e.target.value })} 
-                      required 
-                      className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none mt-1" 
-                    />
+                  <div className="flex gap-2 pt-2">
+                    <button onClick={() => { setFromDate(''); setToDate(''); }} className="w-1/3 bg-gray-800 text-gray-300 text-xs py-2 rounded-lg font-bold">Clear Dates</button>
+                    <button onClick={downloadReport} className="w-2/3 bg-[#2ECC71] text-black font-extrabold text-xs py-2 rounded-lg">Download CSV Report</button>
                   </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-400">Description</label>
-                    <textarea 
-                      placeholder="Enter Item Description..." 
-                      value={itemData.description} 
-                      onChange={(e) => setItemData({ ...itemData, description: e.target.value })} 
-                      className="w-full p-2.5 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-white focus:border-[#2ECC71] outline-none h-16 mt-1"
-                    ></textarea>
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] font-bold text-gray-400">Upload Item Image *</label>
-                    <input 
-                      type="file" 
-                      accept="image/*" 
-                      onChange={handleImageUpload} 
-                      required={!itemData.imageUrl}
-                      className="w-full p-2 text-xs bg-[#0D1B2A] border border-gray-800 rounded-lg text-gray-300 focus:border-[#2ECC71] outline-none mt-1"
-                    />
-                  </div>
-
-                  {itemData.imageUrl && (
-                    <div className="mt-2">
-                      <p className="text-[10px] text-gray-400 mb-1">Image Preview:</p>
-                      <img src={itemData.imageUrl} alt="Preview" className="w-full h-32 object-cover rounded-lg border border-gray-700" />
-                    </div>
-                  )}
-
-                  <button type="submit" className="w-full bg-[#2ECC71] hover:bg-[#27ae60] text-black font-extrabold py-2.5 rounded-xl shadow-lg transition text-xs mt-2">
-                    Save Item to Store
-                  </button>
-                </form>
-
-                {/* ITEM STORE LIST */}
-                <div className="space-y-3">
-                  <h3 className="text-sm font-bold text-white">Stored Items Collection</h3>
-                  {items.length === 0 ? (
-                    <div className="text-center py-6 text-gray-500 text-xs">No items added to the store yet.</div>
-                  ) : (
-                    <div className="grid grid-cols-1 gap-3">
-                      {items.map(item => (
-                        <div key={item.id} className="bg-[#1B2A4A] p-3 rounded-xl border border-gray-800 flex gap-3 items-center shadow-md">
-                          {item.imageUrl && (
-                            <img src={item.imageUrl} alt={item.modelName} className="w-20 h-20 object-cover rounded-lg border border-gray-700 flex-shrink-0" />
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-sm text-white truncate">{item.modelName}</h4>
-                            <p className="text-xs text-gray-400 mt-1 line-clamp-2">{item.description || 'No description provided.'}</p>
-                          </div>
-                          <button 
-                            onClick={() => handleDeleteItem(item.id)} 
-                            className="bg-red-500/20 text-red-400 border border-red-500/30 p-2 rounded-lg text-xs font-bold"
-                            title="Delete Item"
-                          >
-                            🗑️
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             )}
@@ -986,9 +944,9 @@
               <span className="text-lg">📜</span>
               <span className="text-[10px] font-bold">Orders</span>
             </button>
-            <button onClick={() => setView('itemStore')} className={`flex flex-col items-center gap-1 ${view === 'itemStore' ? 'text-[#2ECC71]' : 'text-gray-400'}`}>
-              <span className="text-lg">🛍️</span>
-              <span className="text-[10px] font-bold">Item Store</span>
+            <button onClick={() => setView('reports')} className={`flex flex-col items-center gap-1 ${view === 'reports' ? 'text-[#2ECC71]' : 'text-gray-400'}`}>
+              <span className="text-lg">📥</span>
+              <span className="text-[10px] font-bold">Reports</span>
             </button>
           </nav>
 
@@ -1002,4 +960,6 @@
   </script>
 </body>
 </html>
+
+
 
