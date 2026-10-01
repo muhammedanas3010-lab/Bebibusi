@@ -1,0 +1,235 @@
+import React, { useState } from "react";
+import { db, storage } from "./firebase"; // നിങ്ങളുടെ firebase configuration ഫയൽ ഇമ്പോർട്ട് ചെയ്യുക
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+const OrderCreationForm = () => {
+  const [customerName, setCustomerName] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [imagesList, setImagesList] = useState([]); // Array of { file, price, preview }
+  const [advancePaid, setAdvancePaid] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 1. Handle File Upload (With 5MB Restriction)
+  const handleImageChange = (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    const maxSizeBytes = 5 * 1024 * 1024; // 5MB
+
+    const validItems = [];
+    let sizeError = false;
+
+    selectedFiles.forEach((file) => {
+      if (file.size <= maxSizeBytes) {
+        validItems.push({
+          file: file,
+          price: 0,
+          preview: URL.createObjectURL(file),
+        });
+      } else {
+        sizeError = true;
+      }
+    });
+
+    if (sizeError) {
+      setErrorMsg("5MB-ൽ കൂടുതൽ വലുപ്പമുള്ള ഇമേജുകൾ ഒഴിവാക്കിയിട്ടുണ്ട്!");
+    } else {
+      setErrorMsg("");
+    }
+
+    setImagesList((prev) => [...prev, ...validItems]);
+  };
+
+  // 2. Handle Price Change for Specific Image
+  const handlePriceChange = (index, value) => {
+    const updated = [...imagesList];
+    updated[index].price = Number(value) || 0;
+    setImagesList(updated);
+  };
+
+  // 3. Remove Image Item
+  const handleRemoveImage = (index) => {
+    const updated = imagesList.filter((_, i) => i !== index);
+    setImagesList(updated);
+  };
+
+  // 4. Calculations
+  const totalCost = imagesList.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+  const numericAdvance = Number(advancePaid) || 0;
+  const remainingBalance = totalCost - numericAdvance;
+
+  // 5. Submit Order to Firebase
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (imagesList.length === 0) {
+      alert("കുറഞ്ഞത് ഒരു ഇമേജ് എങ്കിലും അപ്‌ലോഡ് ചെയ്യുക.");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Step A: Upload images to Firebase Storage & get URLs
+      const uploadedItems = await Promise.all(
+        imagesList.map(async (item) => {
+          const storageRef = ref(storage, `orders/${Date.now()}_${item.file.name}`);
+          await uploadBytes(storageRef, item.file);
+          const downloadURL = await getDownloadURL(storageRef);
+          return {
+            imageUrl: downloadURL,
+            price: item.price,
+          };
+        })
+      );
+
+      // Step B: Save Order Details in Firestore
+      await addDoc(collection(db, "orders"), {
+        customerName: customerName,
+        phoneNumber: phoneNumber,
+        items: uploadedItems, // List of { imageUrl, price }
+        totalCost: totalCost,
+        advancePaid: numericAdvance,
+        remainingBalance: remainingBalance >= 0 ? remainingBalance : 0,
+        createdAt: serverTimestamp(),
+      });
+
+      alert("Order വിജയകരമായി Save ചെയ്തു!");
+
+      // Form Reset
+      setCustomerName("");
+      setPhoneNumber("");
+      setImagesList([]);
+      setAdvancePaid("");
+      setErrorMsg("");
+    } catch (error) {
+      console.error("Error submitting order:", error);
+      alert("Order Save ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <div style={{ maxWidth: "550px", margin: "20px auto", padding: "20px", border: "1px solid #ddd", borderRadius: "10px", fontFamily: "sans-serif", backgroundColor: "#fff" }}>
+      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Create New Order</h2>
+
+      <form onSubmit={handleSubmit}>
+        {/* Customer Info */}
+        <div style={{ marginBottom: "12px" }}>
+          <label style={{ fontWeight: "bold" }}>Customer Name:</label>
+          <input
+            type="text"
+            required
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            style={{ width: "100%", padding: "8px", marginTop: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+        </div>
+
+        <div style={{ marginBottom: "15px" }}>
+          <label style={{ fontWeight: "bold" }}>Phone Number:</label>
+          <input
+            type="tel"
+            required
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            style={{ width: "100%", padding: "8px", marginTop: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+        </div>
+
+        {/* Image Upload Input */}
+        <div style={{ marginBottom: "15px" }}>
+          <label style={{ fontWeight: "bold" }}>Upload Designs / Dresses (Max 5MB per file):</label>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleImageChange}
+            style={{ display: "block", marginTop: "6px" }}
+          />
+          {errorMsg && <p style={{ color: "red", fontSize: "12px", marginTop: "4px" }}>{errorMsg}</p>}
+        </div>
+
+        {/* Uploaded Images List with Individual Price Fields */}
+        {imagesList.map((item, index) => (
+          <div key={index} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px", padding: "10px", border: "1px solid #eee", borderRadius: "6px", backgroundColor: "#fafafa" }}>
+            <img src={item.preview} alt="preview" style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "4px" }} />
+            
+            <div style={{ flexGrow: 1 }}>
+              <label style={{ fontSize: "12px", fontWeight: "bold" }}>Item Price (₹):</label>
+              <input
+                type="number"
+                value={item.price || ""}
+                placeholder="Enter item price"
+                onChange={(e) => handlePriceChange(index, e.target.value)}
+                style={{ width: "100%", padding: "6px", marginTop: "2px", borderRadius: "4px", border: "1px solid #ccc" }}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => handleRemoveImage(index)}
+              style={{ backgroundColor: "#ff4d4d", color: "#fff", border: "none", padding: "6px 10px", borderRadius: "4px", cursor: "pointer" }}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+
+        {/* Total Cost Display */}
+        <div style={{ padding: "10px", backgroundColor: "#eef6ff", borderRadius: "6px", fontWeight: "bold", fontSize: "16px", marginBottom: "12px" }}>
+          Total Cost: ₹{totalCost}
+        </div>
+
+        {/* Advance Paid Input */}
+        <div style={{ marginBottom: "15px" }}>
+          <label style={{ fontWeight: "bold" }}>Advance Paid (₹):</label>
+          <input
+            type="number"
+            value={advancePaid}
+            onChange={(e) => setAdvancePaid(e.target.value)}
+            placeholder="0"
+            style={{ width: "100%", padding: "8px", marginTop: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+        </div>
+
+        {/* Remaining Balance Display */}
+        <div style={{ padding: "12px", backgroundColor: "#f9f9f9", borderRadius: "6px", borderLeft: "4px solid #007bff", marginBottom: "20px" }}>
+          <div>
+            <strong>Remaining Balance: </strong>
+            <span style={{ color: remainingBalance > 0 ? "#d9534f" : "#5cb85c", fontSize: "18px", fontWeight: "bold" }}>
+              ₹{remainingBalance >= 0 ? remainingBalance : 0}
+            </span>
+          </div>
+          {remainingBalance < 0 && (
+            <small style={{ color: "#0275d8", display: "block", marginTop: "4px" }}>
+              (Excess Advance: ₹{Math.abs(remainingBalance)})
+            </small>
+          )}
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          style={{
+            width: "100%",
+            padding: "12px",
+            backgroundColor: isSubmitting ? "#ccc" : "#28a745",
+            color: "#fff",
+            border: "none",
+            borderRadius: "6px",
+            fontSize: "16px",
+            fontWeight: "bold",
+            cursor: isSubmitting ? "not-allowed" : "pointer"
+          }}
+        >
+          {isSubmitting ? "Saving Order..." : "Save Order"}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default OrderCreationForm;
+
