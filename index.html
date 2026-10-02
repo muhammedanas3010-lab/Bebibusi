@@ -895,15 +895,9 @@
             let totalOwnerSavings = activeOrders.reduce((acc, curr) => acc + Number(curr.ownerSavings), 0);
             let totalTailorWages = activeOrders.reduce((acc, curr) => acc + Number(curr.tailorWage || 0), 0);
             
-            // 1. Gross Profit / Total Profit (Before general expenses & investments deductions)
-            // म्हणजेच എക്സ്പെൻസുകൾ കൂട്ടാതെ ബിസിനസ് മൊത്തത്തിൽ ഉണ്ടാക്കിയ പ്രോഫിറ്റ്
             let totalGrossProfit = activeOrders.reduce((acc, curr) => acc + Number(curr.bizProfit || 0), 0);
-
-            // 2. Net Profit (After deducting all general expenses & machine investments)
-            // म्हणजेच എക്സ്പെൻസുകൾ കഴിഞ്ഞതിനു ശേഷമുള്ള ബാക്കി നെറ്റ് പ്രോഫിറ്റ്
             let netProfit = totalGrossProfit - totalGeneralExp - totalInvestments;
 
-            // Order status counters
             let totalOrdersCount = activeOrders.length;
             let pendingOrdersCount = activeOrders.filter(o => o.status === 'Pending' || o.status === 'Stitching').length;
             let completedOrdersCount = activeOrders.filter(o => o.status === 'Ready' || o.status === 'Delivered').length;
@@ -924,16 +918,16 @@
             document.getElementById('bebi-rev').innerText = `₹${bebiRev}`;
             document.getElementById('bebi-profit').innerText = `₹${bebiProfit}`;
 
-            // Update Header Values (Gross Profit vs Net Profit)
             document.getElementById('dash-gross-profit').innerText = `₹${totalGrossProfit}`;
             document.getElementById('dash-net-profit').innerText = `₹${netProfit > 0 ? netProfit : 0}`;
 
             document.getElementById('dash-revenue').innerText = `₹${totalRevenue}`;
             document.getElementById('dash-expense').innerText = `₹${totalOrderCost + totalGeneralExp}`;
             document.getElementById('dash-investments').innerText = `₹${totalInvestments}`;
-            document.getElementById('dash-profit').innerText = `₹${netProfit > 0 ? netProfit : 0}`;
             document.getElementById('dash-owner-savings').innerText = `₹${totalOwnerSavings}`;
-            document.getElementById('dash-orders-count').innerText = `${activeOrders.length} Total Orders`;
+            
+            let dashOrdersCountEl = document.getElementById('dash-orders-count');
+            if(dashOrdersCountEl) dashOrdersCountEl.innerText = `${activeOrders.length} Total Orders`;
         }
 
         // Form Submissions
@@ -1062,10 +1056,6 @@
             saveData(); renderAll(); e.target.reset();
         });
 
-        document.getElementById('investment-form').addEventListener('submit, (e)') => {
-            // Handled via standard submit below
-        };
-
         document.getElementById('investment-form').addEventListener('submit', (e) => {
             e.preventDefault();
             let todayDate = new Date().toISOString().split('T')[0];
@@ -1083,6 +1073,7 @@
     </script>
 </body>
 </html>
+
 
 
    
