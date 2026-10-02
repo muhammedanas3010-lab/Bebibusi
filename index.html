@@ -1,235 +1,988 @@
-import React, { useState } from "react";
-import { db, storage } from "./firebase"; // നിങ്ങളുടെ firebase configuration ഫയൽ ഇമ്പോർട്ട് ചെയ്യുക
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KAIZ SOOQ - Business Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        @media print {
+            body * { visibility: hidden; }
+            #invoice-print-area, #invoice-print-area * { visibility: visible; }
+            #invoice-print-area { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="text-gray-800 pb-24">
 
-const OrderCreationForm = () => {
-  const [customerName, setCustomerName] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [imagesList, setImagesList] = useState([]); // Array of { file, price, preview }
-  const [advancePaid, setAdvancePaid] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // 1. Handle File Upload (With 5MB Restriction)
-  const handleImageChange = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    const maxSizeBytes = 5 * 1024 * 1024; // 5MB
-
-    const validItems = [];
-    let sizeError = false;
-
-    selectedFiles.forEach((file) => {
-      if (file.size <= maxSizeBytes) {
-        validItems.push({
-          file: file,
-          price: 0,
-          preview: URL.createObjectURL(file),
-        });
-      } else {
-        sizeError = true;
-      }
-    });
-
-    if (sizeError) {
-      setErrorMsg("5MB-ൽ കൂടുതൽ വലുപ്പമുള്ള ഇമേജുകൾ ഒഴിവാക്കിയിട്ടുണ്ട്!");
-    } else {
-      setErrorMsg("");
-    }
-
-    setImagesList((prev) => [...prev, ...validItems]);
-  };
-
-  // 2. Handle Price Change for Specific Image
-  const handlePriceChange = (index, value) => {
-    const updated = [...imagesList];
-    updated[index].price = Number(value) || 0;
-    setImagesList(updated);
-  };
-
-  // 3. Remove Image Item
-  const handleRemoveImage = (index) => {
-    const updated = imagesList.filter((_, i) => i !== index);
-    setImagesList(updated);
-  };
-
-  // 4. Calculations
-  const totalCost = imagesList.reduce((sum, item) => sum + (Number(item.price) || 0), 0);
-  const numericAdvance = Number(advancePaid) || 0;
-  const remainingBalance = totalCost - numericAdvance;
-
-  // 5. Submit Order to Firebase
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (imagesList.length === 0) {
-      alert("കുറഞ്ഞത് ഒരു ഇമേജ് എങ്കിലും അപ്‌ലോഡ് ചെയ്യുക.");
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      // Step A: Upload images to Firebase Storage & get URLs
-      const uploadedItems = await Promise.all(
-        imagesList.map(async (item) => {
-          const storageRef = ref(storage, `orders/${Date.now()}_${item.file.name}`);
-          await uploadBytes(storageRef, item.file);
-          const downloadURL = await getDownloadURL(storageRef);
-          return {
-            imageUrl: downloadURL,
-            price: item.price,
-          };
-        })
-      );
-
-      // Step B: Save Order Details in Firestore
-      await addDoc(collection(db, "orders"), {
-        customerName: customerName,
-        phoneNumber: phoneNumber,
-        items: uploadedItems, // List of { imageUrl, price }
-        totalCost: totalCost,
-        advancePaid: numericAdvance,
-        remainingBalance: remainingBalance >= 0 ? remainingBalance : 0,
-        createdAt: serverTimestamp(),
-      });
-
-      alert("Order വിജയകരമായി Save ചെയ്തു!");
-
-      // Form Reset
-      setCustomerName("");
-      setPhoneNumber("");
-      setImagesList([]);
-      setAdvancePaid("");
-      setErrorMsg("");
-    } catch (error) {
-      console.error("Error submitting order:", error);
-      alert("Order Save ചെയ്യുന്നതിൽ തടസ്സം നേരിട്ടു.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  return (
-    <div style={{ maxWidth: "550px", margin: "20px auto", padding: "20px", border: "1px solid #ddd", borderRadius: "10px", fontFamily: "sans-serif", backgroundColor: "#fff" }}>
-      <h2 style={{ textAlign: "center", marginBottom: "20px" }}>Create New Order</h2>
-
-      <form onSubmit={handleSubmit}>
-        {/* Customer Info */}
-        <div style={{ marginBottom: "12px" }}>
-          <label style={{ fontWeight: "bold" }}>Customer Name:</label>
-          <input
-            type="text"
-            required
-            value={customerName}
-            onChange={(e) => setCustomerName(e.target.value)}
-            style={{ width: "100%", padding: "8px", marginTop: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
-          />
-        </div>
-
-        <div style={{ marginBottom: "15px" }}>
-          <label style={{ fontWeight: "bold" }}>Phone Number:</label>
-          <input
-            type="tel"
-            required
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            style={{ width: "100%", padding: "8px", marginTop: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
-          />
-        </div>
-
-        {/* Image Upload Input */}
-        <div style={{ marginBottom: "15px" }}>
-          <label style={{ fontWeight: "bold" }}>Upload Designs / Dresses (Max 5MB per file):</label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageChange}
-            style={{ display: "block", marginTop: "6px" }}
-          />
-          {errorMsg && <p style={{ color: "red", fontSize: "12px", marginTop: "4px" }}>{errorMsg}</p>}
-        </div>
-
-        {/* Uploaded Images List with Individual Price Fields */}
-        {imagesList.map((item, index) => (
-          <div key={index} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px", padding: "10px", border: "1px solid #eee", borderRadius: "6px", backgroundColor: "#fafafa" }}>
-            <img src={item.preview} alt="preview" style={{ width: "60px", height: "60px", objectFit: "cover", borderRadius: "4px" }} />
-            
-            <div style={{ flexGrow: 1 }}>
-              <label style={{ fontSize: "12px", fontWeight: "bold" }}>Item Price (₹):</label>
-              <input
-                type="number"
-                value={item.price || ""}
-                placeholder="Enter item price"
-                onChange={(e) => handlePriceChange(index, e.target.value)}
-                style={{ width: "100%", padding: "6px", marginTop: "2px", borderRadius: "4px", border: "1px solid #ccc" }}
-              />
+    <!-- Top Dark Green Header -->
+    <header class="bg-[#0b3b2c] text-white pt-6 pb-12 px-4 rounded-b-[30px] shadow-lg">
+        <div class="max-w-2xl mx-auto flex justify-between items-center mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-lg text-white">KS</div>
+                <div>
+                    <p class="text-xs text-emerald-200">Welcome back,</p>
+                    <h2 class="text-base font-bold tracking-wide">KAIZ SOOQ</h2>
+                </div>
             </div>
-
-            <button
-              type="button"
-              onClick={() => handleRemoveImage(index)}
-              style={{ backgroundColor: "#ff4d4d", color: "#fff", border: "none", padding: "6px 10px", borderRadius: "4px", cursor: "pointer" }}
-            >
-              Remove
-            </button>
-          </div>
-        ))}
-
-        {/* Total Cost Display */}
-        <div style={{ padding: "10px", backgroundColor: "#eef6ff", borderRadius: "6px", fontWeight: "bold", fontSize: "16px", marginBottom: "12px" }}>
-          Total Cost: ₹{totalCost}
+            <div class="flex items-center gap-2">
+                <select id="global-filter" onchange="changeFilter(this.value)" class="bg-[#06261c] text-emerald-200 text-xs rounded-lg px-2.5 py-1.5 border border-emerald-700 outline-none font-semibold">
+                    <option value="all">All Segments</option>
+                    <option value="Ledi">Ledi</option>
+                    <option value="Bebi">Bebi</option>
+                </select>
+                <div class="w-9 h-9 rounded-full bg-[#06261c] border border-emerald-700 flex items-center justify-center text-emerald-300 text-sm">🔔</div>
+            </div>
         </div>
 
-        {/* Advance Paid Input */}
-        <div style={{ marginBottom: "15px" }}>
-          <label style={{ fontWeight: "bold" }}>Advance Paid (₹):</label>
-          <input
-            type="number"
-            value={advancePaid}
-            onChange={(e) => setAdvancePaid(e.target.value)}
-            placeholder="0"
-            style={{ width: "100%", padding: "8px", marginTop: "4px", borderRadius: "4px", border: "1px solid #ccc" }}
-          />
+        <!-- Wallet / Balance Card in Header -->
+        <div class="max-w-2xl mx-auto bg-[#114b38] border border-emerald-700/50 p-5 rounded-2xl shadow-inner text-center">
+            <p class="text-xs text-emerald-300 font-medium">Net Business Profit (After Investments)</p>
+            <h1 class="text-3xl font-extrabold text-white mt-1" id="dash-profit">₹0</h1>
+            <div class="flex justify-center gap-3 mt-4">
+                <button onclick="switchTab('orders-new')" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow">＋ New Order</button>
+                <button onclick="switchTab('catalog')" class="bg-[#19634b] hover:bg-[#207a5d] text-emerald-100 text-xs font-semibold px-4 py-2 rounded-xl transition border border-emerald-600">👗 Item Catalog</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-2xl mx-auto px-4 -mt-6">
+        
+        <!-- Quick Stats Cards Row -->
+        <div class="grid grid-cols-2 gap-3 mb-6">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-400 font-medium">Total Revenue</p>
+                    <h3 class="text-lg font-bold text-green-600 mt-0.5" id="dash-revenue">₹0</h3>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-lg">📈</div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                <div>
+                    <p class="text-xs text-gray-400 font-medium">Owner Savings (₹300/Order)</p>
+                    <h3 class="text-lg font-bold text-amber-600 mt-0.5" id="dash-owner-savings">₹0</h3>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">💰</div>
+            </div>
         </div>
 
-        {/* Remaining Balance Display */}
-        <div style={{ padding: "12px", backgroundColor: "#f9f9f9", borderRadius: "6px", borderLeft: "4px solid #007bff", marginBottom: "20px" }}>
-          <div>
-            <strong>Remaining Balance: </strong>
-            <span style={{ color: remainingBalance > 0 ? "#d9534f" : "#5cb85c", fontSize: "18px", fontWeight: "bold" }}>
-              ₹{remainingBalance >= 0 ? remainingBalance : 0}
-            </span>
-          </div>
-          {remainingBalance < 0 && (
-            <small style={{ color: "#0275d8", display: "block", marginTop: "4px" }}>
-              (Excess Advance: ₹{Math.abs(remainingBalance)})
-            </small>
-          )}
+        <!-- Urgent Deliveries Alert -->
+        <div class="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 shadow-sm">
+            <h4 class="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">🚨 Urgent Deliveries (Next 2 Days)</h4>
+            <div id="urgent-deliveries-list" class="space-y-2 text-xs text-red-900">
+                <p class="text-gray-400 italic">No urgent deliveries pending.</p>
+            </div>
         </div>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          style={{
-            width: "100%",
-            padding: "12px",
-            backgroundColor: isSubmitting ? "#ccc" : "#28a745",
-            color: "#fff",
-            border: "none",
-            borderRadius: "6px",
-            fontSize: "16px",
-            fontWeight: "bold",
-            cursor: isSubmitting ? "not-allowed" : "pointer"
-          }}
-        >
-          {isSubmitting ? "Saving Order..." : "Save Order"}
-        </button>
-      </form>
+        <!-- Category Performance Summary -->
+        <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-pink-100">
+                <h4 class="text-sm font-bold text-pink-700 mb-2">👗 Ledi Performance</h4>
+                <div class="flex justify-between py-1 text-xs text-gray-500"><span>Revenue:</span> <strong id="ledi-rev" class="text-green-600">₹0</strong></div>
+                <div class="flex justify-between py-1 text-xs text-gray-500"><span>Profit:</span> <strong id="ledi-profit" class="text-indigo-600">₹0</strong></div>
+            </div>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-sky-100">
+                <h4 class="text-sm font-bold text-sky-700 mb-2">👶 Bebi Performance</h4>
+                <div class="flex justify-between py-1 text-xs text-gray-500"><span>Revenue:</span> <strong id="bebi-rev" class="text-green-600">₹0</strong></div>
+                <div class="flex justify-between py-1 text-xs text-gray-500"><span>Profit:</span> <strong id="bebi-profit" class="text-indigo-600">₹0</strong></div>
+            </div>
+        </div>
+
+        <!-- TAB 1: DASHBOARD -->
+        <div id="tab-dashboard" class="tab-content space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-bold text-gray-800">Business Overview</h3>
+                    <span class="text-xs text-emerald-600 font-semibold" id="dash-orders">0 Total Orders</span>
+                </div>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
+                        <span class="text-xs font-medium text-gray-600">Total Operating Expenses (Costs + Bills)</span>
+                        <span class="text-sm font-bold text-red-600" id="dash-expense">₹0</span>
+                    </div>
+                    <div class="flex justify-between items-center p-3 bg-purple-50 rounded-xl border border-purple-100">
+                        <span class="text-xs font-medium text-purple-700">Machine & Asset Investments</span>
+                        <span class="text-sm font-bold text-purple-700" id="dash-investments">₹0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2.1: NEW / CONFIRM ORDERS WINDOW -->
+        <div id="tab-orders-new" class="tab-content hidden space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                <h3 class="text-sm font-bold text-gray-800 mb-3">Add & Confirm New Order (Auto-Select by Code)</h3>
+                <form id="order-form" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Select Item Code</label>
+                        <select id="order-code-select" onchange="autofillItemByCode(this.value)" class="w-full border p-2 rounded-xl outline-none bg-gray-50 font-medium">
+                            <option value="">-- Choose Item Code --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Segment</label>
+                        <select id="order-segment" required class="w-full border p-2 rounded-xl outline-none bg-gray-50 font-medium">
+                            <option value="Ledi">Ledi</option>
+                            <option value="Bebi">Bebi</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Customer Name</label>
+                        <input type="text" id="order-customer" placeholder="Customer Name" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Customer WhatsApp Number</label>
+                        <input type="text" id="order-cust-phone" placeholder="e.g. 919876543210" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Item Details / Name</label>
+                        <input type="text" id="order-item" placeholder="Item Name / Design" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Selling Price (₹)</label>
+                        <input type="number" id="order-amount" placeholder="₹" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Material/Production Cost (₹)</label>
+                        <input type="number" id="order-cost" placeholder="₹" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Assign Tailor</label>
+                        <select id="order-tailor" required class="w-full border p-2 rounded-xl outline-none bg-gray-50 font-medium">
+                            <option value="">Select Tailor</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Tailor Wage / Payment (₹)</label>
+                        <input type="number" id="order-tailor-wage" placeholder="Payment to Tailor for this item" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Delivery Date</label>
+                        <input type="date" id="order-date" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
+                    </div>
+                    
+                    <!-- Measurement Type Selection -->
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Measurement Type</label>
+                        <select id="order-meas-type" onchange="toggleMeasurementType(this.value)" required class="w-full border p-2 rounded-xl outline-none bg-gray-50 font-medium">
+                            <option value="Manual">Manual Measurements</option>
+                            <option value="Standard">Standard Size</option>
+                        </select>
+                    </div>
+                    <div id="manual-meas-container">
+                        <label class="block font-semibold text-gray-500 mb-1">Measurements / Size Details</label>
+                        <input type="text" id="order-measurements" placeholder="e.g. Chest 36, Length 40..." class="w-full border p-2 rounded-xl outline-none bg-gray-50">
+                    </div>
+
+                    <div>
+                        <label class="block font-semibold text-gray-500 mb-1">Payment Status</label>
+                        <select id="order-payment" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
+                            <option value="Paid">Paid</option>
+                            <option value="Advance">Advance</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </div>
+                    <div class="col-span-full pt-2">
+                        <button type="submit" class="w-full bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold hover:bg-[#114b38] transition">Confirm & Save Order</button>
+                    </div>
+                </form>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border p-4">
+                <h4 class="text-xs font-bold text-gray-700 uppercase mb-3">📌 New Confirmed Orders</h4>
+                <div id="new-orders-list" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2.2: STITCHING WINDOW -->
+        <div id="tab-orders-stitching" class="tab-content hidden space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border p-4">
+                <h3 class="text-sm font-bold text-amber-700 mb-3">✂️ Orders Currently in Stitching</h3>
+                <div id="stitching-orders-list" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2.3: COMPLETED & READY WINDOW -->
+        <div id="tab-orders-completed" class="tab-content hidden space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border p-4">
+                <h3 class="text-sm font-bold text-green-700 mb-3">✅ Ready / Completed & Delivered Orders</h3>
+                <div id="completed-orders-list" class="space-y-2"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2.4: EMPLOYEES & EARNINGS WINDOW -->
+        <div id="tab-employees-window" class="tab-content hidden space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
+                <h3 class="text-sm font-bold text-[#0b3b2c]">👩‍🎨 Employees & Tailor Earnings Analytics</h3>
+                <p class="text-xs text-gray-500">Track how many orders each tailor has completed and their total earned wages.</p>
+                
+                <div id="employees-earnings-list" class="space-y-3"></div>
+
+                <div class="border-t pt-4 mt-4">
+                    <h4 class="text-xs font-bold text-gray-700 mb-2">Add New Tailor / Employee</h4>
+                    <form id="employee-form" class="grid grid-cols-1 gap-3 text-xs">
+                        <input type="text" id="emp-name" placeholder="Tailor Name (e.g. Umma)" required class="border p-2 rounded-xl bg-gray-50">
+                        <input type="text" id="emp-phone" placeholder="WhatsApp Number (e.g. 919000000001)" required class="border p-2 rounded-xl bg-gray-50">
+                        <input type="text" id="emp-role" placeholder="Role" value="Tailor" required class="border p-2 rounded-xl bg-gray-50">
+                        <button type="submit" class="bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">Save Tailor</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2.5: ITEM CATALOG & IMAGE UPLOAD -->
+        <div id="tab-catalog" class="tab-content hidden space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                <h3 class="text-sm font-bold text-gray-800 mb-3">👗 Item Catalog & Storage (Up to 10 Images)</h3>
+                <form id="catalog-form" class="grid grid-cols-1 gap-3 text-xs">
+                    <select id="cat-segment" required class="border p-2 rounded-xl bg-gray-50 font-medium">
+                        <option value="Ledi">Ledi</option>
+                        <option value="Bebi">Bebi</option>
+                    </select>
+                    <input type="text" id="cat-code" placeholder="Unique Item Code (e.g. LD-001)" required class="border p-2 rounded-xl bg-gray-50 font-bold">
+                    <input type="text" id="cat-name" placeholder="Dress Model Name" required class="border p-2 rounded-xl bg-gray-50">
+                    <input type="number" id="cat-price" placeholder="Standard Price (₹)" required class="border p-2 rounded-xl bg-gray-50">
+                    <div>
+                        <label class="block text-[11px] font-semibold text-gray-500 mb-1">Image URLs / Links (Comma separated, up to 10 images):</label>
+                        <textarea id="cat-images" placeholder="https://image1.jpg, https://image2.jpg..." rows="3" class="w-full border p-2 rounded-xl bg-gray-50 outline-none"></textarea>
+                    </div>
+                    <button type="submit" class="bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">Save Catalog Item</button>
+                </form>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow-sm border p-4 space-y-3">
+                <h4 class="text-xs font-bold text-gray-700 uppercase">📋 Available Catalog Items</h4>
+                <div id="catalog-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+            </div>
+        </div>
+
+        <!-- TAB 3: STOCK SECTION -->
+        <div id="tab-stock" class="tab-content hidden space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                <h3 class="text-sm font-bold text-gray-800 mb-3">Add Material Stock</h3>
+                <form id="stock-form" class="grid grid-cols-1 gap-3 text-xs">
+                    <select id="stock-segment" required class="border p-2 rounded-xl bg-gray-50">
+                        <option value="Ledi">Ledi</option>
+                        <option value="Bebi">Bebi</option>
+                    </select>
+                    <input type="text" id="stock-name" placeholder="Item Name" required class="border p-2 rounded-xl bg-gray-50">
+                    <input type="number" id="stock-qty" placeholder="Quantity" required class="border p-2 rounded-xl bg-gray-50">
+                    <input type="text" id="stock-location" placeholder="Storage Location (Rack/Shelf)" required class="border p-2 rounded-xl bg-gray-50">
+                    <button type="submit" class="bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">Save Stock</button>
+                </form>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border overflow-x-auto p-2">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-gray-50 border-b">
+                        <tr><th class="p-2.5">Seg</th><th class="p-2.5">Name</th><th class="p-2.5">Qty</th><th class="p-2.5">Location</th><th class="p-2.5">Action</th></tr>
+                    </thead>
+                    <tbody id="stock-list" class="divide-y"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 4: CUSTOMERS SECTION (With Edit & Delete) -->
+        <div id="tab-customers" class="tab-content hidden space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                <h3 class="text-sm font-bold text-gray-800 mb-3" id="customer-form-title">Add Customer</h3>
+                <form id="customer-form" class="grid grid-cols-1 gap-3 text-xs">
+                    <input type="hidden" id="cust-edit-index" value="-1">
+                    <select id="cust-segment" required class="border p-2 rounded-xl bg-gray-50">
+                        <option value="Ledi">Ledi</option>
+                        <option value="Bebi">Bebi</option>
+                    </select>
+                    <input type="text" id="cust-name" placeholder="Customer Name" required class="border p-2 rounded-xl bg-gray-50">
+                    <input type="text" id="cust-phone" placeholder="WhatsApp Phone Number (e.g. 919876543210)" required class="border p-2 rounded-xl bg-gray-50">
+                    <button type="submit" id="cust-submit-btn" class="bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">Save Customer</button>
+                </form>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border overflow-x-auto p-2">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-gray-50 border-b">
+                        <tr><th class="p-2.5">Seg</th><th class="p-2.5">Name</th><th class="p-2.5">Phone</th><th class="p-2.5">Action</th></tr>
+                    </thead>
+                    <tbody id="customers-list" class="divide-y"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 6: FINANCE & INVESTMENTS SECTION -->
+        <div id="tab-finance" class="tab-content hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border">
+                <h3 class="text-sm font-bold text-gray-800 mb-3">Add General Expenses (Bills, Rent etc.)</h3>
+                <form id="expense-form" class="grid grid-cols-1 gap-3 text-xs">
+                    <select id="exp-segment" required class="border p-2 rounded-xl bg-gray-50">
+                        <option value="Ledi">Ledi</option>
+                        <option value="Bebi">Bebi</option>
+                    </select>
+                    <input type="text" id="exp-desc" placeholder="Expense Reason (e.g. Rent, Electricity)" required class="border p-2 rounded-xl bg-gray-50">
+                    <input type="number" id="exp-amount" placeholder="Amount (₹)" required class="border p-2 rounded-xl bg-gray-50">
+                    <button type="submit" class="bg-red-600 text-white py-2.5 rounded-xl font-semibold">Save Expense</button>
+                </form>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border overflow-x-auto p-2">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-gray-50 border-b">
+                        <tr><th class="p-2.5">Seg</th><th class="p-2.5">Description</th><th class="p-2.5">Amount</th><th class="p-2.5">Action</th></tr>
+                    </thead>
+                    <tbody id="expenses-list" class="divide-y"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 6.5: INVESTMENTS & MACHINES (Asset Expenses) -->
+        <div id="tab-investments" class="tab-content hidden space-y-6">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-purple-100">
+                <h3 class="text-sm font-bold text-purple-800 mb-2">⚙️ Buy Machines / Business Assets (Deducted from Profit)</h3>
+                <form id="investment-form" class="grid grid-cols-1 gap-3 text-xs">
+                    <select id="inv-segment" required class="border p-2 rounded-xl bg-gray-50">
+                        <option value="Ledi">Ledi</option>
+                        <option value="Bebi">Bebi</option>
+                    </select>
+                    <input type="text" id="inv-desc" placeholder="Machine/Asset Name (e.g. Pico Machine)" required class="border p-2 rounded-xl bg-gray-50">
+                    <input type="number" id="inv-amount" placeholder="Cost Amount (₹)" required class="border p-2 rounded-xl bg-gray-50">
+                    <button type="submit" class="bg-purple-700 hover:bg-purple-800 text-white py-2.5 rounded-xl font-semibold transition">Deduct from Profit & Save</button>
+                </form>
+            </div>
+            <div class="bg-white rounded-2xl shadow-sm border overflow-x-auto p-2">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-gray-50 border-b">
+                        <tr><th class="p-2.5">Seg</th><th class="p-2.5">Machine/Asset Name</th><th class="p-2.5">Cost</th><th class="p-2.5">Action</th></tr>
+                    </thead>
+                    <tbody id="investments-list" class="divide-y"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 7: ANALYTICS SECTION -->
+        <div id="tab-analytics" class="tab-content hidden space-y-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-3">
+                <h3 class="text-sm font-bold text-gray-800">Date-wise Analytics & Reports</h3>
+                <div class="grid grid-cols-1 gap-3 text-xs">
+                    <div>
+                        <label class="block text-gray-500 mb-1">From Date</label>
+                        <input type="date" id="anal-start-date" class="w-full border p-2 rounded-xl bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="block text-gray-500 mb-1">To Date</label>
+                        <input type="date" id="anal-end-date" class="w-full border p-2 rounded-xl bg-gray-50">
+                    </div>
+                    <button onclick="calculateAnalytics()" class="w-full bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">View Report</button>
+                </div>
+                <div id="analytics-results" class="grid grid-cols-2 gap-3 mt-4 pt-4 border-t hidden text-xs">
+                    <div class="bg-gray-50 p-3 rounded-xl"><p class="text-gray-400">Revenue</p><h4 class="text-base font-bold text-green-600 mt-1" id="anal-rev">₹0</h4></div>
+                    <div class="bg-gray-50 p-3 rounded-xl"><p class="text-gray-400">Expenses</p><h4 class="text-base font-bold text-red-600 mt-1" id="anal-exp">₹0</h4></div>
+                    <div class="bg-gray-50 p-3 rounded-xl"><p class="text-gray-400">Net Profit</p><h4 class="text-base font-bold text-indigo-600 mt-1" id="anal-profit">₹0</h4></div>
+                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-200"><p class="text-amber-700">Owner Savings</p><h4 class="text-base font-bold text-amber-600 mt-1" id="anal-owner">₹0</h4></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Order Details Popup Modal -->
+    <div id="order-details-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative text-xs space-y-3">
+            <h3 class="text-base font-bold text-[#0b3b2c] border-b pb-2">📋 Order Full Details</h3>
+            <div class="space-y-2 text-gray-700">
+                <p><strong>Segment:</strong> <span id="m-segment"></span></p>
+                <p><strong>Customer Name:</strong> <span id="m-customer"></span></p>
+                <p><strong>Customer WhatsApp:</strong> <span id="m-custPhone"></span></p>
+                <p><strong>Item / Design:</strong> <span id="m-item"></span></p>
+                <p><strong>Measurements Type:</strong> <span id="m-measType" class="font-semibold text-emerald-700"></span></p>
+                <p><strong>Measurements / Size:</strong> <span id="m-measurements"></span></p>
+                <p><strong>Assigned Tailor:</strong> <span id="m-tailor"></span></p>
+                <p><strong>Tailor Wage:</strong> <span id="m-tailorWage" class="text-amber-600 font-bold"></span></p>
+                <p><strong>Delivery Date:</strong> <span id="m-date"></span></p>
+                <p><strong>Order Status:</strong> <span id="m-status"></span></p>
+                <p><strong>Payment Status:</strong> <span id="m-payment"></span></p>
+                <p><strong>Selling Price:</strong> <span id="m-amount" class="text-green-600 font-bold"></span></p>
+                <p><strong>Total Cost:</strong> <span id="m-cost" class="text-red-600 font-bold"></span></p>
+            </div>
+            <div class="pt-3 border-t flex justify-end">
+                <button onclick="closeDetailsModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl font-semibold">Close</button>
+            </div>
+        </div>
     </div>
-  );
-};
 
-export default OrderCreationForm;
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 shadow-lg z-50">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <button onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-dashboard">
+                <span class="text-lg">🏠</span>
+                <span class="text-[9px] font-medium">Home</span>
+            </button>
+            <button onclick="switchTab('orders-new')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-orders-new">
+                <span class="text-lg">📥</span>
+                <span class="text-[9px] font-medium">New/Confirm</span>
+            </button>
+            <button onclick="switchTab('orders-stitching')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-orders-stitching">
+                <span class="text-lg">✂️</span>
+                <span class="text-[9px] font-medium">Stitching</span>
+            </button>
+            <button onclick="switchTab('employees-window')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-employees-window">
+                <span class="text-lg">👩‍🎨</span>
+                <span class="text-[9px] font-medium">Employees</span>
+            </button>
+            <button onclick="switchTab('orders-completed')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-orders-completed">
+                <span class="text-lg">✅</span>
+                <span class="text-[9px] font-medium">Completed</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hidden Bill Template -->
+    <div id="invoice-print-area" class="hidden p-8 bg-white max-w-lg mx-auto border rounded-xl shadow-lg my-6">
+        <div class="text-center border-b pb-4 mb-4">
+            <h2 class="text-2xl font-bold text-[#0b3b2c]">KAIZ SOOQ</h2>
+            <p class="text-xs text-gray-500">Ledi & Bebi Retail Clothing Management</p>
+            <h3 class="text-lg font-semibold mt-3 bg-gray-100 py-1 rounded">INVOICE / BILL</h3>
+        </div>
+        <div class="space-y-2 text-sm mb-6">
+            <div class="flex justify-between"><span>Customer Name:</span> <strong id="inv-customer"></strong></div>
+            <div class="flex justify-between"><span>Segment:</span> <strong id="inv-segment"></strong></div>
+            <div class="flex justify-between"><span>Item:</span> <strong id="inv-item"></strong></div>
+            <div class="flex justify-between"><span>Size/Measurements:</span> <strong id="inv-measurements"></strong></div>
+            <div class="flex justify-between"><span>Delivery Date:</span> <strong id="inv-date"></strong></div>
+            <div class="flex justify-between"><span>Tailor:</span> <strong id="inv-tailor"></strong></div>
+            <div class="flex justify-between"><span>Payment:</span> <strong id="inv-payment"></strong></div>
+        </div>
+        <div class="border-t pt-4 flex justify-between items-center text-lg font-bold">
+            <span>Total Amount:</span> <span id="inv-amount" class="text-[#0b3b2c]"></span>
+        </div>
+    </div>
+
+    <script>
+        let data = {
+            orders: JSON.parse(localStorage.getItem('kaiz_orders')) || [],
+            stock: JSON.parse(localStorage.getItem('kaiz_stock')) || [],
+            customers: JSON.parse(localStorage.getItem('kaiz_customers')) || [],
+            employees: JSON.parse(localStorage.getItem('kaiz_employees')) || [
+                { name: 'Umma', phone: '919000000001', role: 'Tailor' },
+                { name: 'Anu', phone: '919000000002', role: 'Tailor' },
+                { name: 'Nusrath', phone: '919000000003', role: 'Tailor' },
+                { name: 'Meema (v)', phone: '919000000004', role: 'Tailor' }
+            ],
+            expenses: JSON.parse(localStorage.getItem('kaiz_expenses')) || [],
+            investments: JSON.parse(localStorage.getItem('kaiz_investments')) || [],
+            catalog: JSON.parse(localStorage.getItem('kaiz_catalog')) || []
+        };
+
+        let currentFilter = 'all';
+
+        function changeFilter(val) {
+            currentFilter = val;
+            renderAll();
+        }
+
+        function saveData() {
+            localStorage.setItem('kaiz_orders', JSON.stringify(data.orders));
+            localStorage.setItem('kaiz_stock', JSON.stringify(data.stock));
+            localStorage.setItem('kaiz_customers', JSON.stringify(data.customers));
+            localStorage.setItem('kaiz_employees', JSON.stringify(data.employees));
+            localStorage.setItem('kaiz_expenses', JSON.stringify(data.expenses));
+            localStorage.setItem('kaiz_investments', JSON.stringify(data.investments));
+            localStorage.setItem('kaiz_catalog', JSON.stringify(data.catalog));
+            updateDashboard();
+            updateTailorDropdown();
+            updateCatalogDropdown();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('text-[#0b3b2c]', 'font-bold'));
+            
+            let targetTab = document.getElementById('tab-' + tabId);
+            if(targetTab) targetTab.classList.remove('hidden');
+            
+            let targetNav = document.getElementById('bbtn-' + tabId);
+            if(targetNav) targetNav.classList.add('text-[#0b3b2c]', 'font-bold');
+        }
+
+        function getFilteredData(type) {
+            if (currentFilter === 'all') return data[type];
+            return data[type].filter(item => item.segment === currentFilter);
+        }
+
+        function updateTailorDropdown() {
+            const select = document.getElementById('order-tailor');
+            if(!select) return;
+            select.innerHTML = '<option value="">Select Tailor</option>';
+            data.employees.forEach(emp => {
+                let opt = document.createElement('option');
+                opt.value = emp.name;
+                opt.innerText = emp.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function updateCatalogDropdown() {
+            const select = document.getElementById('order-code-select');
+            if(!select) return;
+            select.innerHTML = '<option value="">-- Choose Item Code --</option>';
+            data.catalog.forEach(cat => {
+                let opt = document.createElement('option');
+                opt.value = cat.code;
+                opt.innerText = `${cat.code} - ${cat.name} (₹${cat.price})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function autofillItemByCode(code) {
+            if(!code) return;
+            let found = data.catalog.find(c => c.code === code);
+            if(found) {
+                document.getElementById('order-segment').value = found.segment;
+                document.getElementById('order-item').value = found.name;
+                document.getElementById('order-amount').value = found.price;
+            }
+        }
+
+        function toggleMeasurementType(val) {
+            let container = document.getElementById('manual-meas-container');
+            let inputField = document.getElementById('order-measurements');
+            if(val === 'Standard') {
+                container.classList.add('hidden');
+                inputField.value = 'Standard Size';
+                inputField.required = false;
+            } else {
+                container.classList.remove('hidden');
+                inputField.value = '';
+                inputField.required = true;
+            }
+        }
+
+        function renderAll() {
+            updateTailorDropdown();
+            updateCatalogDropdown();
+            renderSegmentedOrders();
+            renderEmployeesEarningsList();
+            renderCatalogList();
+            renderList('stock', ['segment', 'name', 'qty', 'location']);
+            renderCustomersList();
+            renderList('expenses', ['segment', 'desc', 'amount']);
+            renderList('investments', ['segment', 'desc', 'amount']);
+            updateDashboard();
+            checkUrgentDeliveries();
+        }
+
+        function renderEmployeesEarningsList() {
+            let container = document.getElementById('employees-earnings-list');
+            if(!container) return;
+            container.innerHTML = '';
+
+            data.employees.forEach((emp) => {
+                let completedOrders = data.orders.filter(o => o.tailor === emp.name && (o.status === 'Ready' || o.status === 'Delivered'));
+                let totalCompletedCount = completedOrders.length;
+                let totalEarned = completedOrders.reduce((sum, curr) => sum + Number(curr.tailorWage || 0), 0);
+
+                let div = document.createElement('div');
+                div.className = 'bg-gray-50 border p-3 rounded-xl flex justify-between items-center text-xs';
+                div.innerHTML = `
+                    <div>
+                        <strong class="text-sm text-[#0b3b2c]">${emp.name}</strong> (${emp.role})
+                        <div class="text-gray-500 mt-0.5">Phone: ${emp.phone || 'N/A'}</div>
+                    </div>
+                    <div class="text-right">
+                        <span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-semibold">${totalCompletedCount} Completed</span>
+                        <div class="text-green-600 font-bold mt-1">Earned: ₹${totalEarned}</div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderCatalogList() {
+            let container = document.getElementById('catalog-list');
+            if(!container) return;
+            container.innerHTML = '';
+
+            data.catalog.forEach((cat, index) => {
+                let imgs = cat.images ? cat.images.split(',').map(s => s.trim()).filter(s => s) : [];
+                let imgHtml = imgs.length > 0 ? `<div class="flex gap-1 overflow-x-auto mt-2">${imgs.map(img => `<img src="${img}" class="w-12 h-12 object-cover rounded border" onerror="this.src='https://via.placeholder.com/50?text=Dress'">`).join('')}</div>` : `<p class="text-[10px] text-gray-400 mt-1">No images attached</p>`;
+
+                let card = document.createElement('div');
+                card.className = 'bg-gray-50 border p-3 rounded-xl space-y-1 text-xs';
+                card.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <span class="bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded text-[10px] font-semibold">${cat.segment}</span>
+                        <strong class="text-sm text-[#0b3b2c]">${cat.code}</strong>
+                    </div>
+                    <p class="font-bold text-gray-800">${cat.name}</p>
+                    <p class="text-green-600 font-bold">Price: ₹${cat.price}</p>
+                    ${imgHtml}
+                    <div class="pt-2 text-right">
+                        <button onclick="deleteItem('catalog', ${index})" class="text-red-500 text-[11px] underline">Delete Item</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            if(data.catalog.length === 0) container.innerHTML = '<p class="text-gray-400 italic text-xs col-span-full">No catalog items added yet.</p>';
+        }
+
+        function renderCustomersList() {
+            const tbody = document.getElementById('customers-list');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            let itemsToRender = getFilteredData('customers');
+
+            itemsToRender.forEach((item) => {
+                let globalIndex = data.customers.indexOf(item);
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2.5"><span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${item.segment === 'Ledi' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700'}">${item.segment}</span></td>
+                    <td class="p-2.5 font-medium">${item.name}</td>
+                    <td class="p-2.5">${item.phone}</td>
+                    <td class="p-2.5 text-xs space-x-2">
+                        <button onclick="editCustomer(${globalIndex})" class="text-blue-600 font-semibold underline">Edit</button>
+                        <button onclick="deleteItem('customers', ${globalIndex})" class="text-red-500">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function editCustomer(index) {
+            let cust = data.customers[index];
+            document.getElementById('cust-edit-index').value = index;
+            document.getElementById('cust-segment').value = cust.segment;
+            document.getElementById('cust-name').value = cust.name;
+            document.getElementById('cust-phone').value = cust.phone;
+            document.getElementById('customer-form-title').innerText = 'Edit Customer';
+            document.getElementById('cust-submit-btn').innerText = 'Update Customer';
+        }
+
+        function renderSegmentedOrders() {
+            let orders = getFilteredData('orders');
+            
+            let newContainer = document.getElementById('new-orders-list');
+            let stitchingContainer = document.getElementById('stitching-orders-list');
+            let completedContainer = document.getElementById('completed-orders-list');
+            
+            if(newContainer) newContainer.innerHTML = '';
+            if(stitchingContainer) stitchingContainer.innerHTML = '';
+            if(completedContainer) completedContainer.innerHTML = '';
+
+            orders.forEach((item) => {
+                let globalIndex = data.orders.indexOf(item);
+                let status = item.status || 'Pending';
+
+                let cardHtml = `
+                    <div class="bg-gray-50 border p-3 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-2 text-xs">
+                        <div>
+                            <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${item.segment === 'Ledi' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700'}">${item.segment}</span>
+                            <strong class="text-sm ml-1">${item.customer}</strong> - ${item.item}
+                            <div class="text-gray-500 mt-1">Tailor: ${item.tailor} (Wage: ₹${item.tailorWage || 0}) | Delivery: ${item.date} | Price: ₹${item.amount}</div>
+                        </div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <select onchange="updateOrderStatus(${globalIndex}, this.value)" class="border p-1.5 rounded-lg bg-white font-medium">
+                                <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
+                                <option value="Stitching" ${status === 'Stitching' ? 'selected' : ''}>Stitching</option>
+                                <option value="Ready" ${status === 'Ready' ? 'selected' : ''}>Ready</option>
+                                <option value="Delivered" ${status === 'Delivered' ? 'selected' : ''}>Delivered</option>
+                            </select>
+                            <button onclick="viewOrderDetails(${globalIndex})" class="text-indigo-600 font-semibold underline">Details</button>
+                            <button onclick="sendCustomerWA(${globalIndex})" class="text-green-600 font-semibold">Cust WA</button>
+                            <button onclick="sendTailorWA(${globalIndex})" class="text-blue-600 font-semibold">Tailor WA</button>
+                            <button onclick="deleteItem('orders', ${globalIndex})" class="text-red-500">Del</button>
+                        </div>
+                    </div>
+                `;
+
+                if(status === 'Pending') {
+                    if(newContainer) newContainer.innerHTML += cardHtml;
+                } else if(status === 'Stitching') {
+                    if(stitchingContainer) stitchingContainer.innerHTML += cardHtml;
+                } else {
+                    if(completedContainer) completedContainer.innerHTML += cardHtml;
+                }
+            });
+
+            if(newContainer && newContainer.innerHTML === '') newContainer.innerHTML = '<p class="text-gray-400 italic">No new/pending orders.</p>';
+            if(stitchingContainer && stitchingContainer.innerHTML === '') stitchingContainer.innerHTML = '<p class="text-gray-400 italic">No orders in stitching.</p>';
+            if(completedContainer && completedContainer.innerHTML === '') completedContainer.innerHTML = '<p class="text-gray-400 italic">No completed/delivered orders.</p>';
+        }
+
+        function updateOrderStatus(index, newStatus) {
+            data.orders[index].status = newStatus;
+            saveData();
+            renderAll();
+        }
+
+        function viewOrderDetails(index) {
+            let item = data.orders[index];
+            document.getElementById('m-segment').innerText = item.segment;
+            document.getElementById('m-customer').innerText = item.customer;
+            document.getElementById('m-custPhone').innerText = item.custPhone || 'N/A';
+            document.getElementById('m-item').innerText = item.item;
+            document.getElementById('m-measType').innerText = item.measType || 'Manual';
+            document.getElementById('m-measurements').innerText = item.measurements;
+            document.getElementById('m-tailor').innerText = item.tailor;
+            document.getElementById('m-tailorWage').innerText = `₹${item.tailorWage || 0}`;
+            document.getElementById('m-date').innerText = item.date;
+            document.getElementById('m-status').innerText = item.status || 'Pending';
+            document.getElementById('m-payment').innerText = item.payment;
+            document.getElementById('m-amount').innerText = `₹${item.amount}`;
+            document.getElementById('m-cost').innerText = `₹${item.cost}`;
+
+            document.getElementById('order-details-modal').classList.remove('hidden');
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('order-details-modal').classList.add('hidden');
+        }
+
+        function sendCustomerWA(index) {
+            let item = data.orders[index];
+            let custMsg = encodeURIComponent(`Hello ${item.customer}, your KAIZ SOOQ order (${item.item}) has been confirmed! Total Amount: ₹${item.amount}, Delivery Date: ${item.date}. Thank you for choosing us!`);
+            let custWaUrl = item.custPhone ? `https://wa.me/${item.custPhone}?text=${custMsg}` : `https://wa.me/?text=${custMsg}`;
+            window.open(custWaUrl, '_blank');
+        }
+
+        function sendTailorWA(index) {
+            let item = data.orders[index];
+            let tailorObj = data.employees.find(e => e.name === item.tailor);
+            let tailorPhone = tailorObj ? tailorObj.phone : '';
+            let tailorMsg = encodeURIComponent(`Hello ${item.tailor}, you have a new KAIZ SOOQ order assigned!\n\nItem: ${item.item}\nMeasurement Type: ${item.measType || 'Manual'}\nMeasurements: ${item.measurements}\nDelivery Deadline: ${item.date}\nWage Payment: ₹${item.tailorWage || 0}\n\nPlease complete this order on time. Thank you!`);
+            let tailorWaUrl = tailorPhone ? `https://wa.me/${tailorPhone}?text=${tailorMsg}` : `https://wa.me/?text=${tailorMsg}`;
+            window.open(tailorWaUrl, '_blank');
+        }
+
+        function renderList(type, keys) {
+            const tbody = document.getElementById(type + '-list');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            let itemsToRender = getFilteredData(type);
+
+            itemsToRender.forEach((item) => {
+                let globalIndex = data[type].indexOf(item);
+                let tr = document.createElement('tr');
+                
+                keys.forEach((key) => {
+                    let td = document.createElement('td');
+                    td.className = 'p-2.5';
+                    if(key === 'segment') {
+                        td.innerHTML = `<span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${item.segment === 'Ledi' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700'}">${item.segment}</span>`;
+                    } else if(key === 'amount') {
+                        td.innerText = `₹${item[key] || 0}`;
+                        td.className += ' font-semibold text-green-600';
+                    } else {
+                        td.innerText = item[key] || '-';
+                    }
+                    tr.appendChild(td);
+                });
+                
+                let actionTd = document.createElement('td');
+                actionTd.className = 'p-2.5 text-xs';
+                actionTd.innerHTML = `<button onclick="deleteItem('${type}', ${globalIndex})" class="text-red-500">Delete</button>`;
+                tr.appendChild(actionTd);
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteItem(type, index) {
+            data[type].splice(index, 1);
+            saveData();
+            renderAll();
+        }
+
+        function checkUrgentDeliveries() {
+            let container = document.getElementById('urgent-deliveries-list');
+            if(!container) return;
+            container.innerHTML = '';
+            
+            let today = new Date();
+            let urgentOrders = data.orders.filter(o => {
+                if(!o.date || o.status === 'Delivered') return false;
+                let dDate = new Date(o.date);
+                let diffTime = dDate - today;
+                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                return diffDays >= 0 && diffDays <= 2;
+            });
+
+            if(urgentOrders.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 italic">No urgent deliveries pending.</p>`;
+                return;
+            }
+
+            urgentOrders.forEach(ord => {
+                let div = document.createElement('div');
+                div.className = 'bg-white p-2 rounded border border-red-200 flex justify-between items-center';
+                div.innerHTML = `<span>👗 <strong>${ord.customer}</strong> - ${ord.item}</span> <span class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px]">${ord.date}</span>`;
+                container.appendChild(div);
+            });
+        }
+
+        function updateDashboard() {
+            let activeOrders = getFilteredData('orders');
+            let activeExpenses = getFilteredData('expenses');
+            let activeInvestments = getFilteredData('investments');
+
+            let totalRevenue = activeOrders.reduce((acc, curr) => acc + Number(curr.amount), 0);
+            let totalOrderCost = activeOrders.reduce((acc, curr) => acc + Number(curr.cost), 0);
+            let totalGeneralExp = activeExpenses.reduce((acc, curr) => acc + Number(curr.amount), 0);
+            let totalExpense = totalOrderCost + totalGeneralExp;
+            
+            let totalInvestments = activeInvestments.reduce((acc, curr) => acc + Number(curr.amount), 0);
+            let totalOwnerSavings = activeOrders.reduce((acc, curr) => acc + Number(curr.ownerSavings), 0);
+            
+            // Net Business Profit = (Total Revenue - Total Expenses - Total Tailor Wages - Total Investments) minus Owner Savings
+            let totalTailorWages = activeOrders.reduce((acc, curr) => acc + Number(curr.tailorWage || 0), 0);
+            let grossProfit = totalRevenue - totalOrderCost - totalTailorWages - totalGeneralExp;
+            let totalBizProfit = grossProfit - totalOwnerSavings - totalInvestments;
+
+            // Segment Specific Metrics
+            let lediOrders = data.orders.filter(o => o.segment === 'Ledi');
+            let lediRev = lediOrders.reduce((acc, curr) => acc + Number(curr.amount), 0);
+            let lediProfit = lediOrders.reduce((acc, curr) => acc + Number(curr.bizProfit || 0), 0);
+            document.getElementById('ledi-rev').innerText = `₹${lediRev}`;
+            document.getElementById('ledi-profit').innerText = `₹${lediProfit}`;
+
+            let bebiOrders = data.orders.filter(o => o.segment === 'Bebi');
+            let bebiRev = bebiOrders.reduce((acc, curr) => acc + Number(curr.amount), 0);
+            let bebiProfit = bebiOrders.reduce((acc, curr) => acc + Number(curr.bizProfit || 0), 0);
+            document.getElementById('bebi-rev').innerText = `₹${bebiRev}`;
+            document.getElementById('bebi-profit').innerText = `₹${bebiProfit}`;
+
+            document.getElementById('dash-revenue').innerText = `₹${totalRevenue}`;
+            document.getElementById('dash-expense').innerText = `₹${totalExpense}`;
+            document.getElementById('dash-investments').innerText = `₹${totalInvestments}`;
+            document.getElementById('dash-profit').innerText = `₹${totalBizProfit > 0 ? totalBizProfit : 0}`;
+            document.getElementById('dash-owner-savings').innerText = `₹${totalOwnerSavings}`;
+            document.getElementById('dash-orders').innerText = `${activeOrders.length} Total Orders`;
+        }
+
+        function calculateAnalytics() {
+            let start = document.getElementById('anal-start-date').value;
+            let end = document.getElementById('anal-end-date').value;
+            if(!start || !end) { alert('Please select both dates!'); return; }
+
+            let filteredOrders = data.orders.filter(o => o.date >= start && o.date <= end);
+            let filteredInvestments = data.investments.filter(i => i.date >= start && i.date <= end);
+            let rev = filteredOrders.reduce((acc, curr) => acc + Number(curr.amount), 0);
+            let cost = filteredOrders.reduce((acc, curr) => acc + Number(curr.cost), 0);
+            let invCost = filteredInvestments.reduce((acc, curr) => acc + Number(curr.amount), 0);
+            let bizProfit = filteredOrders.reduce((acc, curr) => acc + Number(curr.bizProfit), 0) - invCost;
+            let ownerSavings = filteredOrders.reduce((acc, curr) => acc + Number(curr.ownerSavings), 0);
+
+            document.getElementById('anal-rev').innerText = `₹${rev}`;
+            document.getElementById('anal-exp').innerText = `₹${cost}`;
+            document.getElementById('anal-profit').innerText = `₹${bizProfit}`;
+            document.getElementById('anal-owner').innerText = `₹${ownerSavings}`;
+            document.getElementById('analytics-results').classList.remove('hidden');
+        }
+
+        // Form Submissions
+        document.getElementById('order-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            let amount = Number(document.getElementById('order-amount').value);
+            let cost = Number(document.getElementById('order-cost').value);
+            let tailorWage = Number(document.getElementById('order-tailor-wage').value || 0);
+            
+            // Net profit after deducting all expenses (Material Cost + Tailor Wage) from Selling Price
+            let netOrderProfit = amount - cost - tailorWage;
+            let ownerSavings = netOrderProfit >= 300 ? 300 : (netOrderProfit > 0 ? netOrderProfit : 0);
+            let bizProfit = netOrderProfit - ownerSavings;
+
+            data.orders.push({
+                code: document.getElementById('order-code-select').value,
+                segment: document.getElementById('order-segment').value,
+                customer: document.getElementById('order-customer').value,
+                custPhone: document.getElementById('order-cust-phone').value,
+                item: document.getElementById('order-item').value,
+                amount: amount, cost: cost, tailorWage: tailorWage, ownerSavings: ownerSavings, bizProfit: bizProfit > 0 ? bizProfit : 0,
+                date: document.getElementById('order-date').value,
+                measType: document.getElementById('order-meas-type').value,
+                measurements: document.getElementById('order-measurements').value,
+                tailor: document.getElementById('order-tailor').value,
+                status: 'Pending',
+                payment: document.getElementById('order-payment').value
+            });
+            saveData(); renderAll(); e.target.reset(); toggleMeasurementType('Manual'); switchTab('orders-new');
+        });
+
+        document.getElementById('catalog-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            data.catalog.push({
+                segment: document.getElementById('cat-segment').value,
+                code: document.getElementById('cat-code').value,
+                name: document.getElementById('cat-name').value,
+                price: document.getElementById('cat-price').value,
+                images: document.getElementById('cat-images').value
+            });
+            saveData(); renderAll(); e.target.reset();
+            alert('Catalog item successfully added!');
+        });
+
+        document.getElementById('stock-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            data.stock.push({
+                segment: document.getElementById('stock-segment').value,
+                name: document.getElementById('stock-name').value,
+                qty: document.getElementById('stock-qty').value,
+                location: document.getElementById('stock-location').value
+            });
+            saveData(); renderAll(); e.target.reset();
+        });
+
+        document.getElementById('customer-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            let editIndex = Number(document.getElementById('cust-edit-index').value);
+            let seg = document.getElementById('cust-segment').value;
+            let name = document.getElementById('cust-name').value;
+            let phone = document.getElementById('cust-phone').value;
+
+            if(editIndex > -1) {
+                data.customers[editIndex] = { segment: seg, name: name, phone: phone };
+                document.getElementById('cust-edit-index').value = -1;
+                document.getElementById('customer-form-title').innerText = 'Add Customer';
+                document.getElementById('cust-submit-btn').innerText = 'Save Customer';
+            } else {
+                data.customers.push({ segment: seg, name: name, phone: phone });
+            }
+
+            saveData(); renderAll(); e.target.reset();
+        });
+
+        document.getElementById('employee-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            data.employees.push({ 
+                name: document.getElementById('emp-name').value, 
+                phone: document.getElementById('emp-phone').value,
+                role: document.getElementById('emp-role').value 
+            });
+            saveData(); renderAll(); e.target.reset();
+            alert('Tailor successfully added!');
+        });
+
+        document.getElementById('expense-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            data.expenses.push({
+                segment: document.getElementById('exp-segment').value,
+                desc: document.getElementById('exp-desc').value,
+                amount: document.getElementById('exp-amount').value
+            });
+            saveData(); renderAll(); e.target.reset();
+        });
+
+        document.getElementById('investment-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            let todayDate = new Date().toISOString().split('T')[0];
+            data.investments.push({
+                segment: document.getElementById('inv-segment').value,
+                desc: document.getElementById('inv-desc').value,
+                amount: document.getElementById('inv-amount').value,
+                date: todayDate
+            });
+            saveData(); renderAll(); e.target.reset();
+            alert('Machine/Asset expense successfully deducted from profit!');
+        });
+
+        renderAll();
+    </script>
+</body>
+</html>
+
 
