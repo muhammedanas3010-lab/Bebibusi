@@ -1,630 +1,327 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIZ SOOQ - Business Manager</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
-    </style>
-</head>
-<body class="text-gray-800 pb-24">
+import React, { useState } from 'react';
 
-    <!-- Top Dark Green Header -->
-    <header class="bg-[#0b3b2c] text-white pt-6 pb-12 px-4 rounded-b-[30px] shadow-lg">
-        <div class="max-w-2xl mx-auto flex justify-between items-center mb-6">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-lg text-white">KS</div>
-                <div>
-                    <p class="text-xs text-emerald-200">Welcome back,</p>
-                    <h2 class="text-base font-bold tracking-wide">KAIZ SOOQ</h2>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <select id="global-filter" onchange="changeFilter(this.value)" class="bg-[#06261c] text-emerald-200 text-xs rounded-lg px-2.5 py-1.5 border border-emerald-700 outline-none font-semibold">
-                    <option value="all">All Segments</option>
-                    <option value="Ledi">Ledi</option>
-                    <option value="Bebi">Bebi</option>
-                </select>
-            </div>
-        </div>
+export default function KaizSooqApp() {
+  const [activeTab, setActiveTab] = useState('home');
 
-        <!-- Wallet / Balance Card in Header -->
-        <div class="max-w-2xl mx-auto bg-[#114b38] border border-emerald-700/50 p-5 rounded-2xl shadow-inner text-center space-y-3">
-            <div class="grid grid-cols-2 gap-2 border-b border-emerald-700/40 pb-3">
-                <div>
-                    <p class="text-[11px] text-emerald-300 font-medium">Total Profit (Before Expenses)</p>
-                    <h2 class="text-xl font-bold text-white mt-0.5" id="dash-gross-profit">₹0</h2>
-                </div>
-                <div>
-                    <p class="text-[11px] text-emerald-300 font-medium">Net Profit (After Expenses)</p>
-                    <h2 class="text-xl font-bold text-emerald-300 mt-0.5" id="dash-net-profit">₹0</h2>
-                </div>
-            </div>
-            <div class="flex justify-center gap-3 pt-1">
-                <button onclick="switchTab('orders-new')" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow">＋ New Order</button>
-                <button onclick="switchTab('catalog')" class="bg-[#19634b] hover:bg-[#207a5d] text-emerald-100 text-xs font-semibold px-4 py-2 rounded-xl transition border border-emerald-600">👗 Item Catalog</button>
-            </div>
-        </div>
-    </header>
+  // State: Orders
+  const [orders, setOrders] = useState([
+    {
+      id: 1,
+      customerName: 'Aisha',
+      phone: '9876543210',
+      category: 'Lady',
+      itemDetails: 'Churidar Stitching',
+      totalAmount: 1200,
+      expenses: 400,
+      assignedTailor: 'Anu',
+      dueDate: '2026-10-05',
+      status: 'Ongoing',
+      invoiceNo: 'INV-001'
+    },
+    {
+      id: 2,
+      customerName: 'Fathima',
+      phone: '9123456789',
+      category: 'Baby',
+      itemDetails: 'Frock & Cap',
+      totalAmount: 800,
+      expenses: 200,
+      assignedTailor: 'Umma',
+      dueDate: '2026-10-04',
+      status: 'Ongoing',
+      invoiceNo: 'INV-002'
+    }
+  ]);
 
-    <!-- Main Container -->
-    <main class="max-w-2xl mx-auto px-4 -mt-6">
+  // State: Customers
+  const [customers, setCustomers] = useState([
+    { id: 1, name: 'Aisha', phone: '9876543210', ordersCount: 1, totalSpent: 1200, measurements: 'Chest: 36, Length: 40' },
+    { id: 2, name: 'Fathima', phone: '9123456789', ordersCount: 1, totalSpent: 800, measurements: 'Age: 3 Years' }
+  ]);
+
+  // State: Employees
+  const [employees] = useState([
+    { id: 1, name: 'Umma', role: 'Master Tailor', phone: '9000000001' },
+    { id: 2, name: 'Anu', role: 'Tailor', phone: '9000000002' },
+    { id: 3, name: 'Nusrath', role: 'Tailor', phone: '9000000003' }
+  ]);
+
+  // New Order Form State
+  const [newOrder, setNewOrder] = useState({
+    customerName: '',
+    phone: '',
+    category: 'Lady',
+    itemDetails: '',
+    totalAmount: '',
+    expenses: '',
+    assignedTailor: '',
+    dueDate: '',
+    invoiceNo: ''
+  });
+
+  const handleAddOrder = (e) => {
+    e.preventDefault();
+    if (!newOrder.customerName || !newOrder.totalAmount) return;
+
+    const orderItem = {
+      id: Date.now(),
+      ...newOrder,
+      totalAmount: parseFloat(newOrder.totalAmount),
+      expenses: parseFloat(newOrder.expenses || 0),
+      status: 'Ongoing'
+    };
+
+    setOrders([...orders, orderItem]);
+
+    const existingCust = customers.find(c => c.phone === newOrder.phone);
+    if (existingCust) {
+      setCustomers(customers.map(c => c.phone === newOrder.phone ? {
+        ...c,
+        ordersCount: c.ordersCount + 1,
+        totalSpent: c.totalSpent + parseFloat(newOrder.totalAmount)
+      } : c));
+    } else {
+      setCustomers([...customers, {
+        id: Date.now(),
+        name: newOrder.customerName,
+        phone: newOrder.phone,
+        ordersCount: 1,
+        totalSpent: parseFloat(newOrder.totalAmount),
+        measurements: 'Standard'
+      }]);
+    }
+
+    setNewOrder({ customerName: '', phone: '', category: 'Lady', itemDetails: '', totalAmount: '', expenses: '', assignedTailor: '', dueDate: '', invoiceNo: '' });
+    alert('Order Added Successfully!');
+    setActiveTab('ongoing');
+  };
+
+  const toggleOrderStatus = (id) => {
+    setOrders(orders.map(o => o.id === id ? { ...o, status: o.status === 'Ongoing' ? 'Completed' : 'Ongoing' } : o));
+  };
+
+  const deleteOrder = (id) => {
+    setOrders(orders.filter(o => o.id !== id));
+  };
+
+  // Financial Calculations
+  const completedOrders = orders.filter(o => o.status === 'Completed');
+  let totalRevenue = completedOrders.reduce((sum, o) => sum + o.totalAmount, 0);
+  let totalExpenses = completedOrders.reduce((sum, o) => sum + o.expenses, 0);
+
+  let totalOwnerSalary = 0;
+  let totalBusinessNetProfit = 0;
+
+  completedOrders.forEach(o => {
+    let orderProfit = o.totalAmount - o.expenses;
+    if (orderProfit > 0) {
+      if (orderProfit >= 300) {
+        totalOwnerSalary += 300;
+        totalBusinessNetProfit += (orderProfit - 300);
+      } else {
+        totalOwnerSalary += orderProfit;
+      }
+    }
+  });
+
+  const ongoingOrders = orders.filter(o => o.status === 'Ongoing');
+  const sortedPriorityOrders = [...ongoingOrders].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)).slice(0, 2);
+
+  return (
+    <div style={{ fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif', backgroundColor: '#e8f5e9', minHeight: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '10px' }}>
+      
+      {/* Mobile Frame Container */}
+      <div style={{ width: '100%', maxWidth: '420px', height: '850px', backgroundColor: '#064e3b', borderRadius: '40px', boxShadow: '0 20px 40px rgba(0,0,0,0.3)', display: 'flex', flexDirection: 'column', overflow: 'hidden', border: '8px solid #022c22', position: 'relative' }}>
         
-        <!-- Quick Stats Cards Row -->
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-gray-400 font-medium">Total Revenue (Sales)</p>
-                    <h3 class="text-lg font-bold text-green-600 mt-0.5" id="dash-revenue">₹0</h3>
+        {/* Top Header Section */}
+        <div style={{ padding: '20px 20px 10px 20px', color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <p style={{ margin: 0, fontSize: '13px', color: '#a7f3d0' }}>Welcome back,</p>
+            <h3 style={{ margin: 0, fontSize: '18px' }}>Kaiz Sooq Admin</h3>
+          </div>
+          <div style={{ background: '#047857', padding: '8px 12px', borderRadius: '20px', fontSize: '12px', color: '#ecfdf5', fontWeight: 'bold' }}>
+            PRO Active
+          </div>
+        </div>
+
+        {/* Wallet / Balance Card */}
+        <div style={{ margin: '10px 20px', backgroundColor: '#047857', borderRadius: '20px', padding: '20px', color: 'white', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+          <p style={{ margin: 0, fontSize: '12px', color: '#a7f3d0' }}>Total Business Revenue</p>
+          <h2 style={{ margin: '5px 0 15px 0', fontSize: '28px' }}>₹{totalRevenue.toLocaleString()}</h2>
+          
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button onClick={() => setActiveTab('newOrder')} style={{ flex: 1, backgroundColor: '#10b981', color: 'white', border: 'none', padding: '10px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>+ New Order</button>
+            <button onClick={() => setActiveTab('finance')} style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.2)', color: 'white', border: 'none', padding: '10px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }}>Analytics</button>
+          </div>
+        </div>
+
+        {/* Main Scrollable Content Area */}
+        <div style={{ flex: 1, backgroundColor: '#f3f4f6', borderTopLeftRadius: '30px', borderTopRightRadius: '30px', padding: '20px', overflowY: 'auto', paddingBottom: '80px' }}>
+          
+          {/* HOME TAB */}
+          {activeTab === 'home' && (
+            <div>
+              <h4 style={{ margin: '0 0 10px 0', color: '#374151' }}>Financial Overview</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '20px' }}>
+                <div style={{ background: 'white', padding: '15px', borderRadius: '15px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+                  <span style={{ fontSize: '12px', color: '#6b7280' }}>Owner Salary</span>
+                  <h3 style={{ margin: '5px 0 0 0', color: '#059669' }}>₹{totalOwnerSalary}</h3>
                 </div>
-                <div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-lg">📈</div>
-            </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-                <div>
-                    <p class="text-xs text-gray-400 font-medium">Owner Savings</p>
-                    <h3 class="text-lg font-bold text-amber-600 mt-0.5" id="dash-owner-savings">₹0</h3>
+                <div style={{ background: 'white', padding: '15px', borderRadius: '15px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+                  <span style={{ fontSize: '12px', color: '#6b7280' }}>Net Profit</span>
+                  <h3 style={{ margin: '5px 0 0 0', color: '#2563eb' }}>₹{totalBusinessNetProfit}</h3>
                 </div>
-                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">💰</div>
-            </div>
-        </div>
+              </div>
 
-        <!-- Order Status Counts Summary Card -->
-        <div class="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm mb-6 grid grid-cols-3 gap-2 text-center">
-            <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
-                <p class="text-[11px] text-blue-600 font-medium">Total Orders</p>
-                <h4 class="text-base font-bold text-blue-800 mt-0.5" id="stat-total-orders">0</h4>
-            </div>
-            <div class="bg-amber-50 p-3 rounded-xl border border-amber-100">
-                <p class="text-[11px] text-amber-600 font-medium">Pending / Stitching</p>
-                <h4 class="text-base font-bold text-amber-800 mt-0.5" id="stat-pending-orders">0</h4>
-            </div>
-            <div class="bg-green-50 p-3 rounded-xl border border-green-100">
-                <p class="text-[11px] text-green-600 font-medium">Completed</p>
-                <h4 class="text-base font-bold text-green-800 mt-0.5" id="stat-completed-orders">0</h4>
-            </div>
-        </div>
+              {/* Priority Alert Box */}
+              <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', padding: '15px', borderRadius: '15px', marginBottom: '20px' }}>
+                <h4 style={{ margin: '0 0 8px 0', color: '#92400e', fontSize: '14px' }}>🚨 Priority Orders (Top 2 Urgent)</h4>
+                {sortedPriorityOrders.length === 0 ? (
+                  <p style={{ margin: 0, fontSize: '13px', color: '#78350f' }}>No pending orders!</p>
+                ) : (
+                  sortedPriorityOrders.map(ord => (
+                    <div key={ord.id} style={{ background: 'white', padding: '10px', borderRadius: '10px', marginBottom: '8px', fontSize: '13px' }}>
+                      <strong>{ord.customerName}</strong> ({ord.category}) - Due: <span style={{ color: 'red' }}>{ord.dueDate}</span><br/>
+                      Tailor: {ord.assignedTailor}
+                    </div>
+                  ))
+                )}
+              </div>
 
-        <!-- TAB 1: DASHBOARD -->
-        <div id="tab-dashboard" class="tab-content space-y-4">
-            <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-                <div class="flex justify-between items-center mb-3">
-                    <h3 class="text-sm font-bold text-gray-800">Business Overview</h3>
-                    <span class="text-xs text-emerald-600 font-semibold" id="dash-orders-count">0 Total Orders</span>
+              <h4 style={{ margin: '0 0 10px 0', color: '#374151' }}>Quick Navigation</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                <button onClick={() => setActiveTab('ongoing')} style={{ padding: '15px', background: 'white', border: 'none', borderRadius: '15px', textAlign: 'left', cursor: 'pointer', fontWeight: 'bold' }}>⏳ Ongoing Orders ({ongoingOrders.length})</button>
+                <button onClick={() => setActiveTab('completed')} style={{ padding: '15px', background: 'white', border: 'none', borderRadius: '15px', textAlign: 'left', cursor: 'pointer', fontWeight: 'bold' }}>✅ Completed ({completedOrders.length})</button>
+                <button onClick={() => setActiveTab('customers')} style={{ padding: '15px', background: 'white', border: 'none', borderRadius: '15px', textAlign: 'left', cursor: 'pointer', fontWeight: 'bold' }}>👥 Customers CRM</button>
+                <button onClick={() => setActiveTab('employees')} style={{ padding: '15px', background: 'white', border: 'none', borderRadius: '15px', textAlign: 'left', cursor: 'pointer', fontWeight: 'bold' }}>✂️ Employees</button>
+              </div>
+            </div>
+          )}
+
+          {/* ONGOING ORDERS TAB */}
+          {activeTab === 'ongoing' && (
+            <div>
+              <h3 style={{ marginTop: 0, color: '#1f2937' }}>Ongoing Orders</h3>
+              {ongoingOrders.length === 0 ? <p>No ongoing orders.</p> : ongoingOrders.map(ord => (
+                <div key={ord.id} style={{ background: 'white', padding: '15px', borderRadius: '15px', marginBottom: '10px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                    <span>{ord.customerName} ({ord.category})</span>
+                    <span style={{ color: '#059669' }}>₹{ord.totalAmount}</span>
+                  </div>
+                  <p style={{ margin: '5px 0', fontSize: '13px', color: '#4b5563' }}>Item: {ord.itemDetails} | Tailor: {ord.assignedTailor}</p>
+                  <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: 'red' }}>Due Date: {ord.dueDate}</p>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button onClick={() => toggleOrderStatus(ord.id)} style={{ flex: 1, background: '#10b981', color: 'white', border: 'none', padding: '6px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}>Mark Complete</button>
+                    <button onClick={() => deleteOrder(ord.id)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', fontSize: '12px' }}>Delete</button>
+                  </div>
                 </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
-                        <span class="text-xs font-medium text-gray-600">Total Operating Expenses (Costs + Bills)</span>
-                        <span class="text-sm font-bold text-red-600" id="dash-expense">₹0</span>
+              ))}
+            </div>
+          )}
+
+          {/* COMPLETED ORDERS TAB */}
+          {activeTab === 'completed' && (
+            <div>
+              <h3 style={{ marginTop: 0, color: '#1f2937' }}>Completed Orders History</h3>
+              {completedOrders.length === 0 ? <p>No completed orders yet.</p> : completedOrders.map(ord => {
+                let p = ord.totalAmount - ord.expenses;
+                let ownerCut = p >= 300 ? 300 : (p > 0 ? p : 0);
+                return (
+                  <div key={ord.id} style={{ background: 'white', padding: '15px', borderRadius: '15px', marginBottom: '10px', boxShadow: '0 2px 5px rgba(0,0,0,0.05)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 'bold' }}>
+                      <span>{ord.customerName} ({ord.category})</span>
+                      <span style={{ color: '#059669' }}>₹{ord.totalAmount}</span>
                     </div>
-                    <div class="flex justify-between items-center p-3 bg-purple-50 rounded-xl border border-purple-100">
-                        <span class="text-xs font-medium text-purple-700">Machine & Asset Investments</span>
-                        <span class="text-sm font-bold text-purple-700" id="dash-investments">₹0</span>
-                    </div>
+                    <p style={{ margin: '5px 0', fontSize: '13px', color: '#4b5563' }}>Owner Share Credited: <b style={{ color: 'green' }}>₹{ownerCut}</b></p>
+                    <button onClick={() => toggleOrderStatus(ord.id)} style={{ background: '#f59e0b', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px' }}>Revert</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {/* CUSTOMERS TAB */}
+          {activeTab === 'customers' && (
+            <div>
+              <h3 style={{ marginTop: 0, color: '#1f2937' }}>Customer CRM</h3>
+              {customers.map(cust => (
+                <div key={cust.id} style={{ background: 'white', padding: '15px', borderRadius: '15px', marginBottom: '10px' }}>
+                  <strong>{cust.name}</strong> ({cust.phone})<br/>
+                  <span style={{ fontSize: '13px', color: '#4b5563' }}>Total Orders: {cust.ordersCount} | Total Spent: ₹{cust.totalSpent}</span><br/>
+                  <span style={{ fontSize: '12px', color: '#6b7280' }}>Measurements: {cust.measurements}</span>
                 </div>
+              ))}
             </div>
-        </div>
+          )}
 
-        <!-- TAB 2.1: NEW / CONFIRM ORDERS WINDOW -->
-        <div id="tab-orders-new" class="tab-content hidden space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border">
-                <h3 class="text-sm font-bold text-gray-800 mb-3">Add & Confirm New Order</h3>
-                <form id="order-form" class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Select Item Code</label>
-                        <select id="order-code-select" onchange="autofillItemByCode(this.value)" class="w-full border p-2 rounded-xl outline-none bg-gray-50 font-medium">
-                            <option value="">-- Choose Item Code --</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Segment</label>
-                        <select id="order-segment" required class="w-full border p-2 rounded-xl outline-none bg-gray-50 font-medium">
-                            <option value="Ledi">Ledi</option>
-                            <option value="Bebi">Bebi</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Customer Name</label>
-                        <input type="text" id="order-customer" placeholder="Customer Name" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Customer WhatsApp Number</label>
-                        <input type="text" id="order-cust-phone" placeholder="e.g. 919876543210" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Item Details / Name</label>
-                        <input type="text" id="order-item" placeholder="Item Name / Design" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Selling Price (₹)</label>
-                        <input type="number" id="order-amount" placeholder="₹" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Material/Production Cost (₹)</label>
-                        <input type="number" id="order-cost" placeholder="₹" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Assign Tailor</label>
-                        <select id="order-tailor" required class="w-full border p-2 rounded-xl outline-none bg-gray-50 font-medium">
-                            <option value="">Select Tailor</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Tailor Wage / Payment (₹)</label>
-                        <input type="number" id="order-tailor-wage" placeholder="Payment to Tailor" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Delivery Date</label>
-                        <input type="date" id="order-date" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Measurement Type</label>
-                        <select id="order-meas-type" onchange="toggleMeasurementType(this.value)" required class="w-full border p-2 rounded-xl outline-none bg-gray-50 font-medium">
-                            <option value="Manual">Manual Measurements</option>
-                            <option value="Standard">Standard Size</option>
-                        </select>
-                    </div>
-                    <div id="manual-meas-container">
-                        <label class="block font-semibold text-gray-500 mb-1">Measurements / Size Details</label>
-                        <input type="text" id="order-measurements" placeholder="e.g. Chest 36, Length 40..." class="w-full border p-2 rounded-xl outline-none bg-gray-50">
-                    </div>
-                    <div>
-                        <label class="block font-semibold text-gray-500 mb-1">Payment Status</label>
-                        <select id="order-payment" required class="w-full border p-2 rounded-xl outline-none bg-gray-50">
-                            <option value="Paid">Paid</option>
-                            <option value="Advance">Advance</option>
-                            <option value="Pending">Pending</option>
-                        </select>
-                    </div>
-                    <div class="col-span-full pt-2">
-                        <button type="submit" class="w-full bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold hover:bg-[#114b38] transition">Confirm & Save Order</button>
-                    </div>
-                </form>
-            </div>
-            <div class="bg-white rounded-2xl shadow-sm border p-4">
-                <h4 class="text-xs font-bold text-gray-700 uppercase mb-3">📌 New Confirmed Orders</h4>
-                <div id="new-orders-list" class="space-y-2"></div>
-            </div>
-        </div>
-
-        <!-- TAB 2.2: STITCHING WINDOW -->
-        <div id="tab-orders-stitching" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-2xl shadow-sm border p-4">
-                <h3 class="text-sm font-bold text-amber-700 mb-3">✂️ Orders Currently in Stitching</h3>
-                <div id="stitching-orders-list" class="space-y-2"></div>
-            </div>
-        </div>
-
-        <!-- TAB 2.3: COMPLETED WINDOW -->
-        <div id="tab-orders-completed" class="tab-content hidden space-y-4">
-            <div class="bg-white rounded-2xl shadow-sm border p-4">
-                <h3 class="text-sm font-bold text-green-700 mb-3">✅ Completed & Delivered Orders</h3>
-                <div id="completed-orders-list" class="space-y-2"></div>
-            </div>
-        </div>
-
-        <!-- TAB 2.4: EMPLOYEES WINDOW -->
-        <div id="tab-employees-window" class="tab-content hidden space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
-                <h3 class="text-sm font-bold text-[#0b3b2c]">👩‍🎨 Employees & Tailor Work Analytics</h3>
-                <div id="employees-earnings-list" class="space-y-3"></div>
-
-                <div class="border-t pt-4 mt-4">
-                    <h4 class="text-xs font-bold text-gray-700 mb-2">Add New Tailor / Employee</h4>
-                    <form id="employee-form" class="grid grid-cols-1 gap-3 text-xs">
-                        <input type="text" id="emp-name" placeholder="Tailor Name" required class="border p-2 rounded-xl bg-gray-50">
-                        <input type="text" id="emp-phone" placeholder="WhatsApp Number" required class="border p-2 rounded-xl bg-gray-50">
-                        <input type="text" id="emp-role" placeholder="Role" value="Tailor" required class="border p-2 rounded-xl bg-gray-50">
-                        <button type="submit" class="bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">Save Tailor</button>
-                    </form>
+          {/* EMPLOYEES TAB */}
+          {activeTab === 'employees' && (
+            <div>
+              <h3 style={{ marginTop: 0, color: '#1f2937' }}>Employees & Tailors</h3>
+              {employees.map(emp => (
+                <div key={emp.id} style={{ background: 'white', padding: '15px', borderRadius: '15px', marginBottom: '10px' }}>
+                  <strong>{emp.name}</strong> - <span style={{ color: '#059669' }}>{emp.role}</span><br/>
+                  <span style={{ fontSize: '13px', color: '#4b5563' }}>Phone: {emp.phone}</span>
                 </div>
+              ))}
             </div>
+          )}
+
+          {/* FINANCE TAB */}
+          {activeTab === 'finance' && (
+            <div>
+              <h3 style={{ marginTop: 0, color: '#1f2937' }}>Financial Analytics</h3>
+              <div style={{ background: 'white', padding: '15px', borderRadius: '15px', marginBottom: '15px' }}>
+                <p>Total Revenue: <b>₹{totalRevenue}</b></p>
+                <p>Total Expenses: <b>₹{totalExpenses}</b></p>
+                <hr style={{ border: '0', borderTop: '1px solid #e5e7eb' }}/>
+                <p>Owner Salary (300 Rule): <b style={{ color: '#059669' }}>₹{totalOwnerSalary}</b></p>
+                <p>Business Net Profit: <b style={{ color: '#2563eb' }}>₹{totalBusinessNetProfit}</b></p>
+              </div>
+            </div>
+          )}
+
+          {/* ADD NEW ORDER FORM TAB */}
+          {activeTab === 'newOrder' && (
+            <div>
+              <h3 style={{ marginTop: 0, color: '#1f2937' }}>Add New Order</h3>
+              <form onSubmit={handleAddOrder} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <input type="text" placeholder="Customer Name" value={newOrder.customerName} onChange={e => setNewOrder({...newOrder, customerName: e.target.value})} required style={{ padding: '12px', borderRadius: '10px', border: '1px solid #d1d5db' }} />
+                <input type="text" placeholder="Phone Number" value={newOrder.phone} onChange={e => setNewOrder({...newOrder, phone: e.target.value})} required style={{ padding: '12px', borderRadius: '10px', border: '1px solid #d1d5db' }} />
+                <select value={newOrder.category} onChange={e => setNewOrder({...newOrder, category: e.target.value})} style={{ padding: '12px', borderRadius: '10px', border: '1px solid #d1d5db' }}>
+                  <option value="Lady">Lady Platform</option>
+                  <option value="Baby">Baby Platform</option>
+                </select>
+                <input type="text" placeholder="Item Details (e.g. Frock)" value={newOrder.itemDetails} onChange={e => setNewOrder({...newOrder, itemDetails: e.target.value})} required style={{ padding: '12px', borderRadius: '10px', border: '1px solid #d1d5db' }} />
+                <input type="number" placeholder="Total Amount (₹)" value={newOrder.totalAmount} onChange={e => setNewOrder({...newOrder, totalAmount: e.target.value})} required style={{ padding: '12px', borderRadius: '10px', border: '1px solid #d1d5db' }} />
+                <input type="number" placeholder="Expenses (₹)" value={newOrder.expenses} onChange={e => setNewOrder({...newOrder, expenses: e.target.value})} style={{ padding: '12px', borderRadius: '10px', border: '1px solid #d1d5db' }} />
+                <select value={newOrder.assignedTailor} onChange={e => setNewOrder({...newOrder, assignedTailor: e.target.value})} required style={{ padding: '12px', borderRadius: '10px', border: '1px solid #d1d5db' }}>
+                  <option value="">Select Tailor</option>
+                  {employees.map(e => <option key={e.id} value={e.name}>{e.name}</option>)}
+                </select>
+                <input type="date" value={newOrder.dueDate} onChange={e => setNewOrder({...newOrder, dueDate: e.target.value})} required style={{ padding: '12px', borderRadius: '10px', border: '1px solid #d1d5db' }} />
+                <input type="text" placeholder="Invoice No (e.g. INV-003)" value={newOrder.invoiceNo} onChange={e => setNewOrder({...newOrder, invoiceNo: e.target.value})} required style={{ padding: '12px', borderRadius: '10px', border: '1px solid #d1d5db' }} />
+                <button type="submit" style={{ background: '#059669', color: 'white', padding: '12px', border: 'none', borderRadius: '10px', fontWeight: 'bold', cursor: 'pointer', marginTop: '5px' }}>Save Order</button>
+              </form>
+            </div>
+          )}
+
         </div>
 
-        <!-- TAB 2.5: ITEM CATALOG -->
-        <div id="tab-catalog" class="tab-content hidden space-y-4">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border">
-                <h3 class="text-sm font-bold text-gray-800 mb-3">👗 Item Catalog & Direct Image Upload</h3>
-                <form id="catalog-form" class="grid grid-cols-1 gap-3 text-xs">
-                    <select id="cat-segment" required class="border p-2 rounded-xl bg-gray-50 font-medium">
-                        <option value="Ledi">Ledi</option>
-                        <option value="Bebi">Bebi</option>
-                    </select>
-                    <input type="text" id="cat-code" placeholder="Unique Item Code (e.g. LD-001)" required class="border p-2 rounded-xl bg-gray-50 font-bold">
-                    <input type="text" id="cat-name" placeholder="Dress Model Name" required class="border p-2 rounded-xl bg-gray-50">
-                    <input type="number" id="cat-price" placeholder="Standard Price (₹)" required class="border p-2 rounded-xl bg-gray-50">
-                    <button type="submit" class="bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">Save Catalog Item</button>
-                </form>
-            </div>
-            
-            <div class="bg-white rounded-2xl shadow-sm border p-4 space-y-3">
-                <h4 class="text-xs font-bold text-gray-700 uppercase">📋 Available Catalog Items</h4>
-                <div id="catalog-list" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
-            </div>
+        {/* Bottom Navigation Bar (Matching the provided UI) */}
+        <div style={{ position: 'absolute', bottom: 0, width: '100%', height: '70px', backgroundColor: 'white', display: 'flex', justifyContent: 'space-around', alignItems: 'center', borderTop: '1px solid #e5e7eb', paddingBottom: '10px' }}>
+          <button onClick={() => setActiveTab('home')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'home' ? '#059669' : '#9ca3af', fontSize: '11px', fontWeight: 'bold' }}>🏠 Home</button>
+          <button onClick={() => setActiveTab('ongoing')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'ongoing' ? '#059669' : '#9ca3af', fontSize: '11px', fontWeight: 'bold' }}>⏳ Ongoing</button>
+          <button onClick={() => setActiveTab('newOrder')} style={{ background: '#10b981', color: 'white', border: 'none', width: '45px', height: '45px', borderRadius: '50%', fontSize: '20px', cursor: 'pointer', boxShadow: '0 4px 10px rgba(16,185,129,0.4)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>+</button>
+          <button onClick={() => setActiveTab('finance')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'finance' ? '#059669' : '#9ca3af', fontSize: '11px', fontWeight: 'bold' }}>📊 Analytics</button>
+          <button onClick={() => setActiveTab('customers')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: activeTab === 'customers' ? '#059669' : '#9ca3af', fontSize: '11px', fontWeight: 'bold' }}>👥 CRM</button>
         </div>
 
-        <!-- TAB 6.5: INVESTMENTS & MACHINES -->
-        <div id="tab-investments" class="tab-content hidden space-y-6">
-            <div class="bg-white p-5 rounded-2xl shadow-sm border border-purple-100">
-                <h3 class="text-sm font-bold text-purple-800 mb-2">⚙️ Buy Machines / Business Assets</h3>
-                <form id="investment-form" class="grid grid-cols-1 gap-3 text-xs">
-                    <select id="inv-segment" required class="border p-2 rounded-xl bg-gray-50">
-                        <option value="Ledi">Ledi</option>
-                        <option value="Bebi">Bebi</option>
-                    </select>
-                    <input type="text" id="inv-desc" placeholder="Machine/Asset Name" required class="border p-2 rounded-xl bg-gray-50">
-                    <input type="number" id="inv-amount" placeholder="Cost Amount (₹)" required class="border p-2 rounded-xl bg-gray-50">
-                    <button type="submit" class="bg-purple-700 hover:bg-purple-800 text-white py-2.5 rounded-xl font-semibold transition">Save Investment</button>
-                </form>
-            </div>
-        </div>
+      </div>
+    </div>
+  );
+}
 
-    </main>
-
-    <!-- Bottom Navigation Bar -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-2 px-4 shadow-lg z-50">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <button onclick="switchTab('dashboard')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-dashboard">
-                <span class="text-lg">🏠</span>
-                <span class="text-[9px] font-medium">Home</span>
-            </button>
-            <button onclick="switchTab('orders-new')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-orders-new">
-                <span class="text-lg">📥</span>
-                <span class="text-[9px] font-medium">New/Confirm</span>
-            </button>
-            <button onclick="switchTab('orders-stitching')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-orders-stitching">
-                <span class="text-lg">✂️</span>
-                <span class="text-[9px] font-medium">Stitching</span>
-            </button>
-            <button onclick="switchTab('employees-window')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-employees-window">
-                <span class="text-lg">👩‍🎨</span>
-                <span class="text-[9px] font-medium">Employees</span>
-            </button>
-            <button onclick="switchTab('orders-completed')" class="nav-btn flex flex-col items-center text-gray-400 hover:text-[#0b3b2c] transition" id="bbtn-orders-completed">
-                <span class="text-lg">✅</span>
-                <span class="text-[9px] font-medium">Completed</span>
-            </button>
-        </div>
-    </nav>
-
-    <script>
-        let data = {
-            orders: JSON.parse(localStorage.getItem('kaiz_orders')) || [],
-            employees: JSON.parse(localStorage.getItem('kaiz_employees')) || [
-                { name: 'Umma', phone: '919000000001', role: 'Tailor' },
-                { name: 'Anu', phone: '919000000002', role: 'Tailor' }
-            ],
-            investments: JSON.parse(localStorage.getItem('kaiz_investments')) || [],
-            catalog: JSON.parse(localStorage.getItem('kaiz_catalog')) || []
-        };
-
-        let currentFilter = 'all';
-
-        function changeFilter(val) {
-            currentFilter = val;
-            renderAll();
-        }
-
-        function saveData() {
-            localStorage.setItem('kaiz_orders', JSON.stringify(data.orders));
-            localStorage.setItem('kaiz_employees', JSON.stringify(data.employees));
-            localStorage.setItem('kaiz_investments', JSON.stringify(data.investments));
-            localStorage.setItem('kaiz_catalog', JSON.stringify(data.catalog));
-            updateDashboard();
-        }
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('text-[#0b3b2c]', 'font-bold'));
-            
-            let targetTab = document.getElementById('tab-' + tabId);
-            if(targetTab) targetTab.classList.remove('hidden');
-            
-            let targetNav = document.getElementById('bbtn-' + tabId);
-            if(targetNav) targetNav.classList.add('text-[#0b3b2c]', 'font-bold');
-        }
-
-        function getFilteredData(type) {
-            if (currentFilter === 'all') return data[type];
-            return data[type].filter(item => item.segment === currentFilter);
-        }
-
-        function updateTailorDropdown() {
-            const select = document.getElementById('order-tailor');
-            if(!select) return;
-            select.innerHTML = '<option value="">Select Tailor</option>';
-            data.employees.forEach(emp => {
-                let opt = document.createElement('option');
-                opt.value = emp.name;
-                opt.innerText = emp.name;
-                select.appendChild(opt);
-            });
-        }
-
-        function updateCatalogDropdown() {
-            const select = document.getElementById('order-code-select');
-            if(!select) return;
-            select.innerHTML = '<option value="">-- Choose Item Code --</option>';
-            data.catalog.forEach(cat => {
-                let opt = document.createElement('option');
-                opt.value = cat.code;
-                opt.innerText = `${cat.code} - ${cat.name} (₹${cat.price})`;
-                select.appendChild(opt);
-            });
-        }
-
-        function autofillItemByCode(code) {
-            if(!code) return;
-            let found = data.catalog.find(c => c.code === code);
-            if(found) {
-                document.getElementById('order-segment').value = found.segment;
-                document.getElementById('order-item').value = found.name;
-                document.getElementById('order-amount').value = found.price;
-            }
-        }
-
-        function toggleMeasurementType(val) {
-            let container = document.getElementById('manual-meas-container');
-            let inputField = document.getElementById('order-measurements');
-            if(val === 'Standard') {
-                container.classList.add('hidden');
-                inputField.value = 'Standard Size';
-                inputField.required = false;
-            } else {
-                container.classList.remove('hidden');
-                inputField.value = '';
-                inputField.required = true;
-            }
-        }
-
-        function renderAll() {
-            updateTailorDropdown();
-            updateCatalogDropdown();
-            renderSegmentedOrders();
-            renderEmployeesEarningsList();
-            renderCatalogList();
-            updateDashboard();
-        }
-
-        function renderEmployeesEarningsList() {
-            let container = document.getElementById('employees-earnings-list');
-            if(!container) return;
-            container.innerHTML = '';
-
-            data.employees.forEach((emp, index) => {
-                let tailorOrders = data.orders.filter(o => o.tailor === emp.name);
-                let pendingCount = tailorOrders.filter(o => o.status === 'Pending' || o.status === 'Stitching').length;
-                let completedOrders = tailorOrders.filter(o => o.status === 'Ready' || o.status === 'Delivered');
-                let totalEarned = completedOrders.reduce((sum, curr) => sum + Number(curr.tailorWage || 0), 0);
-
-                let div = document.createElement('div');
-                div.className = 'bg-gray-50 border p-3 rounded-xl flex justify-between items-center text-xs';
-                div.innerHTML = `
-                    <div>
-                        <strong class="text-sm text-[#0b3b2c]">${emp.name}</strong> (${emp.role})
-                        <div class="text-gray-500 mt-0.5">Phone: ${emp.phone || 'N/A'}</div>
-                        <div class="mt-1 space-x-1">
-                            <span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">Pending: ${pendingCount}</span>
-                            <span class="text-indigo-600 font-bold ml-1">Earned: ₹${totalEarned}</span>
-                        </div>
-                    </div>
-                    <div>
-                        <button onclick="deleteEmployee(${index})" class="text-red-500 font-semibold underline">Delete</button>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-            if(data.employees.length === 0) container.innerHTML = '<p class="text-gray-400 italic text-xs">No tailors added yet.</p>';
-        }
-
-        function deleteEmployee(index) {
-            if(confirm('Are you sure you want to delete this tailor?')) {
-                data.employees.splice(index, 1);
-                saveData();
-                renderAll();
-            }
-        }
-
-        function renderCatalogList() {
-            let container = document.getElementById('catalog-list');
-            if(!container) return;
-            container.innerHTML = '';
-
-            data.catalog.forEach((cat, index) => {
-                let card = document.createElement('div');
-                card.className = 'bg-gray-50 border p-3 rounded-xl space-y-1 text-xs';
-                card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <span class="bg-pink-100 text-pink-700 px-1.5 py-0.5 rounded text-[10px] font-semibold">${cat.segment}</span>
-                        <strong class="text-sm text-[#0b3b2c]">${cat.code}</strong>
-                    </div>
-                    <p class="font-bold text-gray-800">${cat.name}</p>
-                    <p class="text-green-600 font-bold">Price: ₹${cat.price}</p>
-                    <div class="pt-2 text-right">
-                        <button onclick="deleteCatalog(${index})" class="text-red-500 text-[11px] underline">Delete Item</button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-            if(data.catalog.length === 0) container.innerHTML = '<p class="text-gray-400 italic text-xs col-span-full">No catalog items added yet.</p>';
-        }
-
-        function deleteCatalog(index) {
-            data.catalog.splice(index, 1);
-            saveData();
-            renderAll();
-        }
-
-        function renderSegmentedOrders() {
-            let orders = getFilteredData('orders');
-            let newContainer = document.getElementById('new-orders-list');
-            let stitchingContainer = document.getElementById('stitching-orders-list');
-            let completedContainer = document.getElementById('completed-orders-list');
-            
-            if(newContainer) newContainer.innerHTML = '';
-            if(stitchingContainer) stitchingContainer.innerHTML = '';
-            if(completedContainer) completedContainer.innerHTML = '';
-
-            let completedOrders = orders.filter(item => item.status === 'Ready' || item.status === 'Delivered');
-            let pendingOrders = orders.filter(item => (item.status || 'Pending') === 'Pending');
-            let stitchingOrders = orders.filter(item => (item.status || 'Pending') === 'Stitching');
-
-            let renderOrderCard = (item) => {
-                let globalIndex = data.orders.indexOf(item);
-                let status = item.status || 'Pending';
-
-                return `
-                    <div class="bg-gray-50 border p-3 rounded-xl flex justify-between items-center gap-2 text-xs">
-                        <div>
-                            <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${item.segment === 'Ledi' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700'}">${item.segment}</span>
-                            <strong class="text-sm ml-1">${item.customer}</strong> - ${item.item}
-                            <div class="text-gray-500 mt-1">Tailor: ${item.tailor} | Delivery: ${item.date} | Price: ₹${item.amount}</div>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <select onchange="updateOrderStatus(${globalIndex}, this.value)" class="border p-1.5 rounded-lg bg-white font-medium">
-                                <option value="Pending" ${status === 'Pending' ? 'selected' : ''}>Pending</option>
-                                <option value="Stitching" ${status === 'Stitching' ? 'selected' : ''}>Stitching</option>
-                                <option value="Ready" ${status === 'Ready' ? 'selected' : ''}>Ready</option>
-                                <option value="Delivered" ${status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-                            </select>
-                            <button onclick="deleteOrder(${globalIndex})" class="text-red-500">Del</button>
-                        </div>
-                    </div>
-                `;
-            };
-
-            pendingOrders.forEach(item => { if(newContainer) newContainer.innerHTML += renderOrderCard(item); });
-            stitchingOrders.forEach(item => { if(stitchingContainer) stitchingContainer.innerHTML += renderOrderCard(item); });
-            completedOrders.forEach(item => { if(completedContainer) completedContainer.innerHTML += renderOrderCard(item); });
-
-            if(newContainer && newContainer.innerHTML === '') newContainer.innerHTML = '<p class="text-gray-400 italic">No new/pending orders.</p>';
-            if(stitchingContainer && stitchingContainer.innerHTML === '') stitchingContainer.innerHTML = '<p class="text-gray-400 italic">No orders in stitching.</p>';
-            if(completedContainer && completedContainer.innerHTML === '') completedContainer.innerHTML = '<p class="text-gray-400 italic">No completed/delivered orders.</p>';
-        }
-
-        function updateOrderStatus(index, newStatus) {
-            data.orders[index].status = newStatus;
-            saveData();
-            renderAll();
-        }
-
-        function deleteOrder(index) {
-            data.orders.splice(index, 1);
-            saveData();
-            renderAll();
-        }
-
-        function updateDashboard() {
-            let activeOrders = getFilteredData('orders');
-            let activeInvestments = getFilteredData('investments');
-
-            let totalRevenue = activeOrders.reduce((acc, curr) => acc + Number(curr.amount), 0);
-            let totalOrderCost = activeOrders.reduce((acc, curr) => acc + Number(curr.cost), 0);
-            let totalInvestments = activeInvestments.reduce((acc, curr) => acc + Number(curr.amount), 0);
-            let totalOwnerSavings = activeOrders.reduce((acc, curr) => acc + Number(curr.ownerSavings || 0), 0);
-            
-            let totalGrossProfit = activeOrders.reduce((acc, curr) => acc + Number(curr.bizProfit || 0), 0);
-            let netProfit = totalGrossProfit - totalInvestments;
-
-            document.getElementById('stat-total-orders').innerText = activeOrders.length;
-            document.getElementById('stat-pending-orders').innerText = activeOrders.filter(o => o.status === 'Pending' || o.status === 'Stitching').length;
-            document.getElementById('stat-completed-orders').innerText = activeOrders.filter(o => o.status === 'Ready' || o.status === 'Delivered').length;
-
-            document.getElementById('dash-gross-profit').innerText = `₹${totalGrossProfit}`;
-            document.getElementById('dash-net-profit').innerText = `₹${netProfit > 0 ? netProfit : 0}`;
-            document.getElementById('dash-revenue').innerText = `₹${totalRevenue}`;
-            document.getElementById('dash-expense').innerText = `₹${totalOrderCost}`;
-            document.getElementById('dash-investments').innerText = `₹${totalInvestments}`;
-            document.getElementById('dash-owner-savings').innerText = `₹${totalOwnerSavings}`;
-            
-            let dashOrdersCountEl = document.getElementById('dash-orders-count');
-            if(dashOrdersCountEl) dashOrdersCountEl.innerText = `${activeOrders.length} Total Orders`;
-        }
-
-        // Event Listeners for Forms
-        document.getElementById('order-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            let amount = Number(document.getElementById('order-amount').value);
-            let cost = Number(document.getElementById('order-cost').value);
-            let tailorWage = Number(document.getElementById('order-tailor-wage').value || 0);
-            
-            let netOrderProfit = amount - cost - tailorWage;
-            let ownerSavings = netOrderProfit >= 300 ? 300 : (netOrderProfit > 0 ? netOrderProfit : 0);
-            let bizProfit = netOrderProfit - ownerSavings;
-
-            data.orders.push({
-                code: document.getElementById('order-code-select').value,
-                segment: document.getElementById('order-segment').value,
-                customer: document.getElementById('order-customer').value,
-                custPhone: document.getElementById('order-cust-phone').value,
-                item: document.getElementById('order-item').value,
-                amount: amount, 
-                cost: cost, 
-                tailorWage: tailorWage, 
-                ownerSavings: ownerSavings, 
-                bizProfit: bizProfit > 0 ? bizProfit : 0,
-                date: document.getElementById('order-date').value,
-                measType: document.getElementById('order-meas-type').value,
-                measurements: document.getElementById('order-measurements').value,
-                tailor: document.getElementById('order-tailor').value,
-                status: 'Pending',
-                payment: document.getElementById('order-payment').value
-            });
-            saveData(); 
-            renderAll(); 
-            e.target.reset(); 
-            toggleMeasurementType('Manual'); 
-            switchTab('orders-new');
-        });
-
-        document.getElementById('catalog-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            data.catalog.push({
-                segment: document.getElementById('cat-segment').value,
-                code: document.getElementById('cat-code').value,
-                name: document.getElementById('cat-name').value,
-                price: document.getElementById('cat-price').value
-            });
-            saveData(); 
-            renderAll(); 
-            e.target.reset();
-            alert('Catalog item added successfully!');
-        });
-
-        document.getElementById('employee-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            data.employees.push({
-                name: document.getElementById('emp-name').value,
-                phone: document.getElementById('emp-phone').value,
-                role: document.getElementById('emp-role').value
-            });
-            saveData(); 
-            renderAll(); 
-            e.target.reset();
-            alert('Tailor saved successfully!');
-        });
-
-        document.getElementById('investment-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            data.investments.push({
-                segment: document.getElementById('inv-segment').value,
-                desc: document.getElementById('inv-desc').value,
-                amount: document.getElementById('inv-amount').value
-            });
-            saveData(); 
-            renderAll(); 
-            e.target.reset();
-            alert('Investment saved successfully!');
-        });
-
-        // Initial Load
-        renderAll();
-        switchTab('dashboard');
-    </script>
-</body>
-</html>
 
 
 
