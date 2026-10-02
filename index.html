@@ -37,11 +37,19 @@
             </div>
         </div>
 
-        <!-- Wallet / Balance Card in Header -->
-        <div class="max-w-2xl mx-auto bg-[#114b38] border border-emerald-700/50 p-5 rounded-2xl shadow-inner text-center">
-            <p class="text-xs text-emerald-300 font-medium">Net Business Profit (After Investments)</p>
-            <h1 class="text-3xl font-extrabold text-white mt-1" id="dash-profit">₹0</h1>
-            <div class="flex justify-center gap-3 mt-4">
+        <!-- Wallet / Balance Card in Header (Dual Profits Display) -->
+        <div class="max-w-2xl mx-auto bg-[#114b38] border border-emerald-700/50 p-5 rounded-2xl shadow-inner text-center space-y-3">
+            <div class="grid grid-cols-2 gap-2 border-b border-emerald-700/40 pb-3">
+                <div>
+                    <p class="text-[11px] text-emerald-300 font-medium">Total Profit (Before Expenses)</p>
+                    <h2 class="text-xl font-bold text-white mt-0.5" id="dash-gross-profit">₹0</h2>
+                </div>
+                <div>
+                    <p class="text-[11px] text-emerald-300 font-medium">Net Profit (After Expenses)</p>
+                    <h2 class="text-xl font-bold text-emerald-300 mt-0.5" id="dash-net-profit">₹0</h2>
+                </div>
+            </div>
+            <div class="flex justify-center gap-3 pt-1">
                 <button onclick="switchTab('orders-new')" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow">＋ New Order</button>
                 <button onclick="switchTab('catalog')" class="bg-[#19634b] hover:bg-[#207a5d] text-emerald-100 text-xs font-semibold px-4 py-2 rounded-xl transition border border-emerald-600">👗 Item Catalog</button>
             </div>
@@ -231,7 +239,7 @@
         <!-- TAB 2.4: EMPLOYEES & EARNINGS WINDOW -->
         <div id="tab-employees-window" class="tab-content hidden space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
-                <h3 class="text-sm font-bold text-[#0b3b2c]" id="employee-form-title">👩‍‍🎨 Employees & Tailor Work Analytics</h3>
+                <h3 class="text-sm font-bold text-[#0b3b2c]" id="employee-form-title">👩‍🎨 Employees & Tailor Work Analytics</h3>
                 <p class="text-xs text-gray-500">Track pending orders, completed orders, and total earned wages for each tailor.</p>
                 
                 <div id="employees-earnings-list" class="space-y-3"></div>
@@ -595,7 +603,6 @@
             container.innerHTML = '';
 
             data.employees.forEach((emp, index) => {
-                // Tailor statistics: Pending vs Completed orders count
                 let tailorOrders = data.orders.filter(o => o.tailor === emp.name);
                 let pendingCount = tailorOrders.filter(o => o.status === 'Pending' || o.status === 'Stitching').length;
                 let completedOrders = tailorOrders.filter(o => o.status === 'Ready' || o.status === 'Delivered');
@@ -630,7 +637,7 @@
             document.getElementById('emp-name').value = emp.name;
             document.getElementById('emp-phone').value = emp.phone;
             document.getElementById('emp-role').value = emp.role;
-            document.getElementById('employee-form-title').innerText = '👩‍🎨 Edit Tailor / Employee';
+            document.getElementById('employee-form-title').innerText = '👩‍‍🎨 Edit Tailor / Employee';
             document.getElementById('employee-form-subtitle').innerText = 'Edit Tailor Details';
             document.getElementById('emp-submit-btn').innerText = 'Update Tailor';
         }
@@ -883,14 +890,18 @@
             let totalRevenue = activeOrders.reduce((acc, curr) => acc + Number(curr.amount), 0);
             let totalOrderCost = activeOrders.reduce((acc, curr) => acc + Number(curr.cost), 0);
             let totalGeneralExp = activeExpenses.reduce((acc, curr) => acc + Number(curr.amount), 0);
-            let totalExpense = totalOrderCost + totalGeneralExp;
             
             let totalInvestments = activeInvestments.reduce((acc, curr) => acc + Number(curr.amount), 0);
             let totalOwnerSavings = activeOrders.reduce((acc, curr) => acc + Number(curr.ownerSavings), 0);
-            
             let totalTailorWages = activeOrders.reduce((acc, curr) => acc + Number(curr.tailorWage || 0), 0);
-            let grossProfit = totalRevenue - totalOrderCost - totalTailorWages - totalGeneralExp;
-            let totalBizProfit = grossProfit - totalOwnerSavings - totalInvestments;
+            
+            // 1. Gross Profit / Total Profit (Before general expenses & investments deductions)
+            // म्हणजेच എക്സ്പെൻസുകൾ കൂട്ടാതെ ബിസിനസ് മൊത്തത്തിൽ ഉണ്ടാക്കിയ പ്രോഫിറ്റ്
+            let totalGrossProfit = activeOrders.reduce((acc, curr) => acc + Number(curr.bizProfit || 0), 0);
+
+            // 2. Net Profit (After deducting all general expenses & machine investments)
+            // म्हणजेच എക്സ്പെൻസുകൾ കഴിഞ്ഞതിനു ശേഷമുള്ള ബാക്കി നെറ്റ് പ്രോഫിറ്റ്
+            let netProfit = totalGrossProfit - totalGeneralExp - totalInvestments;
 
             // Order status counters
             let totalOrdersCount = activeOrders.length;
@@ -913,10 +924,14 @@
             document.getElementById('bebi-rev').innerText = `₹${bebiRev}`;
             document.getElementById('bebi-profit').innerText = `₹${bebiProfit}`;
 
+            // Update Header Values (Gross Profit vs Net Profit)
+            document.getElementById('dash-gross-profit').innerText = `₹${totalGrossProfit}`;
+            document.getElementById('dash-net-profit').innerText = `₹${netProfit > 0 ? netProfit : 0}`;
+
             document.getElementById('dash-revenue').innerText = `₹${totalRevenue}`;
-            document.getElementById('dash-expense').innerText = `₹${totalExpense}`;
+            document.getElementById('dash-expense').innerText = `₹${totalOrderCost + totalGeneralExp}`;
             document.getElementById('dash-investments').innerText = `₹${totalInvestments}`;
-            document.getElementById('dash-profit').innerText = `₹${totalBizProfit > 0 ? totalBizProfit : 0}`;
+            document.getElementById('dash-profit').innerText = `₹${netProfit > 0 ? netProfit : 0}`;
             document.getElementById('dash-owner-savings').innerText = `₹${totalOwnerSavings}`;
             document.getElementById('dash-orders-count').innerText = `${activeOrders.length} Total Orders`;
         }
@@ -1047,6 +1062,10 @@
             saveData(); renderAll(); e.target.reset();
         });
 
+        document.getElementById('investment-form').addEventListener('submit, (e)') => {
+            // Handled via standard submit below
+        };
+
         document.getElementById('investment-form').addEventListener('submit', (e) => {
             e.preventDefault();
             let todayDate = new Date().toISOString().split('T')[0];
@@ -1064,6 +1083,7 @@
     </script>
 </body>
 </html>
+
 
    
 
