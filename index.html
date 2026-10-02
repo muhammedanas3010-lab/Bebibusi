@@ -55,7 +55,7 @@
         <div class="grid grid-cols-2 gap-3 mb-6">
             <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
                 <div>
-                    <p class="text-xs text-gray-400 font-medium">Total Revenue</p>
+                    <p class="text-xs text-gray-400 font-medium">Total Revenue (Sales)</p>
                     <h3 class="text-lg font-bold text-green-600 mt-0.5" id="dash-revenue">₹0</h3>
                 </div>
                 <div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-lg">📈</div>
@@ -69,11 +69,27 @@
             </div>
         </div>
 
-        <!-- Urgent Deliveries Alert -->
-        <div class="bg-red-50 border border-red-200 rounded-2xl p-4 mb-6 shadow-sm">
-            <h4 class="text-xs font-bold text-red-700 uppercase tracking-wider mb-2">🚨 Urgent Deliveries (Next 2 Days)</h4>
-            <div id="urgent-deliveries-list" class="space-y-2 text-xs text-red-900">
-                <p class="text-gray-400 italic">No urgent deliveries pending.</p>
+        <!-- Order Status Counts Summary Card -->
+        <div class="bg-white border border-gray-100 p-4 rounded-2xl shadow-sm mb-6 grid grid-cols-3 gap-2 text-center">
+            <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                <p class="text-[11px] text-blue-600 font-medium">Total Orders</p>
+                <h4 class="text-base font-bold text-blue-800 mt-0.5" id="stat-total-orders">0</h4>
+            </div>
+            <div class="bg-amber-50 p-3 rounded-xl border border-amber-100">
+                <p class="text-[11px] text-amber-600 font-medium">Pending / Stitching</p>
+                <h4 class="text-base font-bold text-amber-800 mt-0.5" id="stat-pending-orders">0</h4>
+            </div>
+            <div class="bg-green-50 p-3 rounded-xl border border-green-100">
+                <p class="text-[11px] text-green-600 font-medium">Completed</p>
+                <h4 class="text-base font-bold text-green-800 mt-0.5" id="stat-completed-orders">0</h4>
+            </div>
+        </div>
+
+        <!-- Next Upcoming Deliveries Widget (First 2 Sorted by Date) -->
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-6 shadow-sm">
+            <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-2">🎯 Next 2 Upcoming Deliveries</h4>
+            <div id="next-two-deliveries-list" class="space-y-2 text-xs text-emerald-950">
+                <p class="text-gray-400 italic">No upcoming deliveries found.</p>
             </div>
         </div>
 
@@ -96,7 +112,7 @@
             <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="text-sm font-bold text-gray-800">Business Overview</h3>
-                    <span class="text-xs text-emerald-600 font-semibold" id="dash-orders">0 Total Orders</span>
+                    <span class="text-xs text-emerald-600 font-semibold" id="dash-orders-count">0 Total Orders</span>
                 </div>
                 <div class="space-y-3">
                     <div class="flex justify-between items-center p-3 bg-gray-50 rounded-xl">
@@ -207,7 +223,7 @@
         <!-- TAB 2.3: COMPLETED & READY WINDOW -->
         <div id="tab-orders-completed" class="tab-content hidden space-y-4">
             <div class="bg-white rounded-2xl shadow-sm border p-4">
-                <h3 class="text-sm font-bold text-green-700 mb-3">✅ Ready / Completed & Delivered Orders</h3>
+                <h3 class="text-sm font-bold text-green-700 mb-3">✅ Ready / Completed & Delivered Orders (Recent First)</h3>
                 <div id="completed-orders-list" class="space-y-2"></div>
             </div>
         </div>
@@ -215,18 +231,19 @@
         <!-- TAB 2.4: EMPLOYEES & EARNINGS WINDOW -->
         <div id="tab-employees-window" class="tab-content hidden space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
-                <h3 class="text-sm font-bold text-[#0b3b2c]">👩‍🎨 Employees & Tailor Earnings Analytics</h3>
-                <p class="text-xs text-gray-500">Track how many orders each tailor has completed and their total earned wages.</p>
+                <h3 class="text-sm font-bold text-[#0b3b2c]" id="employee-form-title">👩‍‍🎨 Employees & Tailor Work Analytics</h3>
+                <p class="text-xs text-gray-500">Track pending orders, completed orders, and total earned wages for each tailor.</p>
                 
                 <div id="employees-earnings-list" class="space-y-3"></div>
 
                 <div class="border-t pt-4 mt-4">
-                    <h4 class="text-xs font-bold text-gray-700 mb-2">Add New Tailor / Employee</h4>
+                    <h4 class="text-xs font-bold text-gray-700 mb-2" id="employee-form-subtitle">Add New Tailor / Employee</h4>
                     <form id="employee-form" class="grid grid-cols-1 gap-3 text-xs">
+                        <input type="hidden" id="emp-edit-index" value="-1">
                         <input type="text" id="emp-name" placeholder="Tailor Name (e.g. Umma)" required class="border p-2 rounded-xl bg-gray-50">
                         <input type="text" id="emp-phone" placeholder="WhatsApp Number (e.g. 919000000001)" required class="border p-2 rounded-xl bg-gray-50">
                         <input type="text" id="emp-role" placeholder="Role" value="Tailor" required class="border p-2 rounded-xl bg-gray-50">
-                        <button type="submit" class="bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">Save Tailor</button>
+                        <button type="submit" id="emp-submit-btn" class="bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">Save Tailor</button>
                     </form>
                 </div>
             </div>
@@ -235,7 +252,7 @@
         <!-- TAB 2.5: ITEM CATALOG & IMAGE UPLOAD -->
         <div id="tab-catalog" class="tab-content hidden space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border">
-                <h3 class="text-sm font-bold text-gray-800 mb-3">👗 Item Catalog & Storage (Up to 10 Images)</h3>
+                <h3 class="text-sm font-bold text-gray-800 mb-3">👗 Item Catalog & Direct Image Upload</h3>
                 <form id="catalog-form" class="grid grid-cols-1 gap-3 text-xs">
                     <select id="cat-segment" required class="border p-2 rounded-xl bg-gray-50 font-medium">
                         <option value="Ledi">Ledi</option>
@@ -245,8 +262,8 @@
                     <input type="text" id="cat-name" placeholder="Dress Model Name" required class="border p-2 rounded-xl bg-gray-50">
                     <input type="number" id="cat-price" placeholder="Standard Price (₹)" required class="border p-2 rounded-xl bg-gray-50">
                     <div>
-                        <label class="block text-[11px] font-semibold text-gray-500 mb-1">Image URLs / Links (Comma separated, up to 10 images):</label>
-                        <textarea id="cat-images" placeholder="https://image1.jpg, https://image2.jpg..." rows="3" class="w-full border p-2 rounded-xl bg-gray-50 outline-none"></textarea>
+                        <label class="block text-[11px] font-semibold text-gray-500 mb-1">Upload Item Image / Pictures:</label>
+                        <input type="file" id="cat-image-file" accept="image/*" multiple class="w-full border p-2 rounded-xl bg-gray-50 outline-none text-xs">
                     </div>
                     <button type="submit" class="bg-[#0b3b2c] text-white py-2.5 rounded-xl font-semibold">Save Catalog Item</button>
                 </form>
@@ -385,7 +402,7 @@
     <!-- Order Details Popup Modal -->
     <div id="order-details-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl relative text-xs space-y-3">
-            <h3 class="text-base font-bold text-[#0b3b2c] border-b pb-2">📋 Order Full Details</h3>
+            <h3 class="text-base font-bold text-[#0b3b2c] border-b pb-2">📋 Order Full Details & Profits</h3>
             <div class="space-y-2 text-gray-700">
                 <p><strong>Segment:</strong> <span id="m-segment"></span></p>
                 <p><strong>Customer Name:</strong> <span id="m-customer"></span></p>
@@ -398,8 +415,12 @@
                 <p><strong>Delivery Date:</strong> <span id="m-date"></span></p>
                 <p><strong>Order Status:</strong> <span id="m-status"></span></p>
                 <p><strong>Payment Status:</strong> <span id="m-payment"></span></p>
-                <p><strong>Selling Price:</strong> <span id="m-amount" class="text-green-600 font-bold"></span></p>
-                <p><strong>Total Cost:</strong> <span id="m-cost" class="text-red-600 font-bold"></span></p>
+                <p><strong>Selling Price (Revenue):</strong> <span id="m-amount" class="text-green-600 font-bold"></span></p>
+                <p><strong>Material Cost:</strong> <span id="m-cost" class="text-red-600 font-bold"></span></p>
+                <div class="border-t pt-2 mt-2 space-y-1 bg-emerald-50 p-2 rounded-lg">
+                    <p><strong>Owner Savings:</strong> <span id="m-ownerSavings" class="text-amber-700 font-bold"></span></p>
+                    <p><strong>Business Profit from Order:</strong> <span id="m-bizProfit" class="text-indigo-700 font-bold text-sm"></span></p>
+                </div>
             </div>
             <div class="pt-3 border-t flex justify-end">
                 <button onclick="closeDetailsModal()" class="bg-gray-800 text-white px-4 py-2 rounded-xl font-semibold">Close</button>
@@ -565,7 +586,7 @@
             renderList('expenses', ['segment', 'desc', 'amount']);
             renderList('investments', ['segment', 'desc', 'amount']);
             updateDashboard();
-            checkUrgentDeliveries();
+            renderNextTwoDeliveries();
         }
 
         function renderEmployeesEarningsList() {
@@ -573,8 +594,11 @@
             if(!container) return;
             container.innerHTML = '';
 
-            data.employees.forEach((emp) => {
-                let completedOrders = data.orders.filter(o => o.tailor === emp.name && (o.status === 'Ready' || o.status === 'Delivered'));
+            data.employees.forEach((emp, index) => {
+                // Tailor statistics: Pending vs Completed orders count
+                let tailorOrders = data.orders.filter(o => o.tailor === emp.name);
+                let pendingCount = tailorOrders.filter(o => o.status === 'Pending' || o.status === 'Stitching').length;
+                let completedOrders = tailorOrders.filter(o => o.status === 'Ready' || o.status === 'Delivered');
                 let totalCompletedCount = completedOrders.length;
                 let totalEarned = completedOrders.reduce((sum, curr) => sum + Number(curr.tailorWage || 0), 0);
 
@@ -584,14 +608,39 @@
                     <div>
                         <strong class="text-sm text-[#0b3b2c]">${emp.name}</strong> (${emp.role})
                         <div class="text-gray-500 mt-0.5">Phone: ${emp.phone || 'N/A'}</div>
+                        <div class="mt-1 space-x-1">
+                            <span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">Pending: ${pendingCount}</span>
+                            <span class="bg-green-100 text-green-800 px-1.5 py-0.5 rounded font-medium">Completed: ${totalCompletedCount}</span>
+                            <span class="text-indigo-600 font-bold ml-1">Earned: ₹${totalEarned}</span>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <span class="bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-semibold">${totalCompletedCount} Completed</span>
-                        <div class="text-green-600 font-bold mt-1">Earned: ₹${totalEarned}</div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="editEmployee(${index})" class="text-blue-600 font-semibold underline">Edit</button>
+                        <button onclick="deleteEmployee(${index})" class="text-red-500 font-semibold underline">Delete</button>
                     </div>
                 `;
                 container.appendChild(div);
             });
+            if(data.employees.length === 0) container.innerHTML = '<p class="text-gray-400 italic text-xs">No tailors added yet.</p>';
+        }
+
+        function editEmployee(index) {
+            let emp = data.employees[index];
+            document.getElementById('emp-edit-index').value = index;
+            document.getElementById('emp-name').value = emp.name;
+            document.getElementById('emp-phone').value = emp.phone;
+            document.getElementById('emp-role').value = emp.role;
+            document.getElementById('employee-form-title').innerText = '👩‍🎨 Edit Tailor / Employee';
+            document.getElementById('employee-form-subtitle').innerText = 'Edit Tailor Details';
+            document.getElementById('emp-submit-btn').innerText = 'Update Tailor';
+        }
+
+        function deleteEmployee(index) {
+            if(confirm('Are you sure you want to delete this tailor?')) {
+                data.employees.splice(index, 1);
+                saveData();
+                renderAll();
+            }
         }
 
         function renderCatalogList() {
@@ -665,16 +714,26 @@
             if(stitchingContainer) stitchingContainer.innerHTML = '';
             if(completedContainer) completedContainer.innerHTML = '';
 
-            orders.forEach((item) => {
+            let completedOrders = orders.filter(item => {
+                let status = item.status || 'Pending';
+                return status === 'Ready' || status === 'Delivered';
+            });
+
+            completedOrders.sort((a, b) => (a.completedAt || 0) - (b.completedAt || 0));
+
+            let pendingOrders = orders.filter(item => (item.status || 'Pending') === 'Pending');
+            let stitchingOrders = orders.filter(item => (item.status || 'Pending') === 'Stitching');
+
+            let renderOrderCard = (item) => {
                 let globalIndex = data.orders.indexOf(item);
                 let status = item.status || 'Pending';
 
-                let cardHtml = `
+                return `
                     <div class="bg-gray-50 border p-3 rounded-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-2 text-xs">
                         <div>
                             <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold ${item.segment === 'Ledi' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700'}">${item.segment}</span>
                             <strong class="text-sm ml-1">${item.customer}</strong> - ${item.item}
-                            <div class="text-gray-500 mt-1">Tailor: ${item.tailor} (Wage: ₹${item.tailorWage || 0}) | Delivery: ${item.date} | Price: ₹${item.amount}</div>
+                            <div class="text-gray-500 mt-1">Tailor: ${item.tailor} | Delivery: ${item.date} | Price: ₹${item.amount} | <span class="text-indigo-600 font-semibold">Profit: ₹${item.bizProfit || 0}</span></div>
                         </div>
                         <div class="flex items-center gap-2 flex-wrap">
                             <select onchange="updateOrderStatus(${globalIndex}, this.value)" class="border p-1.5 rounded-lg bg-white font-medium">
@@ -690,15 +749,11 @@
                         </div>
                     </div>
                 `;
+            };
 
-                if(status === 'Pending') {
-                    if(newContainer) newContainer.innerHTML += cardHtml;
-                } else if(status === 'Stitching') {
-                    if(stitchingContainer) stitchingContainer.innerHTML += cardHtml;
-                } else {
-                    if(completedContainer) completedContainer.innerHTML += cardHtml;
-                }
-            });
+            pendingOrders.forEach(item => { if(newContainer) newContainer.innerHTML += renderOrderCard(item); });
+            stitchingOrders.forEach(item => { if(stitchingContainer) stitchingContainer.innerHTML += renderOrderCard(item); });
+            completedOrders.forEach(item => { if(completedContainer) completedContainer.innerHTML += renderOrderCard(item); });
 
             if(newContainer && newContainer.innerHTML === '') newContainer.innerHTML = '<p class="text-gray-400 italic">No new/pending orders.</p>';
             if(stitchingContainer && stitchingContainer.innerHTML === '') stitchingContainer.innerHTML = '<p class="text-gray-400 italic">No orders in stitching.</p>';
@@ -706,7 +761,15 @@
         }
 
         function updateOrderStatus(index, newStatus) {
-            data.orders[index].status = newStatus;
+            let order = data.orders[index];
+            order.status = newStatus;
+            if (newStatus === 'Ready' || newStatus === 'Delivered') {
+                if (!order.completedAt) {
+                    order.completedAt = Date.now();
+                }
+            } else {
+                order.completedAt = null;
+            }
             saveData();
             renderAll();
         }
@@ -726,6 +789,8 @@
             document.getElementById('m-payment').innerText = item.payment;
             document.getElementById('m-amount').innerText = `₹${item.amount}`;
             document.getElementById('m-cost').innerText = `₹${item.cost}`;
+            document.getElementById('m-ownerSavings').innerText = `₹${item.ownerSavings || 0}`;
+            document.getElementById('m-bizProfit').innerText = `₹${item.bizProfit || 0}`;
 
             document.getElementById('order-details-modal').classList.remove('hidden');
         }
@@ -788,29 +853,24 @@
             renderAll();
         }
 
-        function checkUrgentDeliveries() {
-            let container = document.getElementById('urgent-deliveries-list');
+        function renderNextTwoDeliveries() {
+            let container = document.getElementById('next-two-deliveries-list');
             if(!container) return;
             container.innerHTML = '';
-            
-            let today = new Date();
-            let urgentOrders = data.orders.filter(o => {
-                if(!o.date || o.status === 'Delivered') return false;
-                let dDate = new Date(o.date);
-                let diffTime = dDate - today;
-                let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                return diffDays >= 0 && diffDays <= 2;
-            });
 
-            if(urgentOrders.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 italic">No urgent deliveries pending.</p>`;
+            let activeOrders = getFilteredData('orders').filter(o => o.status !== 'Delivered' && o.date);
+            activeOrders.sort((a, b) => new Date(a.date) - new Date(b.date));
+            let nextTwo = activeOrders.slice(0, 2);
+
+            if(nextTwo.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 italic">No upcoming deliveries found.</p>`;
                 return;
             }
 
-            urgentOrders.forEach(ord => {
+            nextTwo.forEach(ord => {
                 let div = document.createElement('div');
-                div.className = 'bg-white p-2 rounded border border-red-200 flex justify-between items-center';
-                div.innerHTML = `<span>👗 <strong>${ord.customer}</strong> - ${ord.item}</span> <span class="bg-red-600 text-white px-2 py-0.5 rounded text-[10px]">${ord.date}</span>`;
+                div.className = 'bg-white p-2 rounded border border-emerald-200 flex justify-between items-center';
+                div.innerHTML = `<span>📅 <strong>${ord.customer}</strong> - ${ord.item}</span> <span class="bg-emerald-600 text-white px-2 py-0.5 rounded text-[10px] font-semibold">${ord.date}</span>`;
                 container.appendChild(div);
             });
         }
@@ -828,12 +888,19 @@
             let totalInvestments = activeInvestments.reduce((acc, curr) => acc + Number(curr.amount), 0);
             let totalOwnerSavings = activeOrders.reduce((acc, curr) => acc + Number(curr.ownerSavings), 0);
             
-            // Net Business Profit = (Total Revenue - Total Expenses - Total Tailor Wages - Total Investments) minus Owner Savings
             let totalTailorWages = activeOrders.reduce((acc, curr) => acc + Number(curr.tailorWage || 0), 0);
             let grossProfit = totalRevenue - totalOrderCost - totalTailorWages - totalGeneralExp;
             let totalBizProfit = grossProfit - totalOwnerSavings - totalInvestments;
 
-            // Segment Specific Metrics
+            // Order status counters
+            let totalOrdersCount = activeOrders.length;
+            let pendingOrdersCount = activeOrders.filter(o => o.status === 'Pending' || o.status === 'Stitching').length;
+            let completedOrdersCount = activeOrders.filter(o => o.status === 'Ready' || o.status === 'Delivered').length;
+
+            document.getElementById('stat-total-orders').innerText = totalOrdersCount;
+            document.getElementById('stat-pending-orders').innerText = pendingOrdersCount;
+            document.getElementById('stat-completed-orders').innerText = completedOrdersCount;
+
             let lediOrders = data.orders.filter(o => o.segment === 'Ledi');
             let lediRev = lediOrders.reduce((acc, curr) => acc + Number(curr.amount), 0);
             let lediProfit = lediOrders.reduce((acc, curr) => acc + Number(curr.bizProfit || 0), 0);
@@ -851,27 +918,7 @@
             document.getElementById('dash-investments').innerText = `₹${totalInvestments}`;
             document.getElementById('dash-profit').innerText = `₹${totalBizProfit > 0 ? totalBizProfit : 0}`;
             document.getElementById('dash-owner-savings').innerText = `₹${totalOwnerSavings}`;
-            document.getElementById('dash-orders').innerText = `${activeOrders.length} Total Orders`;
-        }
-
-        function calculateAnalytics() {
-            let start = document.getElementById('anal-start-date').value;
-            let end = document.getElementById('anal-end-date').value;
-            if(!start || !end) { alert('Please select both dates!'); return; }
-
-            let filteredOrders = data.orders.filter(o => o.date >= start && o.date <= end);
-            let filteredInvestments = data.investments.filter(i => i.date >= start && i.date <= end);
-            let rev = filteredOrders.reduce((acc, curr) => acc + Number(curr.amount), 0);
-            let cost = filteredOrders.reduce((acc, curr) => acc + Number(curr.cost), 0);
-            let invCost = filteredInvestments.reduce((acc, curr) => acc + Number(curr.amount), 0);
-            let bizProfit = filteredOrders.reduce((acc, curr) => acc + Number(curr.bizProfit), 0) - invCost;
-            let ownerSavings = filteredOrders.reduce((acc, curr) => acc + Number(curr.ownerSavings), 0);
-
-            document.getElementById('anal-rev').innerText = `₹${rev}`;
-            document.getElementById('anal-exp').innerText = `₹${cost}`;
-            document.getElementById('anal-profit').innerText = `₹${bizProfit}`;
-            document.getElementById('anal-owner').innerText = `₹${ownerSavings}`;
-            document.getElementById('analytics-results').classList.remove('hidden');
+            document.getElementById('dash-orders-count').innerText = `${activeOrders.length} Total Orders`;
         }
 
         // Form Submissions
@@ -881,7 +928,6 @@
             let cost = Number(document.getElementById('order-cost').value);
             let tailorWage = Number(document.getElementById('order-tailor-wage').value || 0);
             
-            // Net profit after deducting all expenses (Material Cost + Tailor Wage) from Selling Price
             let netOrderProfit = amount - cost - tailorWage;
             let ownerSavings = netOrderProfit >= 300 ? 300 : (netOrderProfit > 0 ? netOrderProfit : 0);
             let bizProfit = netOrderProfit - ownerSavings;
@@ -898,6 +944,7 @@
                 measurements: document.getElementById('order-measurements').value,
                 tailor: document.getElementById('order-tailor').value,
                 status: 'Pending',
+                completedAt: null,
                 payment: document.getElementById('order-payment').value
             });
             saveData(); renderAll(); e.target.reset(); toggleMeasurementType('Manual'); switchTab('orders-new');
@@ -905,16 +952,39 @@
 
         document.getElementById('catalog-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            data.catalog.push({
-                segment: document.getElementById('cat-segment').value,
-                code: document.getElementById('cat-code').value,
-                name: document.getElementById('cat-name').value,
-                price: document.getElementById('cat-price').value,
-                images: document.getElementById('cat-images').value
-            });
-            saveData(); renderAll(); e.target.reset();
-            alert('Catalog item successfully added!');
+            let fileInput = document.getElementById('cat-image-file');
+            let segment = document.getElementById('cat-segment').value;
+            let code = document.getElementById('cat-code').value;
+            let name = document.getElementById('cat-name').value;
+            let price = document.getElementById('cat-price').value;
+
+            if (fileInput.files.length > 0) {
+                let imagesArr = [];
+                let filesProcessed = 0;
+
+                Array.from(fileInput.files).forEach((file) => {
+                    let reader = new FileReader();
+                    reader.onload = function(uploadEvent) {
+                        imagesArr.push(uploadEvent.target.result);
+                        filesProcessed++;
+                        if (filesProcessed === fileInput.files.length) {
+                            saveCatalogItem(segment, code, name, price, imagesArr.join(','));
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                });
+            } else {
+                saveCatalogItem(segment, code, name, price, '');
+            }
         });
+
+        function saveCatalogItem(segment, code, name, price, images) {
+            data.catalog.push({ segment, code, name, price, images });
+            saveData(); 
+            renderAll(); 
+            document.getElementById('catalog-form').reset();
+            alert('Catalog item with image successfully added!');
+        }
 
         document.getElementById('stock-form').addEventListener('submit', (e) => {
             e.preventDefault();
@@ -948,13 +1018,23 @@
 
         document.getElementById('employee-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            data.employees.push({ 
-                name: document.getElementById('emp-name').value, 
-                phone: document.getElementById('emp-phone').value,
-                role: document.getElementById('emp-role').value 
-            });
+            let editIndex = Number(document.getElementById('emp-edit-index').value);
+            let name = document.getElementById('emp-name').value;
+            let phone = document.getElementById('emp-phone').value;
+            let role = document.getElementById('emp-role').value;
+
+            if(editIndex > -1) {
+                data.employees[editIndex] = { name, phone, role };
+                document.getElementById('emp-edit-index').value = -1;
+                document.getElementById('employee-form-title').innerText = '👩‍🎨 Employees & Tailor Work Analytics';
+                document.getElementById('employee-form-subtitle').innerText = 'Add New Tailor / Employee';
+                document.getElementById('emp-submit-btn').innerText = 'Save Tailor';
+            } else {
+                data.employees.push({ name, phone, role });
+            }
+
             saveData(); renderAll(); e.target.reset();
-            alert('Tailor successfully added!');
+            alert('Tailor details saved successfully!');
         });
 
         document.getElementById('expense-form').addEventListener('submit', (e) => {
@@ -984,5 +1064,7 @@
     </script>
 </body>
 </html>
+
+   
 
 
