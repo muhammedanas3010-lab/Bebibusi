@@ -239,7 +239,7 @@
         <!-- TAB 2.4: EMPLOYEES & EARNINGS WINDOW -->
         <div id="tab-employees-window" class="tab-content hidden space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border space-y-4">
-                <h3 class="text-sm font-bold text-[#0b3b2c]" id="employee-form-title">👩‍🎨 Employees & Tailor Work Analytics</h3>
+                <h3 class="text-sm font-bold text-[#0b3b2c]" id="employee-form-title">👩‍‍🎨 Employees & Tailor Work Analytics</h3>
                 <p class="text-xs text-gray-500">Track pending orders, completed orders, and total earned wages for each tailor.</p>
                 
                 <div id="employees-earnings-list" class="space-y-3"></div>
@@ -637,7 +637,7 @@
             document.getElementById('emp-name').value = emp.name;
             document.getElementById('emp-phone').value = emp.phone;
             document.getElementById('emp-role').value = emp.role;
-            document.getElementById('employee-form-title').innerText = '👩‍‍🎨 Edit Tailor / Employee';
+            document.getElementById('employee-form-title').innerText = '👩‍🎨 Edit Tailor / Employee';
             document.getElementById('employee-form-subtitle').innerText = 'Edit Tailor Details';
             document.getElementById('emp-submit-btn').innerText = 'Update Tailor';
         }
@@ -895,15 +895,9 @@
             let totalOwnerSavings = activeOrders.reduce((acc, curr) => acc + Number(curr.ownerSavings), 0);
             let totalTailorWages = activeOrders.reduce((acc, curr) => acc + Number(curr.tailorWage || 0), 0);
             
-            // 1. Gross Profit / Total Profit (Before general expenses & investments deductions)
-            // म्हणजेच എക്സ്പെൻസുകൾ കൂട്ടാതെ ബിസിനസ് മൊത്തത്തിൽ ഉണ്ടാക്കിയ പ്രോഫിറ്റ്
             let totalGrossProfit = activeOrders.reduce((acc, curr) => acc + Number(curr.bizProfit || 0), 0);
-
-            // 2. Net Profit (After deducting all general expenses & machine investments)
-            // म्हणजेच എക്സ്പെൻസുകൾ കഴിഞ്ഞതിനു ശേഷമുള്ള ബാക്കി നെറ്റ് പ്രോഫിറ്റ്
             let netProfit = totalGrossProfit - totalGeneralExp - totalInvestments;
 
-            // Order status counters
             let totalOrdersCount = activeOrders.length;
             let pendingOrdersCount = activeOrders.filter(o => o.status === 'Pending' || o.status === 'Stitching').length;
             let completedOrdersCount = activeOrders.filter(o => o.status === 'Ready' || o.status === 'Delivered').length;
@@ -924,7 +918,6 @@
             document.getElementById('bebi-rev').innerText = `₹${bebiRev}`;
             document.getElementById('bebi-profit').innerText = `₹${bebiProfit}`;
 
-            // Update Header Values (Gross Profit vs Net Profit)
             document.getElementById('dash-gross-profit').innerText = `₹${totalGrossProfit}`;
             document.getElementById('dash-net-profit').innerText = `₹${netProfit > 0 ? netProfit : 0}`;
 
@@ -1062,10 +1055,6 @@
             saveData(); renderAll(); e.target.reset();
         });
 
-        document.getElementById('investment-form').addEventListener('submit, (e)') => {
-            // Handled via standard submit below
-        };
-
         document.getElementById('investment-form').addEventListener('submit', (e) => {
             e.preventDefault();
             let todayDate = new Date().toISOString().split('T')[0];
@@ -1083,6 +1072,7 @@
     </script>
 </body>
 </html>
+
 
 
 
