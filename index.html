@@ -57,7 +57,6 @@
             <!-- Top Header -->
             <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
                 <div class="flex items-center gap-4">
-                    <button class="md:hidden text-gray-600 text-xl"><i class="fa-solid fa-bars"></i></button>
                     <h2 id="page-title" class="text-xl font-bold text-gray-800">Dashboard Overview</h2>
                 </div>
                 <div class="flex items-center gap-3">
@@ -71,7 +70,7 @@
             <div class="p-6 max-w-7xl mx-auto w-full space-y-6 flex-1">
 
                 <!-- 1. DASHBOARD TAB -->
-                <div id="tab-dashboard" class="space-y-6">
+                <div id="tab-dashboard" class="space-y-6 tab-content">
                     <!-- Top Metric Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
@@ -107,9 +106,9 @@
                     <!-- Sub-Brand Split Cards (LEDY vs BEBI) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- LEDY BLUE PLATFORM -->
-                        <div class="bg-ledy-blue/40 border border-blue-100 p-6 rounded-3xl space-y-4">
+                        <div class="bg-blue-50 border border-blue-100 p-6 rounded-3xl space-y-4">
                             <div class="flex justify-between items-center">
-                                <h3 class="font-bold text-lg text-ledy-blue flex items-center gap-2">
+                                <h3 class="font-bold text-lg text-blue-700 flex items-center gap-2">
                                     <i class="fa-solid fa-shirt"></i> LEDY Platform (Blue)
                                 </h3>
                                 <span class="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full font-semibold">Active</span>
@@ -129,15 +128,15 @@
                                 </div>
                             </div>
                             <div class="flex justify-between text-xs text-gray-600 pt-2 border-t border-blue-100">
-                                <span>Completed Orders: <strong id="ledy-completed">0</strong></span>
-                                <span>Pending Orders: <strong id="ledy-pending" class="text-amber-600">0</strong></span>
+                                <span>Completed: <strong id="ledy-completed">0</strong></span>
+                                <span>Pending: <strong id="ledy-pending" class="text-amber-600">0</strong></span>
                             </div>
                         </div>
 
                         <!-- BEBI LAVENDER PLATFORM -->
-                        <div class="bg-baby-lavender/40 border border-purple-100 p-6 rounded-3xl space-y-4">
+                        <div class="bg-purple-50 border border-purple-100 p-6 rounded-3xl space-y-4">
                             <div class="flex justify-between items-center">
-                                <h3 class="font-bold text-lg text-baby-lavender flex items-center gap-2">
+                                <h3 class="font-bold text-lg text-purple-700 flex items-center gap-2">
                                     <i class="fa-solid fa-child-dress"></i> BEBI Platform (Lavender)
                                 </h3>
                                 <span class="bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full font-semibold">Active</span>
@@ -157,8 +156,8 @@
                                 </div>
                             </div>
                             <div class="flex justify-between text-xs text-gray-600 pt-2 border-t border-purple-100">
-                                <span>Completed Orders: <strong id="bebi-completed">0</strong></span>
-                                <span>Pending Orders: <strong id="bebi-pending" class="text-amber-600">0</strong></span>
+                                <span>Completed: <strong id="bebi-completed">0</strong></span>
+                                <span>Pending: <strong id="bebi-pending" class="text-amber-600">0</strong></span>
                             </div>
                         </div>
                     </div>
@@ -176,65 +175,55 @@
                 </div>
 
                 <!-- 2. CUSTOMERS & ORDERS TAB -->
-                <div id="tab-customers" class="space-y-6 hidden">
+                <div id="tab-customers" class="space-y-6 tab-content hidden">
                     <div class="flex border-b border-gray-200">
                         <button onclick="switchCustomerSubTab('pending')" id="sub-btn-pending" class="px-6 py-3 font-semibold border-b-2 border-purple-600 text-purple-600">Pending Orders</button>
                         <button onclick="switchCustomerSubTab('completed')" id="sub-btn-completed" class="px-6 py-3 font-semibold text-gray-500 border-b-2 border-transparent">Completed Orders</button>
                     </div>
 
-                    <!-- Pending Orders List View -->
                     <div id="customer-pending-view" class="space-y-4">
                         <div class="flex justify-between items-center">
                             <h3 class="font-bold text-lg">Pending Customer Orders</h3>
                             <button onclick="openAddCustomerModal()" class="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-lg">Add New Order</button>
                         </div>
-                        <div id="pending-orders-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Items -->
-                        </div>
+                        <div id="pending-orders-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                     </div>
 
-                    <!-- Completed Orders List View -->
                     <div id="customer-completed-view" class="space-y-4 hidden">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-bold text-lg">Completed Customer Orders (Chronological)</h3>
+                            <h3 class="font-bold text-lg">Completed Customer Orders</h3>
                         </div>
-                        <div id="completed-orders-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <!-- Items -->
-                        </div>
+                        <div id="completed-orders-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                     </div>
                 </div>
 
                 <!-- 3. ITEM STORE TAB -->
-                <div id="tab-store" class="space-y-6 hidden">
+                <div id="tab-store" class="space-y-6 tab-content hidden">
                     <div class="flex justify-between items-center">
                         <h3 class="font-bold text-lg">Item Store &amp; Catalog</h3>
                         <button onclick="openAddItemModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
                             <i class="fa-solid fa-plus"></i> Add Item / Dress
                         </button>
                     </div>
-                    <div id="item-store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <!-- Items populated dynamically -->
-                    </div>
+                    <div id="item-store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
                 </div>
 
                 <!-- 4. EMPLOYEES TAB -->
-                <div id="tab-employees" class="space-y-6 hidden">
+                <div id="tab-employees" class="space-y-6 tab-content hidden">
                     <div class="flex justify-between items-center">
                         <h3 class="font-bold text-lg">Employee Management</h3>
                         <button onclick="openAddEmployeeModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
                             <i class="fa-solid fa-user-plus"></i> Add Employee
                         </button>
                     </div>
-                    <div id="employee-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Employee cards populated dynamically -->
-                    </div>
+                    <div id="employee-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
                 <!-- 5. DATA ANALYTICS TAB -->
-                <div id="tab-analytics" class="space-y-6 hidden">
+                <div id="tab-analytics" class="space-y-6 tab-content hidden">
                     <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xs space-y-4">
                         <h3 class="font-bold text-lg text-gray-800"><i class="fa-solid fa-chart-line text-purple-600 mr-2"></i> Business Data Analytics</h3>
-                        <p class="text-sm text-gray-500">Analyze your business performance over custom date ranges or monthly breakdowns.</p>
+                        <p class="text-sm text-gray-500">Analyze your business performance over custom date ranges.</p>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
                             <div>
@@ -272,7 +261,6 @@
     </div>
 
     <!-- MODALS -->
-
     <!-- Add/Edit Customer Modal -->
     <div id="modal-customer" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50 overflow-y-auto">
         <div class="bg-white rounded-3xl max-w-xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
@@ -344,9 +332,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Assign Employee</label>
-                        <select id="cust-employee" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm">
-                            <!-- Filled dynamically -->
-                        </select>
+                        <select id="cust-employee" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm"></select>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">Stitch/Employee Pay (₹)</label>
@@ -430,16 +416,14 @@
         </div>
     </div>
 
-    <!-- View Customer Details Modal -->
+    <!-- View Details Modal -->
     <div id="modal-view-cust" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4">
             <div class="flex justify-between items-center border-b border-gray-100 pb-3">
-                <h3 class="font-bold text-lg text-purple-900">Customer Details</h3>
+                <h3 class="font-bold text-lg text-purple-900">Details View</h3>
                 <button onclick="closeModal('modal-view-cust')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div id="cust-details-content" class="space-y-3 text-sm">
-                <!-- Details injected -->
-            </div>
+            <div id="cust-details-content" class="space-y-3 text-sm"></div>
             <div class="flex justify-end pt-2">
                 <button onclick="closeModal('modal-view-cust')" class="px-4 py-2 bg-gray-100 rounded-xl text-sm font-semibold">Close</button>
             </div>
@@ -448,7 +432,6 @@
 
     <!-- Application Script -->
     <script>
-        // LocalStorage Initialization & State
         let db = {
             customers: JSON.parse(localStorage.getItem('kz_customers')) || [
                 { id: 1, platform: 'LEDY', name: 'Aamina Beevi', whatsapp: '9847123456', address: 'Kochi, Kerala', deliveryDate: '2026-03-15', itemCode: 'LD001', dressName: 'Party Gown', totalCost: 3500, advance: 1500, matCost: 800, delChg: 100, employee: 'Rameshan', stitchPay: 400, measureType: 'Standard', measurements: 'Size 38, Standard Fit', status: 'Pending' },
@@ -471,17 +454,22 @@
             renderAll();
         }
 
-        // Navigation Tabs
+        // Navigation Tabs Handling
         function switchTab(tabId) {
             ['dashboard', 'customers', 'store', 'employees', 'analytics'].forEach(t => {
-                document.getElementById(`tab-${t}`).classList.add('hidden');
-                document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition";
+                const el = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if(el) el.classList.add('hidden');
+                if(nav) nav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition";
             });
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.getElementById(`nav-${tabId}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-purple-700 bg-purple-50 transition";
+            
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if(activeTab) activeTab.classList.remove('hidden');
+            if(activeNav) activeNav.className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-purple-700 bg-purple-50 transition";
             
             const titles = { dashboard: 'Dashboard Overview', customers: 'Customers & Orders', store: 'Item Store & Catalog', employees: 'Employee Management', analytics: 'Data Analytics' };
-            document.getElementById('page-title').innerText = titles[tabId];
+            document.getElementById('page-title').innerText = titles[tabId] || 'Dashboard';
             if(tabId === 'analytics') runAnalytics();
         }
 
@@ -552,7 +540,6 @@
             document.getElementById('advance-hint').innerText = `Advance balance after material cost: ₹${hint >= 0 ? hint : 0}`;
         }
 
-        // Save Handlers
         function saveCustomer(e) {
             e.preventDefault();
             const id = document.getElementById('cust-id').value;
@@ -578,7 +565,7 @@
 
             if(id) {
                 const idx = db.customers.findIndex(c => c.id == id);
-                data.status = db.customers[idx].status; // retain status
+                data.status = db.customers[idx].status;
                 db.customers[idx] = data;
             } else {
                 db.customers.push(data);
@@ -591,7 +578,6 @@
             e.preventDefault();
             const id = document.getElementById('store-id').value;
             const fileInput = document.getElementById('store-image');
-            
             let imageUrl = 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=300';
             if(fileInput.files && fileInput.files[0]) {
                 imageUrl = URL.createObjectURL(fileInput.files[0]);
@@ -707,7 +693,7 @@
         function viewEmployeeDetails(empName) {
             const empCusts = db.customers.filter(c => c.employee === empName);
             const pending = empCusts.filter(c => c.status === 'Pending');
-            let html = `<div class="space-y-3">`;
+            let html = `<div class="space-y-3"><p class="font-bold text-purple-800">Pending Works for ${empName}:</p>`;
             pending.forEach(p => {
                 html += `<div class="bg-gray-50 p-3 rounded-xl text-sm">
                     <p><strong>Customer:</strong> ${p.name} (${p.whatsapp})</p>
@@ -716,13 +702,12 @@
                     <p><strong>Delivery Date:</strong> ${p.deliveryDate}</p>
                 </div>`;
             });
-            if(pending.length === 0) html += `<p class="text-sm text-gray-500">No pending orders for this employee.</p>`;
+            if(pending.length === 0) html += `<p class="text-sm text-gray-500">No pending orders.</p>`;
             html += `</div>`;
             document.getElementById('cust-details-content').innerHTML = html;
             openModal('modal-view-cust');
         }
 
-        // Main Rendering Engine
         function renderAll() {
             let totalRev = 0, totalProfit = 0, ownerEarning = 0, ownerOrdersCount = 0;
             let ledyRev = 0, ledyProfit = 0, ledyExp = 0, ledyComp = 0, ledyPend = 0;
@@ -731,8 +716,6 @@
             db.customers.forEach(c => {
                 const expenses = c.matCost + c.delChg + c.stitchPay;
                 const netAfterExp = c.totalCost - expenses;
-                
-                // Owner earning logic: ₹300 per order if net >= 300, else net amount
                 let oEarn = netAfterExp >= 300 ? 300 : (netAfterExp > 0 ? netAfterExp : 0);
                 let bProfit = netAfterExp - oEarn;
                 if(bProfit < 0) bProfit = 0;
@@ -755,16 +738,13 @@
                 }
             });
 
-            // Update Dashboard Metrics
             document.getElementById('dash-total-rev').innerText = `₹${totalRev}`;
             document.getElementById('dash-total-profit').innerText = `₹${totalProfit}`;
             document.getElementById('dash-owner-earning').innerText = `₹${ownerEarning}`;
             document.getElementById('dash-owner-orders-count').innerText = `From ${ownerOrdersCount} orders`;
             
-            const completedCount = db.customers.filter(c => c.status === 'Completed').length;
-            const pendingCount = db.customers.filter(c => c.status === 'Pending').length;
-            document.getElementById('dash-completed-orders').innerText = completedCount;
-            document.getElementById('dash-pending-orders').innerText = pendingCount;
+            document.getElementById('dash-completed-orders').innerText = db.customers.filter(c => c.status === 'Completed').length;
+            document.getElementById('dash-pending-orders').innerText = db.customers.filter(c => c.status === 'Pending').length;
 
             document.getElementById('ledy-rev').innerText = `₹${ledyRev}`;
             document.getElementById('ledy-profit').innerText = `₹${ledyProfit}`;
@@ -778,9 +758,8 @@
             document.getElementById('bebi-completed').innerText = bebiComp;
             document.getElementById('bebi-pending').innerText = bebiPend;
 
-            // Render Upcoming Deliveries (Next 2 pending based on date)
             const pendingList = db.customers.filter(c => c.status === 'Pending').sort((a,b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
-            const upcomingHtml = pendingList.slice(0, 2).map(c => `
+            document.getElementById('upcoming-deliveries-list').innerHTML = pendingList.slice(0, 2).map(c => `
                 <div class="bg-gray-50 p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-gray-100 transition" onclick="viewCustomerDetails(${c.id})">
                     <div>
                         <h4 class="font-bold text-gray-800">${c.name}</h4>
@@ -790,10 +769,8 @@
                         <span class="text-xs bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full font-semibold">${c.deliveryDate}</span>
                     </div>
                 </div>
-            `).join('');
-            document.getElementById('upcoming-deliveries-list').innerHTML = upcomingHtml || '<p class="text-xs text-gray-400">No pending deliveries</p>';
+            `).join('') || '<p class="text-xs text-gray-400">No pending deliveries</p>';
 
-            // Render Customer Lists (Pending & Completed)
             document.getElementById('pending-orders-container').innerHTML = pendingList.map(c => `
                 <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs space-y-3">
                     <div class="flex justify-between items-start">
@@ -838,7 +815,6 @@
                 </div>
             `).join('') || '<p class="text-sm text-gray-400">No completed orders yet.</p>';
 
-            // Render Item Store
             document.getElementById('item-store-grid').innerHTML = db.store.map(s => `
                 <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-xs space-y-3 pb-4">
                     <img src="${s.image}" class="w-full h-40 object-cover" alt="Dress">
@@ -853,7 +829,6 @@
                 </div>
             `).join('') || '<p class="text-sm text-gray-400">Store is empty.</p>';
 
-            // Render Employees
             document.getElementById('employee-list-container').innerHTML = db.employees.map(emp => {
                 const empCusts = db.customers.filter(c => c.employee === emp.name);
                 const earned = empCusts.reduce((acc, curr) => acc + curr.stitchPay, 0);
@@ -891,7 +866,6 @@
         function runAnalytics() {
             const from = document.getElementById('analytics-from').value;
             const to = document.getElementById('analytics-to').value;
-            
             let filtered = db.customers;
             if(from && to) {
                 filtered = db.customers.filter(c => c.deliveryDate >= from && c.deliveryDate <= to);
@@ -913,11 +887,11 @@
             document.getElementById('analytics-orders').innerText = filtered.length;
         }
 
-        // Initialize App on load
         renderAll();
     </script>
 </body>
 </html>
+
 
 
 
