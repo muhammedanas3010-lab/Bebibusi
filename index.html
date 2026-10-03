@@ -35,7 +35,7 @@
                     <p class="text-xs text-slate-400 mt-1">LEDI & BEBI Platform</p>
                 </div>
                 <nav class="p-4 space-y-2">
-                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-700 transition active-tab bg-blue-600 text-white">
+                    <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-700 transition bg-blue-600 text-white">
                         <i class="fa-solid fa-chart-pie w-5"></i>
                         <span>Dashboard</span>
                     </button>
@@ -114,7 +114,6 @@
 
                     <!-- Platform Breakdowns -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- LEDI Platform -->
                         <div class="bg-slate-800 p-5 rounded-xl border border-blue-500/30">
                             <h3 class="text-lg font-semibold text-blue-400 mb-3"><i class="fa-solid fa-circle text-xs mr-2"></i>LEDI Platform Stats</h3>
                             <div class="grid grid-cols-3 gap-2 text-center">
@@ -132,7 +131,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- BEBI Platform -->
                         <div class="bg-slate-800 p-5 rounded-xl border border-purple-500/30">
                             <h3 class="text-lg font-semibold text-purple-400 mb-3"><i class="fa-solid fa-circle text-xs mr-2"></i>BEBI Platform Stats</h3>
                             <div class="grid grid-cols-3 gap-2 text-center">
@@ -157,7 +155,6 @@
                         <div class="lg:col-span-2 bg-slate-800 p-5 rounded-xl border border-slate-700">
                             <h3 class="text-lg font-semibold mb-4 text-slate-200">Upcoming Deliveries (Next 2)</h3>
                             <div id="upcoming-deliveries-list" class="space-y-3">
-                                <!-- Populated by JS -->
                                 <p class="text-slate-400 text-sm">No pending deliveries found.</p>
                             </div>
                         </div>
@@ -187,19 +184,18 @@
                         </button>
                     </div>
 
-                    <!-- Sub-tabs for Orders -->
                     <div class="flex border-b border-slate-700 space-x-4">
                         <button onclick="switchOrderSubTab('pending')" id="subtab-pending-btn" class="pb-3 border-b-2 border-blue-500 text-blue-400 font-medium">Pending Orders</button>
                         <button onclick="switchOrderSubTab('completed')" id="subtab-completed-btn" class="pb-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 font-medium">Completed Orders</button>
                     </div>
 
-                    <!-- Pending Orders View -->
                     <div id="subtab-pending-content" class="space-y-4">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
                                     <tr class="bg-slate-800 text-slate-400 border-b border-slate-700">
                                         <th class="p-3">Customer Name</th>
+                                        <th class="p-3">WhatsApp</th>
                                         <th class="p-3">Platform</th>
                                         <th class="p-3">Dress / Code</th>
                                         <th class="p-3">Assigned Employee</th>
@@ -208,20 +204,18 @@
                                         <th class="p-3 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="pending-orders-table" class="divide-y divide-slate-800">
-                                    <!-- Populated by JS -->
-                                </tbody>
+                                <tbody id="pending-orders-table" class="divide-y divide-slate-800"></tbody>
                             </table>
                         </div>
                     </div>
 
-                    <!-- Completed Orders View -->
                     <div id="subtab-completed-content" class="space-y-4 hidden">
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse text-sm">
                                 <thead>
                                     <tr class="bg-slate-800 text-slate-400 border-b border-slate-700">
                                         <th class="p-3">Customer Name</th>
+                                        <th class="p-3">WhatsApp</th>
                                         <th class="p-3">Platform</th>
                                         <th class="p-3">Dress / Code</th>
                                         <th class="p-3">Revenue</th>
@@ -230,9 +224,7 @@
                                         <th class="p-3 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="completed-orders-table" class="divide-y divide-slate-800">
-                                    <!-- Populated by JS -->
-                                </tbody>
+                                <tbody id="completed-orders-table" class="divide-y divide-slate-800"></tbody>
                             </table>
                         </div>
                     </div>
@@ -247,9 +239,7 @@
                         </button>
                     </div>
 
-                    <div id="store-items-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div id="store-items-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
                 </section>
 
                 <!-- 4. EMPLOYEES TAB -->
@@ -261,9 +251,7 @@
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="employees-grid">
-                        <!-- Populated by JS -->
-                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="employees-grid"></div>
                 </section>
 
                 <!-- 5. DATA ANALYTICS TAB -->
@@ -326,11 +314,11 @@
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Customer Name</label>
-                        <input type="text" id="cust-name" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100" required>
+                        <input type="text" id="cust-name" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100" required placeholder="Enter customer name">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">WhatsApp Number</label>
-                        <input type="text" id="cust-phone" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100" required>
+                        <input type="text" id="cust-phone" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100" required placeholder="Enter WhatsApp number">
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Delivery Date</label>
@@ -338,7 +326,13 @@
                     </div>
                     <div class="sm:col-span-2">
                         <label class="block text-xs text-slate-400 mb-1">Address</label>
-                        <textarea id="cust-address" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100"></textarea>
+                        <textarea id="cust-address" rows="2" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100" placeholder="Customer address..."></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">Select from Item Store (Optional)</label>
+                        <select id="cust-store-select" onchange="fillDressFromStore()" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100">
+                            <option value="">-- Choose from Item Store --</option>
+                        </select>
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Dress Name</label>
@@ -355,7 +349,7 @@
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Advance Amount Paid (₹)</label>
                         <input type="number" id="cust-advance" oninput="calculateFinances()" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100" required>
-                        <p class="text-xs text-emerald-400 mt-1" id="advance-hint">Balance after material cost: ₹0</p>
+                        <p class="text-xs text-emerald-400 mt-1" id="advance-hint">Advance minus Material Cost: ₹0</p>
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Material Cost (₹)</label>
@@ -367,9 +361,7 @@
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Assign Employee</label>
-                        <select id="cust-employee" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100" required>
-                            <!-- Populated by JS -->
-                        </select>
+                        <select id="cust-employee" class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100" required></select>
                     </div>
                     <div>
                         <label class="block text-xs text-slate-400 mb-1">Stitching Charge for Employee (₹)</label>
@@ -381,11 +373,13 @@
                             <label class="text-sm"><input type="radio" name="meas-type" value="Standard" checked onclick="toggleMeasurementInput('Standard')"> Standard Size</label>
                             <label class="text-sm"><input type="radio" name="meas-type" value="Manual" onclick="toggleMeasurementInput('Manual')"> Manual Entry</label>
                         </div>
-                        <textarea id="cust-measurements" rows="2" placeholder="Enter standard size or manual measurements details..." class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100"></textarea>
+                        <div id="measurement-container">
+                            <!-- Dynamic based on selection -->
+                            <input type="text" id="cust-measurements" value="Standard Size (Fixed)" readonly class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-emerald-400 font-medium">
+                        </div>
                     </div>
                 </div>
 
-                <!-- Financial Calculation Preview Box -->
                 <div class="bg-slate-900 p-3 rounded border border-slate-700 text-xs space-y-1">
                     <p class="text-slate-300"><b>Auto Owner Earnings:</b> <span id="preview-owner-earn" class="text-purple-400">₹0</span> (Min ₹300 rule applied)</p>
                     <p class="text-slate-300"><b>Business Profit:</b> <span id="preview-biz-profit" class="text-blue-400">₹0</span></p>
@@ -460,9 +454,7 @@
                 <h3 class="text-lg font-bold text-slate-100">Customer Details & History</h3>
                 <button onclick="closeViewCustomerModal()" class="text-slate-400 hover:text-slate-200"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            <div id="customer-details-content" class="space-y-3 text-sm">
-                <!-- Populated by JS -->
-            </div>
+            <div id="customer-details-content" class="space-y-3 text-sm"></div>
             <div class="flex justify-end pt-2">
                 <button onclick="closeViewCustomerModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded text-sm">Close</button>
             </div>
@@ -471,7 +463,6 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // Local Storage Database Initialization
         let db = JSON.parse(localStorage.getItem('kaizsooq_db')) || {
             customers: [],
             items: [],
@@ -483,7 +474,6 @@
             initApp();
         }
 
-        // Navigation Switching
         function switchTab(tabId) {
             ['dashboard', 'customers', 'store', 'employees', 'analytics'].forEach(t => {
                 document.getElementById(`tab-${t}`).classList.add('hidden');
@@ -509,7 +499,6 @@
             }
         }
 
-        // Financial Calculation Logic according to instructions
         function calculateFinances() {
             const quoted = parseFloat(document.getElementById('cust-quoted-price').value) || 0;
             const advance = parseFloat(document.getElementById('cust-advance').value) || 0;
@@ -517,11 +506,9 @@
             const delivery = parseFloat(document.getElementById('cust-delivery-charge').value) || 0;
             const stitching = parseFloat(document.getElementById('cust-stitching-charge').value) || 0;
 
-            // Advance minus material cost hint
             const advMinusMat = advance - material;
             document.getElementById('advance-hint').innerText = `Advance minus Material Cost: ₹${advMinusMat}`;
 
-            // Total expenses = stitching + material + delivery
             const totalExpenses = stitching + material + delivery;
             const remainingAmount = quoted - totalExpenses;
 
@@ -545,16 +532,15 @@
             document.getElementById('preview-biz-profit').innerText = `₹${bizProfit}`;
         }
 
-        // Core App Initialization & Data Rendering
         function initApp() {
             renderDashboard();
             renderCustomers();
             renderStore();
             renderEmployees();
             populateEmployeeDropdown();
+            populateStoreDropdown();
         }
 
-        // Dashboard Metrics Rendering
         function renderDashboard() {
             let totalRev = 0, totalProf = 0, totalOwnerEarn = 0, ownerOrdersCount = 0;
             let completedCount = 0, pendingCount = 0;
@@ -611,7 +597,6 @@
             document.getElementById('bebi-prof').innerText = `₹${bebiProf}`;
             document.getElementById('bebi-exp').innerText = `₹${bebiExp}`;
 
-            // Render upcoming deliveries (Next 2 pending)
             const pendingList = db.customers.filter(c => c.status !== 'Completed').sort((a,b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
             const upcomingContainer = document.getElementById('upcoming-deliveries-list');
             upcomingContainer.innerHTML = '';
@@ -624,7 +609,7 @@
                         <div class="bg-slate-900 p-3 rounded-lg flex justify-between items-center cursor-pointer hover:bg-slate-700/50 transition" onclick="viewCustomerDetails('${c.id}')">
                             <div>
                                 <h4 class="font-bold text-slate-100">${c.name} <span class="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded">${c.platform}</span></h4>
-                                <p class="text-xs text-slate-400 mt-0.5">Dress: ${c.dressName} (${c.itemCode})</p>
+                                <p class="text-xs text-slate-400 mt-0.5">Dress: ${c.dressName} (${c.itemCode}) | Ph: ${c.phone}</p>
                             </div>
                             <div class="text-right">
                                 <p class="text-xs text-amber-400 font-semibold"><i class="fa-regular fa-calendar mr-1"></i>${c.deliveryDate}</p>
@@ -636,7 +621,6 @@
             }
         }
 
-        // Customers & Orders Rendering
         function renderCustomers() {
             const pendingTable = document.getElementById('pending-orders-table');
             const completedTable = document.getElementById('completed-orders-table');
@@ -658,6 +642,7 @@
                     completedTable.innerHTML += `
                         <tr class="hover:bg-slate-800/50">
                             <td class="p-3 font-medium cursor-pointer text-blue-400 hover:underline" onclick="viewCustomerDetails('${c.id}')">${c.name}</td>
+                            <td class="p-3 text-slate-300">${c.phone}</td>
                             <td class="p-3"><span class="px-2 py-0.5 text-xs rounded ${c.platform === 'LEDI' ? 'bg-blue-600/20 text-blue-400' : 'bg-purple-600/20 text-purple-400'}">${c.platform}</span></td>
                             <td class="p-3">${c.dressName} (${c.itemCode})</td>
                             <td class="p-3">₹${quoted}</td>
@@ -673,6 +658,7 @@
                     pendingTable.innerHTML += `
                         <tr class="hover:bg-slate-800/50">
                             <td class="p-3 font-medium cursor-pointer text-blue-400 hover:underline" onclick="viewCustomerDetails('${c.id}')">${c.name}</td>
+                            <td class="p-3 text-slate-300">${c.phone}</td>
                             <td class="p-3"><span class="px-2 py-0.5 text-xs rounded ${c.platform === 'LEDI' ? 'bg-blue-600/20 text-blue-400' : 'bg-purple-600/20 text-purple-400'}">${c.platform}</span></td>
                             <td class="p-3">${c.dressName} (${c.itemCode})</td>
                             <td class="p-3">${c.employeeName || 'N/A'}</td>
@@ -690,7 +676,6 @@
             });
         }
 
-        // Store Catalog Rendering
         function renderStore() {
             const grid = document.getElementById('store-items-grid');
             grid.innerHTML = '';
@@ -718,7 +703,6 @@
             });
         }
 
-        // Employees Rendering
         function renderEmployees() {
             const grid = document.getElementById('employees-grid');
             grid.innerHTML = '';
@@ -728,7 +712,6 @@
             }
 
             db.employees.forEach(emp => {
-                // Calculate employee stats
                 let earned = 0, completed = 0, pending = 0;
                 db.customers.forEach(c => {
                     if(c.employeeId === emp.id) {
@@ -782,11 +765,32 @@
             });
         }
 
-        // Modal Controls
+        function populateStoreDropdown() {
+            const select = document.getElementById('cust-store-select');
+            select.innerHTML = '<option value="">-- Choose from Item Store --</option>';
+            db.items.forEach(item => {
+                select.innerHTML += `<option value="${item.id}">${item.name} (${item.code}) - ₹${item.price}</option>`;
+            });
+        }
+
+        function fillDressFromStore() {
+            const selectId = document.getElementById('cust-store-select').value;
+            if(!selectId) return;
+            const item = db.items.find(i => i.id === selectId);
+            if(item) {
+                document.getElementById('cust-dress-name').value = item.name;
+                document.getElementById('cust-item-code').value = item.code;
+                document.getElementById('cust-quoted-price').value = item.price;
+                calculateFinances();
+            }
+        }
+
         function openAddCustomerModal() {
             document.getElementById('customer-modal-title').innerText = "Add Customer & Order Details";
             document.getElementById('customer-form').reset();
             document.getElementById('cust-id').value = '';
+            document.querySelector('input[name="meas-type"][value="Standard"]').checked = true;
+            toggleMeasurementInput('Standard');
             calculateFinances();
             document.getElementById('customer-modal').classList.remove('hidden');
         }
@@ -811,15 +815,14 @@
         function closeViewCustomerModal() { document.getElementById('view-customer-modal').classList.add('hidden'); }
 
         function toggleMeasurementInput(type) {
-            const ta = document.getElementById('cust-measurements');
+            const container = document.getElementById('measurement-container');
             if(type === 'Standard') {
-                ta.placeholder = "Enter standard size details...";
+                container.innerHTML = `<input type="text" id="cust-measurements" value="Standard Size (Fixed)" readonly class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-emerald-400 font-medium">`;
             } else {
-                ta.placeholder = "Enter manual measurements (Chest, Length, Waist, etc.)...";
+                container.innerHTML = `<textarea id="cust-measurements" rows="2" placeholder="Enter manual measurements (Chest, Length, Waist, etc.)..." class="w-full bg-slate-900 border border-slate-700 rounded px-3 py-2 text-sm text-slate-100" required></textarea>`;
             }
         }
 
-        // Save Actions
         function saveCustomer(e) {
             e.preventDefault();
             const id = document.getElementById('cust-id').value || 'CUST_' + Date.now();
@@ -849,7 +852,7 @@
 
             const index = db.customers.findIndex(c => c.id === id);
             if(index !== -1) {
-                customerData.status = db.customers[index].status; // retain status
+                customerData.status = db.customers[index].status;
                 customerData.completedDate = db.customers[index].completedDate;
                 db.customers[index] = customerData;
             } else {
@@ -878,7 +881,16 @@
             document.getElementById('cust-delivery-charge').value = c.deliveryCharge;
             document.getElementById('cust-employee').value = c.employeeId;
             document.getElementById('cust-stitching-charge').value = c.stitchingCharge;
-            document.getElementById('cust-measurements').value = c.measurements;
+            
+            if(c.measurements.includes("Standard")) {
+                document.querySelector('input[name="meas-type"][value="Standard"]').checked = true;
+                toggleMeasurementInput('Standard');
+            } else {
+                document.querySelector('input[name="meas-type"][value="Manual"]').checked = true;
+                toggleMeasurementInput('Manual');
+                document.getElementById('cust-measurements').value = c.measurements;
+            }
+
             calculateFinances();
             document.getElementById('customer-modal').classList.remove('hidden');
         }
@@ -988,12 +1000,10 @@
             }
         }
 
-        // View Customer Detailed History modal when clicking customer name
         function viewCustomerDetails(id) {
             const c = db.customers.find(item => item.id === id);
             if(!c) return;
             
-            // Calculate customer totals across all orders
             const custOrders = db.customers.filter(item => item.phone === c.phone || item.name.toLowerCase() === c.name.toLowerCase());
             let totalOrdersCount = custOrders.length;
             let totalRevenueFromCust = custOrders.reduce((sum, ord) => sum + (ord.status === 'Completed' ? (ord.quotedPrice || 0) : 0), 0);
@@ -1025,7 +1035,6 @@
             document.getElementById('view-customer-modal').classList.remove('hidden');
         }
 
-        // View Employee pending work measurements when clicking employee card
         function viewEmployeeDetails(empId) {
             const emp = db.employees.find(e => e.id === empId);
             if(!emp) return;
@@ -1041,8 +1050,9 @@
                     html += `
                         <div class="bg-slate-900 p-3 rounded space-y-1">
                             <p class="text-sm font-semibold text-blue-400">${o.name} (${o.dressName})</p>
+                            <p class="text-xs text-slate-300"><b>WhatsApp:</b> ${o.phone}</p>
                             <p class="text-xs text-slate-300"><b>Delivery Date:</b> ${o.deliveryDate}</p>
-                            <p class="text-xs text-slate-300"><b>Measurements:</b> ${o.measurements || 'Standard'}</p>
+                            <p class="text-xs text-slate-300"><b>Measurements:</b> ${o.measurements}</p>
                         </div>
                     `;
                 });
@@ -1054,7 +1064,6 @@
             document.getElementById('view-customer-modal').classList.remove('hidden');
         }
 
-        // Data Analytics Report Generator
         function runAnalytics() {
             const fromDate = document.getElementById('filter-from-date').value;
             const toDate = document.getElementById('filter-to-date').value;
@@ -1079,11 +1088,12 @@
             document.getElementById('report-orders').innerText = ordersCount;
         }
 
-        // Run on load
         initApp();
     </script>
 </body>
 </html>
+
+
 
 
 
