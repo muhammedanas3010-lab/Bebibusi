@@ -1,654 +1,543 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ml">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIZSOOQ - Management System</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        ledyBlue: '#1E40AF',
-                        babyLavender: '#E9D5FF',
-                        softBg: '#F8FAFC'
-                    }
-                }
-            }
-        }
-    </script>
+    <title>KAIZSOOQ - Business Management</title>
+    <!-- Tailwind CSS for modern responsive design -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .bg-baby-lavender { background-color: #E6E6FA; }
+        .text-baby-lavender { color: #8A2BE2; }
+        .bg-ledy-blue { background-color: #E0F2FE; }
+        .text-ledy-blue { color: #0284C7; }
+    </style>
 </head>
-<body class="bg-softBg font-sans text-gray-800 antialiased">
+<body class="bg-gray-50 text-gray-800 font-sans">
 
     <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-ledyBlue text-white hidden md:flex flex-col shadow-xl">
-            <div class="p-5 text-2xl font-bold tracking-wider border-b border-blue-800 flex items-center gap-2">
-                <i class="fa-solid fa-gem text-babyLavender"></i> KAIZSOOQ
+        <!-- Sidebar Navigation -->
+        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+            <div class="p-6 border-b border-gray-100 flex items-center gap-3">
+                <div class="bg-purple-600 text-white p-2 rounded-lg font-bold text-xl">KZ</div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">KAIZSOOQ</h1>
+                    <p class="text-xs text-gray-500">LEDY &amp; BEBI Platform</p>
+                </div>
             </div>
-            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
-                <button onclick="switchTab('dashboard')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg bg-blue-700 text-white font-medium transition text-left"><i class="fa-solid fa-chart-pie w-5"></i> Dashboard</button>
-                <button onclick="switchTab('customers')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-blue-800 text-blue-100 transition text-left"><i class="fa-solid fa-users w-5"></i> Customers & Orders</button>
-                <button onclick="switchTab('store')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-blue-800 text-blue-100 transition text-left"><i class="fa-solid fa-store w-5"></i> Item Store</button>
-                <button onclick="switchTab('employees')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-blue-800 text-blue-100 transition text-left"><i class="fa-solid fa-user-tie w-5"></i> Employees</button>
-                <button onclick="switchTab('analytics')" class="nav-btn w-full flex items-center gap-3 p-3 rounded-lg hover:bg-blue-800 text-blue-100 transition text-left"><i class="fa-solid fa-chart-line w-5"></i> Data Analysis</button>
+            <nav class="p-4 space-y-2 flex-1 overflow-y-auto">
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-purple-700 bg-purple-50 transition">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                </button>
+                <button onclick="switchTab('customers')" id="nav-customers" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">
+                    <i class="fa-solid fa-users w-5"></i> Customers &amp; Orders
+                </button>
+                <button onclick="switchTab('store')" id="nav-store" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">
+                    <i class="fa-solid fa-shirt w-5"></i> Item Store
+                </button>
+                <button onclick="switchTab('employees')" id="nav-employees" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">
+                    <i class="fa-solid fa-user-tie w-5"></i> Employees
+                </button>
+                <button onclick="switchTab('analytics')" id="nav-analytics" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition">
+                    <i class="fa-solid fa-chart-line w-5"></i> Data Analytics
+                </button>
             </nav>
-            <div class="p-4 border-t border-blue-800 text-xs text-blue-200">
-                Platforms: LEDI & BEBI
+            <div class="p-4 border-t border-gray-100">
+                <div class="bg-purple-900 text-white p-3 rounded-xl text-xs">
+                    <p class="font-bold">KAIZSOOQ v1.0</p>
+                    <p class="text-purple-200 mt-0.5">Active Management System</p>
+                </div>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-screen overflow-y-auto">
             <!-- Top Header -->
-            <header class="bg-white shadow-sm h-16 flex items-center justify-between px-6 z-10">
+            <header class="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0 z-10">
                 <div class="flex items-center gap-4">
-                    <button class="md:hidden text-gray-600 focus:outline-none" onclick="toggleSidebar()">
-                        <i class="fa-solid fa-bars text-xl"></i>
-                    </button>
-                    <h1 id="page-title" class="text-xl font-bold text-gray-800">Dashboard</h1>
+                    <button class="md:hidden text-gray-600 text-xl"><i class="fa-solid fa-bars"></i></button>
+                    <h2 id="page-title" class="text-xl font-bold text-gray-800">Dashboard Overview</h2>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span class="bg-babyLavender text-ledyBlue px-3 py-1 rounded-full text-xs font-semibold">LEDY & BEBI</span>
+                    <button onclick="openAddCustomerModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Add Customer
+                    </button>
                 </div>
             </header>
 
-            <!-- Scrollable View Area -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6" id="main-content">
-                
-                <!-- DASHBOARD TAB -->
-                <div id="tab-dashboard" class="tab-content space-y-6">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                            <p class="text-xs text-gray-500 font-semibold uppercase">Total Revenue</p>
-                            <h3 id="dash-total-revenue" class="text-2xl font-bold text-gray-800 mt-1">₹0</h3>
-                        </div>
-                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                            <p class="text-xs text-gray-500 font-semibold uppercase">Business Profit</p>
-                            <h3 id="dash-total-profit" class="text-2xl font-bold text-green-600 mt-1">₹0</h3>
-                        </div>
-                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                            <p class="text-xs text-gray-500 font-semibold uppercase">Owner Earning</p>
-                            <h3 id="dash-owner-earning" class="text-2xl font-bold text-blue-600 mt-1">₹0</h3>
-                        </div>
-                        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100">
-                            <p class="text-xs text-gray-500 font-semibold uppercase">Orders Status</p>
-                            <p class="text-sm mt-2 text-gray-600"><span id="dash-completed-orders" class="font-bold text-gray-800">0</span> Completed | <span id="dash-pending-orders" class="font-bold text-orange-600">0</span> Pending</p>
-                        </div>
-                    </div>
+            <!-- Content Container -->
+            <div class="p-6 max-w-7xl mx-auto w-full space-y-6 flex-1">
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <h4 class="text-lg font-bold text-gray-800 mb-4">Platform Breakdown (LEDY vs BEBI)</h4>
-                            <div class="space-y-4">
-                                <div class="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                                    <h5 class="font-bold text-ledyBlue mb-2">LEDY Platform</h5>
-                                    <p class="text-sm text-gray-600">Revenue: <span id="ledy-rev" class="font-semibold">₹0</span> | Profit: <span id="ledy-prof" class="font-semibold">₹0</span></p>
-                                    <p class="text-sm text-gray-600">Pending: <span id="ledy-pend" class="font-semibold">0</span> | Completed: <span id="ledy-comp" class="font-semibold">0</span></p>
+                <!-- 1. DASHBOARD TAB -->
+                <div id="tab-dashboard" class="space-y-6">
+                    <!-- Top Metric Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Total Revenue</p>
+                            <h3 class="text-2xl font-bold text-gray-900 mt-1" id="dash-total-rev">₹0</h3>
+                            <span class="text-xs text-green-600 font-medium mt-2 inline-block"><i class="fa-solid fa-arrow-trend-up"></i> Business Total</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Business Profit</p>
+                            <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="dash-total-profit">₹0</h3>
+                            <span class="text-xs text-gray-500 mt-2 inline-block">After all expenses</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Owner Earning</p>
+                            <h3 class="text-2xl font-bold text-purple-600 mt-1" id="dash-owner-earning">₹0</h3>
+                            <span class="text-xs text-purple-500 mt-2 inline-block" id="dash-owner-orders-count">From 0 orders</span>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs">
+                            <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Orders Status</p>
+                            <div class="flex justify-between items-end mt-2">
+                                <div>
+                                    <span class="text-xl font-bold text-gray-900" id="dash-completed-orders">0</span>
+                                    <p class="text-xs text-gray-500">Completed</p>
                                 </div>
-                                <div class="p-4 bg-purple-50 rounded-lg border border-purple-100">
-                                    <h5 class="font-bold text-purple-800 mb-2">BEBI Platform</h5>
-                                    <p class="text-sm text-gray-600">Revenue: <span id="bebi-rev" class="font-semibold">₹0</span> | Profit: <span id="bebi-prof" class="font-semibold">₹0</span></p>
-                                    <p class="text-sm text-gray-600">Pending: <span id="bebi-pend" class="font-semibold">0</span> | Completed: <span id="bebi-comp" class="font-semibold">0</span></p>
+                                <div>
+                                    <span class="text-xl font-bold text-amber-600" id="dash-pending-orders">0</span>
+                                    <p class="text-xs text-gray-500">Pending</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                            <h4 class="text-lg font-bold text-gray-800 mb-4">Upcoming Deliveries (Next 2)</h4>
-                            <div id="upcoming-deliveries-list" class="space-y-3">
-                                <p class="text-sm text-gray-500">No upcoming pending orders.</p>
+                    <!-- Sub-Brand Split Cards (LEDY vs BEBI) -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- LEDY BLUE PLATFORM -->
+                        <div class="bg-ledy-blue/40 border border-blue-100 p-6 rounded-3xl space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-lg text-ledy-blue flex items-center gap-2">
+                                    <i class="fa-solid fa-shirt"></i> LEDY Platform (Blue)
+                                </h3>
+                                <span class="bg-blue-100 text-blue-700 text-xs px-3 py-1 rounded-full font-semibold">Active</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="bg-white/80 p-3 rounded-xl">
+                                    <p class="text-xs text-gray-500">Revenue</p>
+                                    <p class="font-bold text-gray-800 text-sm mt-1" id="ledy-rev">₹0</p>
+                                </div>
+                                <div class="bg-white/80 p-3 rounded-xl">
+                                    <p class="text-xs text-gray-500">Profit</p>
+                                    <p class="font-bold text-emerald-600 text-sm mt-1" id="ledy-profit">₹0</p>
+                                </div>
+                                <div class="bg-white/80 p-3 rounded-xl">
+                                    <p class="text-xs text-gray-500">Expenses</p>
+                                    <p class="font-bold text-red-500 text-sm mt-1" id="ledy-exp">₹0</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-600 pt-2 border-t border-blue-100">
+                                <span>Completed Orders: <strong id="ledy-completed">0</strong></span>
+                                <span>Pending Orders: <strong id="ledy-pending" class="text-amber-600">0</strong></span>
+                            </div>
+                        </div>
+
+                        <!-- BEBI LAVENDER PLATFORM -->
+                        <div class="bg-baby-lavender/40 border border-purple-100 p-6 rounded-3xl space-y-4">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-lg text-baby-lavender flex items-center gap-2">
+                                    <i class="fa-solid fa-child-dress"></i> BEBI Platform (Lavender)
+                                </h3>
+                                <span class="bg-purple-100 text-purple-700 text-xs px-3 py-1 rounded-full font-semibold">Active</span>
+                            </div>
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="bg-white/80 p-3 rounded-xl">
+                                    <p class="text-xs text-gray-500">Revenue</p>
+                                    <p class="font-bold text-gray-800 text-sm mt-1" id="bebi-rev">₹0</p>
+                                </div>
+                                <div class="bg-white/80 p-3 rounded-xl">
+                                    <p class="text-xs text-gray-500">Profit</p>
+                                    <p class="font-bold text-emerald-600 text-sm mt-1" id="bebi-profit">₹0</p>
+                                </div>
+                                <div class="bg-white/80 p-3 rounded-xl">
+                                    <p class="text-xs text-gray-500">Expenses</p>
+                                    <p class="font-bold text-red-500 text-sm mt-1" id="bebi-exp">₹0</p>
+                                </div>
+                            </div>
+                            <div class="flex justify-between text-xs text-gray-600 pt-2 border-t border-purple-100">
+                                <span>Completed Orders: <strong id="bebi-completed">0</strong></span>
+                                <span>Pending Orders: <strong id="bebi-pending" class="text-amber-600">0</strong></span>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- CUSTOMERS & ORDERS TAB -->
-                <div id="tab-customers" class="tab-content hidden space-y-6">
-                    <div class="flex flex-wrap justify-between items-center gap-4">
-                        <div class="flex gap-2">
-                            <button onclick="switchCustomerSubTab('pending')" id="btn-sub-pending" class="px-4 py-2 bg-ledyBlue text-white rounded-lg text-sm font-semibold">Pending Orders</button>
-                            <button onclick="switchCustomerSubTab('completed')" id="btn-sub-completed" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold">Completed Orders</button>
+                    <!-- Upcoming Deliveries Section -->
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xs space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-lg text-gray-800"><i class="fa-solid fa-truck-fast text-purple-600 mr-2"></i> Upcoming Deliveries (Next 2)</h3>
+                            <span class="text-xs text-gray-400">Click name to view details</span>
                         </div>
-                        <button onclick="openCustomerModal()" class="bg-ledyBlue text-white px-4 py-2 rounded-lg text-sm font-semibold shadow hover:bg-blue-700 transition flex items-center gap-2"><i class="fa-solid fa-plus"></i> Add Customer & Order</button>
-                    </div>
-
-                    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="bg-gray-100 text-gray-600 text-xs uppercase font-semibold">
-                                        <th class="p-4">Customer Name</th>
-                                        <th class="p-4">Platform</th>
-                                        <th class="p-4">Item & Code</th>
-                                        <th class="p-4">Delivery Date</th>
-                                        <th class="p-4">Assigned Employee</th>
-                                        <th class="p-4">Total / Advance</th>
-                                        <th class="p-4">Status</th>
-                                        <th class="p-4 text-center">Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="customer-table-body" class="divide-y divide-gray-200 text-sm">
-                                </tbody>
-                            </table>
+                        <div id="upcoming-deliveries-list" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Populated dynamically -->
                         </div>
                     </div>
                 </div>
 
-                <!-- ITEM STORE TAB -->
-                <div id="tab-store" class="tab-content hidden space-y-6">
+                <!-- 2. CUSTOMERS & ORDERS TAB -->
+                <div id="tab-customers" class="space-y-6 hidden">
+                    <div class="flex border-b border-gray-200">
+                        <button onclick="switchCustomerSubTab('pending')" id="sub-btn-pending" class="px-6 py-3 font-semibold border-b-2 border-purple-600 text-purple-600">Pending Orders</button>
+                        <button onclick="switchCustomerSubTab('completed')" id="sub-btn-completed" class="px-6 py-3 font-semibold text-gray-500 border-b-2 border-transparent">Completed Orders</button>
+                    </div>
+
+                    <!-- Pending Orders List View -->
+                    <div id="customer-pending-view" class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-lg">Pending Customer Orders</h3>
+                            <button onclick="openAddCustomerModal()" class="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-lg">Add New Order</button>
+                        </div>
+                        <div id="pending-orders-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Items -->
+                        </div>
+                    </div>
+
+                    <!-- Completed Orders List View -->
+                    <div id="customer-completed-view" class="space-y-4 hidden">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold text-lg">Completed Customer Orders (Chronological)</h3>
+                        </div>
+                        <div id="completed-orders-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Items -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. ITEM STORE TAB -->
+                <div id="tab-store" class="space-y-6 hidden">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-gray-800">Dress Item Store</h3>
-                        <button onclick="openStoreModal()" class="bg-ledyBlue text-white px-4 py-2 rounded-lg text-sm font-semibold shadow hover:bg-blue-700 transition flex items-center gap-2"><i class="fa-solid fa-plus"></i> Add Dress Item</button>
+                        <h3 class="font-bold text-lg">Item Store &amp; Catalog</h3>
+                        <button onclick="openAddItemModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Add Item / Dress
+                        </button>
                     </div>
-                    <div id="store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <div id="item-store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <!-- Items populated dynamically -->
                     </div>
                 </div>
 
-                <!-- EMPLOYEES TAB -->
-                <div id="tab-employees" class="tab-content hidden space-y-6">
+                <!-- 4. EMPLOYEES TAB -->
+                <div id="tab-employees" class="space-y-6 hidden">
                     <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-bold text-gray-800">Employee Management</h3>
-                        <button onclick="openEmployeeModal()" class="bg-ledyBlue text-white px-4 py-2 rounded-lg text-sm font-semibold shadow hover:bg-blue-700 transition flex items-center gap-2"><i class="fa-solid fa-plus"></i> Add Employee</button>
+                        <h3 class="font-bold text-lg">Employee Management</h3>
+                        <button onclick="openAddEmployeeModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-sm font-semibold shadow-sm transition flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus"></i> Add Employee
+                        </button>
                     </div>
-                    <div id="employee-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    </div>
-                </div>
-
-                <!-- DATA ANALYSIS TAB -->
-                <div id="tab-analytics" class="tab-content hidden space-y-6">
-                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 space-y-4">
-                        <h3 class="text-lg font-bold text-gray-800">Business Data Analysis & Filtering</h3>
-                        <div class="flex flex-wrap gap-4 items-end">
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">From Date</label>
-                                <input type="date" id="filter-from" class="border rounded-lg p-2 text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-gray-600 mb-1">To Date</label>
-                                <input type="date" id="filter-to" class="border rounded-lg p-2 text-sm">
-                            </div>
-                            <button onclick="runDataAnalysis()" class="bg-ledyBlue text-white px-4 py-2 rounded-lg text-sm font-semibold">Generate Report</button>
-                        </div>
-                        <div id="analysis-results" class="mt-4 p-4 bg-gray-50 rounded-lg border text-sm text-gray-700">
-                            Select date range and click generate report to view statistics.
-                        </div>
+                    <div id="employee-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Employee cards populated dynamically -->
                     </div>
                 </div>
 
-            </main>
-        </div>
+                <!-- 5. DATA ANALYTICS TAB -->
+                <div id="tab-analytics" class="space-y-6 hidden">
+                    <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-xs space-y-4">
+                        <h3 class="font-bold text-lg text-gray-800"><i class="fa-solid fa-chart-line text-purple-600 mr-2"></i> Business Data Analytics</h3>
+                        <p class="text-sm text-gray-500">Analyze your business performance over custom date ranges or monthly breakdowns.</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">From Date</label>
+                                <input type="date" id="analytics-from" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-500 mb-1">To Date</label>
+                                <input type="date" id="analytics-to" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm">
+                            </div>
+                            <div class="flex items-end">
+                                <button onclick="runAnalytics()" class="w-full bg-purple-600 text-white p-2.5 rounded-xl text-sm font-semibold hover:bg-purple-700 transition">Filter Analytics</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                            <div class="bg-purple-50 p-4 rounded-2xl">
+                                <p class="text-xs text-purple-600 font-semibold">Filtered Revenue</p>
+                                <h4 class="text-xl font-bold text-purple-950 mt-1" id="analytics-rev">₹0</h4>
+                            </div>
+                            <div class="bg-emerald-50 p-4 rounded-2xl">
+                                <p class="text-xs text-emerald-600 font-semibold">Filtered Profit</p>
+                                <h4 class="text-xl font-bold text-emerald-950 mt-1" id="analytics-profit">₹0</h4>
+                            </div>
+                            <div class="bg-blue-50 p-4 rounded-2xl">
+                                <p class="text-xs text-blue-600 font-semibold">Orders Count</p>
+                                <h4 class="text-xl font-bold text-blue-950 mt-1" id="analytics-orders">0</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
     </div>
 
     <!-- MODALS -->
 
-    <!-- Customer Modal -->
-    <div id="customer-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-white rounded-xl max-w-2xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
-            <h3 id="customer-modal-title" class="text-lg font-bold text-gray-800">Add Customer & Order</h3>
+    <!-- Add/Edit Customer Modal -->
+    <div id="modal-customer" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-xl w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-bold text-lg" id="customer-modal-title">Add Customer Order</h3>
+                <button onclick="closeModal('modal-customer')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
             <form id="customer-form" onsubmit="saveCustomer(event)" class="space-y-4">
                 <input type="hidden" id="cust-id">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Platform</label>
-                        <select id="cust-platform" class="w-full border rounded-lg p-2 text-sm" required>
-                            <option value="LEDI">LEDY (Blue)</option>
-                            <option value="BEBI">BEBI (Baby Lavender)</option>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Platform</label>
+                        <select id="cust-platform" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required>
+                            <option value="LEDY">LEDY (Blue)</option>
+                            <option value="BEBI">BEBI (Lavender)</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Customer Name</label>
-                        <input type="text" id="cust-name" class="w-full border rounded-lg p-2 text-sm" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">WhatsApp Number</label>
-                        <input type="text" id="cust-whatsapp" class="w-full border rounded-lg p-2 text-sm" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Address</label>
-                        <input type="text" id="cust-address" class="w-full border rounded-lg p-2 text-sm" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Delivery Date</label>
-                        <input type="date" id="cust-delivery-date" class="w-full border rounded-lg p-2 text-sm" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Dress Code (Select from Store)</label>
-                        <select id="cust-item-code" class="w-full border rounded-lg p-2 text-sm" onchange="fillItemDetails()" required>
-                            <option value="">Select Item Code</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Dress Name</label>
-                        <input type="text" id="cust-dress-name" class="w-full border rounded-lg p-2 text-sm" readonly>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Assigned Employee</label>
-                        <select id="cust-employee" class="w-full border rounded-lg p-2 text-sm" required>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Total Cost (Price)</label>
-                        <input type="number" id="cust-total-cost" class="w-full border rounded-lg p-2 text-sm" oninput="calculateFinancials()" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Advance Amount</label>
-                        <input type="number" id="cust-advance" class="w-full border rounded-lg p-2 text-sm" oninput="calculateFinancials()" required>
-                        <p id="advance-hint" class="text-xs text-blue-600 mt-1"></p>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Material Cost</label>
-                        <input type="number" id="cust-material-cost" class="w-full border rounded-lg p-2 text-sm" oninput="calculateFinancials()" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Delivery Charge</label>
-                        <input type="number" id="cust-delivery-charge" class="w-full border rounded-lg p-2 text-sm" oninput="calculateFinancials()" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Stitching/Employee Charge</label>
-                        <input type="number" id="cust-stitching-charge" class="w-full border rounded-lg p-2 text-sm" oninput="calculateFinancials()" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-600 mb-1">Measurement Type</label>
-                        <select id="cust-measure-type" class="w-full border rounded-lg p-2 text-sm" onchange="toggleMeasurementInput()">
-                            <option value="Standard">Standard</option>
-                            <option value="Manual">Manual</option>
-                        </select>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Customer Name</label>
+                        <input type="text" id="cust-name" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required>
                     </div>
                 </div>
-                <div id="manual-measure-box" class="hidden">
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Manual Measurements Notes</label>
-                    <textarea id="cust-manual-measure" class="w-full border rounded-lg p-2 text-sm" placeholder="Enter measurements details..."></textarea>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">WhatsApp Number</label>
+                        <input type="text" id="cust-whatsapp" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Delivery Date</label>
+                        <input type="date" id="cust-delivery-date" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required>
+                    </div>
                 </div>
-                <div class="flex justify-end gap-3 pt-4 border-t">
-                    <button type="button" onclick="closeModals()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-ledyBlue text-white rounded-lg text-sm font-semibold">Save Order</button>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Address</label>
+                    <textarea id="cust-address" rows="2" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required></textarea>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Item Code (Suggestion)</label>
+                        <input type="text" id="cust-item-code" list="store-code-list" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required oninput="fillItemDetails(this.value)">
+                        <datalist id="store-code-list"></datalist>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Dress Name</label>
+                        <input type="text" id="cust-dress-name" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Total Cost (₹)</label>
+                        <input type="number" id="cust-total-cost" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required oninput="calculateFinancials()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Advance (₹)</label>
+                        <input type="number" id="cust-advance" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required oninput="calculateFinancials()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Material Cost (₹)</label>
+                        <input type="number" id="cust-mat-cost" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" value="0" oninput="calculateFinancials()">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Delivery Chg (₹)</label>
+                        <input type="number" id="cust-del-chg" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" value="0" oninput="calculateFinancials()">
+                    </div>
+                </div>
+                <div class="bg-purple-50 p-3 rounded-xl text-xs text-purple-900" id="advance-hint">
+                    Advance balance after material cost: ₹0
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Assign Employee</label>
+                        <select id="cust-employee" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm">
+                            <!-- Filled dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-500 mb-1">Stitch/Employee Pay (₹)</label>
+                        <input type="number" id="cust-stitch-pay" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" value="0" oninput="calculateFinancials()">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Measurement Type</label>
+                    <div class="flex gap-4 mt-1">
+                        <label class="flex items-center gap-2 text-sm"><input type="radio" name="meas-type" value="Standard" checked> Standard (Fixed)</label>
+                        <label class="flex items-center gap-2 text-sm"><input type="radio" name="meas-type" value="Manual"> Manual Entry</label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Measurement Details / Notes</label>
+                    <textarea id="cust-measurements" rows="2" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" placeholder="Chest, Length, Waist details..."></textarea>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-customer')" class="px-4 py-2 border border-gray-200 rounded-xl text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-semibold">Save Order</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Store Modal -->
-    <div id="store-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
-            <h3 id="store-modal-title" class="text-lg font-bold text-gray-800">Add Dress Item</h3>
+    <!-- Add/Edit Item Store Modal -->
+    <div id="modal-store" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-bold text-lg" id="store-modal-title">Add Dress Item</h3>
+                <button onclick="closeModal('modal-store')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
             <form id="store-form" onsubmit="saveStoreItem(event)" class="space-y-4">
-                <input type="hidden" id="store-item-id">
+                <input type="hidden" id="store-id">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Dress Image</label>
-                    <input type="file" id="store-image" accept="image/*" class="w-full border rounded-lg p-2 text-sm" required>
-                    <p class="text-xs text-gray-500 mt-1">Max 10MB</p>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Dress Name</label>
+                    <input type="text" id="store-name" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Dress Name</label>
-                    <input type="text" id="store-name" class="w-full border rounded-lg p-2 text-sm" required>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Dress Code</label>
+                    <input type="text" id="store-code" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Dress Code</label>
-                    <input type="text" id="store-code" class="w-full border rounded-lg p-2 text-sm" required>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Price (₹)</label>
+                    <input type="number" id="store-price" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Price</label>
-                    <input type="number" id="store-price" class="w-full border rounded-lg p-2 text-sm" required>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Image (Upload up to 10MB)</label>
+                    <input type="file" id="store-image" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
                 </div>
-                <div class="flex justify-end gap-3 pt-4 border-t">
-                    <button type="button" onclick="closeModals()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-ledyBlue text-white rounded-lg text-sm font-semibold">Save Item</button>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-store')" class="px-4 py-2 border border-gray-200 rounded-xl text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-semibold">Save Item</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Employee Modal -->
-    <div id="employee-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
-            <h3 id="employee-modal-title" class="text-lg font-bold text-gray-800">Add Employee</h3>
+    <!-- Add/Edit Employee Modal -->
+    <div id="modal-employee" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-bold text-lg" id="employee-modal-title">Add Employee</h3>
+                <button onclick="closeModal('modal-employee')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
             <form id="employee-form" onsubmit="saveEmployee(event)" class="space-y-4">
                 <input type="hidden" id="emp-id">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-600 mb-1">Employee Name</label>
-                    <input type="text" id="emp-name" class="w-full border rounded-lg p-2 text-sm" required>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Employee Name</label>
+                    <input type="text" id="emp-name" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" required>
                 </div>
-                <div class="flex justify-end gap-3 pt-4 border-t">
-                    <button type="button" onclick="closeModals()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-ledyBlue text-white rounded-lg text-sm font-semibold">Save Employee</button>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 mb-1">Role / Specialization</label>
+                    <input type="text" id="emp-role" class="w-full border border-gray-200 p-2.5 rounded-xl text-sm" placeholder="Master Tailor, Stitcher..." required>
+                </div>
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeModal('modal-employee')" class="px-4 py-2 border border-gray-200 rounded-xl text-sm">Cancel</button>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-xl text-sm font-semibold">Save Employee</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Customer Profile Modal -->
-    <div id="profile-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-lg w-full p-6 space-y-4">
-            <h3 class="text-lg font-bold text-gray-800">Customer Complete Profile</h3>
-            <div id="profile-content" class="space-y-2 text-sm text-gray-700">
+    <!-- View Customer Details Modal -->
+    <div id="modal-view-cust" class="fixed inset-0 bg-black/50 backdrop-blur-xs hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h3 class="font-bold text-lg text-purple-900">Customer Details</h3>
+                <button onclick="closeModal('modal-view-cust')" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="flex justify-end pt-4 border-t">
-                <button onclick="closeModals()" class="px-4 py-2 bg-ledyBlue text-white rounded-lg text-sm font-semibold">Close</button>
+            <div id="cust-details-content" class="space-y-3 text-sm">
+                <!-- Details injected -->
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeModal('modal-view-cust')" class="px-4 py-2 bg-gray-100 rounded-xl text-sm font-semibold">Close</button>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Logic -->
+    <!-- Application Script -->
     <script>
+        // LocalStorage Initialization & State
         let db = {
-            customers: JSON.parse(localStorage.getItem('kaiz_customers')) || [],
-            store: JSON.parse(localStorage.getItem('kaiz_store')) || [],
-            employees: JSON.parse(localStorage.getItem('kaiz_employees')) || []
+            customers: JSON.parse(localStorage.getItem('kz_customers')) || [
+                { id: 1, platform: 'LEDY', name: 'Aamina Beevi', whatsapp: '9847123456', address: 'Kochi, Kerala', deliveryDate: '2026-03-15', itemCode: 'LD001', dressName: 'Party Gown', totalCost: 3500, advance: 1500, matCost: 800, delChg: 100, employee: 'Rameshan', stitchPay: 400, measureType: 'Standard', measurements: 'Size 38, Standard Fit', status: 'Pending' },
+                { id: 2, platform: 'BEBI', name: 'Fathima Zohra', whatsapp: '9567123456', address: 'Calicut, Kerala', deliveryDate: '2026-03-12', itemCode: 'BB001', dressName: 'Baby Frock', totalCost: 1800, advance: 800, matCost: 400, delChg: 50, employee: 'Sureshan', stitchPay: 250, measureType: 'Manual', measurements: 'Length: 22, Chest: 20', status: 'Pending' }
+            ],
+            store: JSON.parse(localStorage.getItem('kz_store')) || [
+                { id: 1, name: 'Party Gown', code: 'LD001', price: 3500, image: 'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=300' },
+                { id: 2, name: 'Baby Frock', code: 'BB001', price: 1800, image: 'https://images.unsplash.com/photo-1518831959646-742c3a14ebf7?w=300' }
+            ],
+            employees: JSON.parse(localStorage.getItem('kz_employees')) || [
+                { id: 1, name: 'Rameshan', role: 'Master Tailor' },
+                { id: 2, name: 'Sureshan', role: 'Stitcher' }
+            ]
         };
 
-        let currentCustomerSubTab = 'pending';
-
         function saveData() {
-            localStorage.setItem('kaiz_customers', JSON.stringify(db.customers));
-            localStorage.setItem('kaiz_store', JSON.stringify(db.store));
-            localStorage.setItem('kaiz_employees', JSON.stringify(db.employees));
-            updateDashboard();
+            localStorage.setItem('kz_customers', JSON.stringify(db.customers));
+            localStorage.setItem('kz_store', JSON.stringify(db.store));
+            localStorage.setItem('kz_employees', JSON.stringify(db.employees));
+            renderAll();
         }
 
-        // Navigation Management
+        // Navigation Tabs
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            ['dashboard', 'customers', 'store', 'employees', 'analytics'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600 hover:bg-gray-50 transition";
+            });
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabId}`).className = "w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-purple-700 bg-purple-50 transition";
             
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-blue-700', 'text-white');
-                btn.classList.add('hover:bg-blue-800', 'text-blue-100');
-            });
-            
-            event.currentTarget.classList.remove('hover:bg-blue-800', 'text-blue-100');
-            event.currentTarget.classList.add('bg-blue-700', 'text-white');
-            document.getElementById('page-title').innerText = event.currentTarget.innerText.trim();
-
-            if(tabId === 'store') renderStore();
-            if(tabId === 'employees') renderEmployees();
-            if(tabId === 'customers') renderCustomers();
-            if(tabId === 'dashboard') updateDashboard();
+            const titles = { dashboard: 'Dashboard Overview', customers: 'Customers & Orders', store: 'Item Store & Catalog', employees: 'Employee Management', analytics: 'Data Analytics' };
+            document.getElementById('page-title').innerText = titles[tabId];
+            if(tabId === 'analytics') runAnalytics();
         }
 
-        function toggleSidebar() {
-            const sidebar = document.querySelector('aside');
-            sidebar.classList.toggle('hidden');
+        function switchCustomerSubTab(sub) {
+            if(sub === 'pending') {
+                document.getElementById('customer-pending-view').classList.remove('hidden');
+                document.getElementById('customer-completed-view').classList.add('hidden');
+                document.getElementById('sub-btn-pending').className = "px-6 py-3 font-semibold border-b-2 border-purple-600 text-purple-600";
+                document.getElementById('sub-btn-completed').className = "px-6 py-3 font-semibold text-gray-500 border-b-2 border-transparent";
+            } else {
+                document.getElementById('customer-pending-view').classList.add('hidden');
+                document.getElementById('customer-completed-view').classList.remove('hidden');
+                document.getElementById('sub-btn-completed').className = "px-6 py-3 font-semibold border-b-2 border-purple-600 text-purple-600";
+                document.getElementById('sub-btn-pending').className = "px-6 py-3 font-semibold text-gray-500 border-b-2 border-transparent";
+            }
         }
 
-        // Dashboard Metrics Calculation
-        function updateDashboard() {
-            let totalRevenue = 0, totalProfit = 0, ownerEarning = 0, completedOrders = 0, pendingOrders = 0;
-            let ledyRev = 0, ledyProf = 0, ledyComp = 0, ledyPend = 0;
-            let bebiRev = 0, bebiProf = 0, bebiComp = 0, bebiPend = 0;
+        // Modal Controls
+        function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); document.getElementById(modalId).classList.remove('flex'); }
+        function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); document.getElementById(modalId).classList.add('flex'); }
 
-            db.customers.forEach(c => {
-                let expenses = Number(c.materialCost) + Number(c.deliveryCharge) + Number(c.stitchingCharge);
-                let netAfterExp = Number(c.totalCost) - expenses;
-                let ownerPart = netAfterExp < 300 ? netAfterExp : 300;
-                let bizProfit = netAfterExp > 300 ? netAfterExp - 300 : 0;
-
-                if(c.status === 'completed') {
-                    completedOrders++;
-                    totalRevenue += Number(c.totalCost);
-                    totalProfit += bizProfit;
-                    ownerEarning += ownerPart;
-
-                    if(c.platform === 'LEDI') {
-                        ledyRev += Number(c.totalCost);
-                        ledyProf += bizProfit;
-                        ledyComp++;
-                    } else {
-                        bebiRev += Number(c.totalCost);
-                        bebiProf += bizProfit;
-                        bebiComp++;
-                    }
-                } else {
-                    pendingOrders++;
-                    if(c.platform === 'LEDI') ledyPend++;
-                    else bebiPend++;
-                }
-            });
-
-            document.getElementById('dash-total-revenue').innerText = `₹${totalRevenue}`;
-            document.getElementById('dash-total-profit').innerText = `₹${totalProfit}`;
-            document.getElementById('dash-owner-earning').innerText = `₹${ownerEarning}`;
-            document.getElementById('dash-completed-orders').innerText = completedOrders;
-            document.getElementById('dash-pending-orders').innerText = pendingOrders;
-
-            document.getElementById('ledy-rev').innerText = `₹${ledyRev}`;
-            document.getElementById('ledy-prof').innerText = `₹${ledyProf}`;
-            document.getElementById('ledy-comp').innerText = ledyComp;
-            document.getElementById('ledy-pend').innerText = ledyPend;
-
-            document.getElementById('bebi-rev').innerText = `₹${bebiRev}`;
-            document.getElementById('bebi-prof').innerText = `₹${bebiProf}`;
-            document.getElementById('bebi-comp').innerText = bebiComp;
-            document.getElementById('bebi-pend').innerText = bebiPend;
-
-            let pendingList = db.customers.filter(c => c.status === 'pending').sort((a,b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
-            let upcomingHTML = '';
-            pendingList.slice(0, 2).forEach(c => {
-                upcomingHTML += `
-                    <div onclick="viewCustomerProfile('${c.id}')" class="p-3 bg-gray-50 rounded-lg border flex justify-between items-center cursor-pointer hover:bg-gray-100">
-                        <div>
-                            <p class="font-bold text-gray-800">${c.name} (${c.platform})</p>
-                            <p class="text-xs text-gray-500">Date: ${c.deliveryDate}</p>
-                        </div>
-                        <span class="text-xs bg-blue-100 text-ledyBlue px-2 py-1 rounded font-semibold">View</span>
-                    </div>
-                `;
-            });
-            document.getElementById('upcoming-deliveries-list').innerHTML = upcomingHTML || '<p class="text-sm text-gray-500">No upcoming pending orders.</p>';
+        function openAddCustomerModal() {
+            document.getElementById('customer-form').reset();
+            document.getElementById('cust-id').value = '';
+            document.getElementById('customer-modal-title').innerText = 'Add Customer Order';
+            populateEmployeeDropdown();
+            populateStoreCodeList();
+            openModal('modal-customer');
         }
 
-        // Store Management
-        function openStoreModal(id = null) {
-            document.getElementById('store-modal').classList.remove('hidden');
+        function openAddItemModal() {
             document.getElementById('store-form').reset();
-            document.getElementById('store-item-id').value = '';
-            if(id) {
-                let item = db.store.find(i => i.id === id);
-                if(item) {
-                    document.getElementById('store-modal-title').innerText = 'Edit Dress Item';
-                    document.getElementById('store-item-id').value = item.id;
-                    document.getElementById('store-name').value = item.name;
-                    document.getElementById('store-code').value = item.code;
-                    document.getElementById('store-price').value = item.price;
-                }
-            } else {
-                document.getElementById('store-modal-title').innerText = 'Add Dress Item';
-            }
+            document.getElementById('store-id').value = '';
+            document.getElementById('store-modal-title').innerText = 'Add Dress Item';
+            openModal('modal-store');
         }
 
-        function saveStoreItem(e) {
-            e.preventDefault();
-            let id = document.getElementById('store-item-id').value;
-            let name = document.getElementById('store-name').value;
-            let code = document.getElementById('store-code').value;
-            let price = document.getElementById('store-price').value;
-            let fileInput = document.getElementById('store-image');
-
-            let reader = new FileReader();
-            if(fileInput.files && fileInput.files[0]) {
-                if(fileInput.files[0].size > 10 * 1024 * 1024) {
-                    alert('Image size exceeds 10MB limit.');
-                    return;
-                }
-                reader.onload = function(uploadEvent) {
-                    saveItemToDB(id, name, code, price, uploadEvent.target.result);
-                }
-                reader.readAsDataURL(fileInput.files[0]);
-            } else if(id) {
-                let existing = db.store.find(i => i.id === id);
-                saveItemToDB(id, name, code, price, existing.image);
-            }
-        }
-
-        function saveItemToDB(id, name, code, price, image) {
-            if(id) {
-                let index = db.store.findIndex(i => i.id === id);
-                db.store[index] = { id, name, code, price, image };
-            } else {
-                db.store.push({ id: Date.now().toString(), name, code, price, image });
-            }
-            saveData();
-            closeModals();
-            renderStore();
-        }
-
-        function renderStore() {
-            let html = '';
-            db.store.forEach(item => {
-                html += `
-                    <div class="bg-white rounded-xl shadow-sm border overflow-hidden flex flex-col">
-                        <img src="${item.image}" class="h-48 w-full object-cover">
-                        <div class="p-4 flex-1 flex flex-col justify-between">
-                            <div>
-                                <h4 class="font-bold text-gray-800">${item.name}</h4>
-                                <p class="text-xs text-gray-500">Code: ${item.code}</p>
-                                <p class="text-sm font-semibold text-ledyBlue mt-1">₹${item.price}</p>
-                            </div>
-                            <div class="flex justify-end gap-2 mt-4 pt-2 border-t">
-                                <button onclick="openStoreModal('${item.id}')" class="text-blue-600 text-xs font-semibold"><i class="fa-solid fa-pen"></i> Edit</button>
-                                <button onclick="deleteStoreItem('${item.id}')" class="text-red-600 text-xs font-semibold"><i class="fa-solid fa-trash"></i> Delete</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById('store-grid').innerHTML = html || '<p class="text-sm text-gray-500 col-span-full">No items added in store yet.</p>';
-            populateStoreSuggestions();
-        }
-
-        function deleteStoreItem(id) {
-            if(confirm('Are you sure you want to delete this item?')) {
-                db.store = db.store.filter(i => i.id !== id);
-                saveData();
-                renderStore();
-            }
-        }
-
-        // Employee Management
-        function openEmployeeModal(id = null) {
-            document.getElementById('employee-modal').classList.remove('hidden');
+        function openAddEmployeeModal() {
             document.getElementById('employee-form').reset();
             document.getElementById('emp-id').value = '';
-            if(id) {
-                let emp = db.employees.find(e => e.id === id);
-                if(emp) {
-                    document.getElementById('employee-modal-title').innerText = 'Edit Employee';
-                    document.getElementById('emp-id').value = emp.id;
-                    document.getElementById('emp-name').value = emp.name;
-                }
-            } else {
-                document.getElementById('employee-modal-title').innerText = 'Add Employee';
-            }
-        }
-
-        function saveEmployee(e) {
-            e.preventDefault();
-            let id = document.getElementById('emp-id').value;
-            let name = document.getElementById('emp-name').value;
-
-            if(id) {
-                let index = db.employees.findIndex(em => em.id === id);
-                db.employees[index].name = name;
-            } else {
-                db.employees.push({ id: Date.now().toString(), name });
-            }
-            saveData();
-            closeModals();
-            renderEmployees();
-        }
-
-        function renderEmployees() {
-            let html = '';
-            db.employees.forEach(emp => {
-                let empCustomers = db.customers.filter(c => c.employee === emp.name);
-                let earned = 0;
-                let completed = 0;
-                let pending = 0;
-
-                empCustomers.forEach(c => {
-                    if(c.status === 'completed') {
-                        earned += Number(c.stitchingCharge || 0);
-                        completed++;
-                    } else {
-                        pending++;
-                    }
-                });
-
-                html += `
-                    <div class="bg-white p-5 rounded-xl shadow-sm border space-y-3">
-                        <h4 class="font-bold text-gray-800 text-lg">${emp.name}</h4>
-                        <p class="text-sm text-gray-600">Total Earned: <span class="font-semibold text-green-600">₹${earned}</span></p>
-                        <p class="text-sm text-gray-600">Completed Work: <span class="font-semibold">${completed}</span></p>
-                        <p class="text-sm text-gray-600">Pending Work: <span class="font-semibold text-orange-600">${pending}</span></p>
-                        <div class="space-y-1 pt-2 border-t">
-                            <p class="text-xs font-semibold text-gray-500">Pending Works Details:</p>
-                `;
-                empCustomers.filter(c => c.status === 'pending').forEach(c => {
-                    html += `
-                        <div onclick="viewCustomerProfile('${c.id}')" class="text-xs bg-gray-50 p-2 rounded cursor-pointer hover:bg-gray-100 flex justify-between">
-                            <span>${c.name} (${c.itemCode})</span>
-                            <span class="text-blue-600">${c.deliveryDate}</span>
-                        </div>
-                    `;
-                });
-                html += `</div>
-                        <div class="flex justify-end gap-3 pt-2 border-t">
-                            <button onclick="openEmployeeModal('${emp.id}')" class="text-blue-600 text-xs font-semibold">Edit</button>
-                            <button onclick="deleteEmployee('${emp.id}')" class="text-red-600 text-xs font-semibold">Delete</button>
-                        </div>
-                    </div>
-                `;
-            });
-            document.getElementById('employee-grid').innerHTML = html || '<p class="text-sm text-gray-500 col-span-full">No employees added yet.</p>';
-            populateEmployeeDropdown();
-        }
-
-        function deleteEmployee(id) {
-            if(confirm('Delete this employee?')) {
-                db.employees = db.employees.filter(e => e.id !== id);
-                saveData();
-                renderEmployees();
-            }
-        }
-
-        // Customer & Orders Management
-        function switchCustomerSubTab(subTab) {
-            currentCustomerSubTab = subTab;
-            if(subTab === 'pending') {
-                document.getElementById('btn-sub-pending').className = 'px-4 py-2 bg-ledyBlue text-white rounded-lg text-sm font-semibold';
-                document.getElementById('btn-sub-completed').className = 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold';
-            } else {
-                document.getElementById('btn-sub-completed').className = 'px-4 py-2 bg-ledyBlue text-white rounded-lg text-sm font-semibold';
-                document.getElementById('btn-sub-pending').className = 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm font-semibold';
-            }
-            renderCustomers();
-        }
-
-        function populateStoreSuggestions() {
-            let select = document.getElementById('cust-item-code');
-            let html = '<option value="">Select Item Code</option>';
-            db.store.forEach(item => {
-                html += `<option value="${item.code}">${item.code} - ${item.name}</option>`;
-            });
-            select.innerHTML = html;
+            document.getElementById('employee-modal-title').innerText = 'Add Employee';
+            openModal('modal-employee');
         }
 
         function populateEmployeeDropdown() {
-            let select = document.getElementById('cust-employee');
-            let html = '<option value="">Select Employee</option>';
-            db.employees.forEach(emp => {
-                html += `<option value="${emp.name}">${emp.name}</option>`;
-            });
-            select.innerHTML = html;
+            const select = document.getElementById('cust-employee');
+            select.innerHTML = db.employees.map(e => `<option value="${e.name}">${e.name} (${e.role})</option>`).join('');
         }
 
-        function fillItemDetails() {
-            let code = document.getElementById('cust-item-code').value;
-            let item = db.store.find(i => i.code === code);
+        function populateStoreCodeList() {
+            const list = document.getElementById('store-code-list');
+            list.innerHTML = db.store.map(s => `<option value="${s.code}">${s.name} - ₹${s.price}</option>`).join('');
+        }
+
+        function fillItemDetails(code) {
+            const item = db.store.find(s => s.code === code);
             if(item) {
                 document.getElementById('cust-dress-name').value = item.name;
                 document.getElementById('cust-total-cost').value = item.price;
@@ -656,59 +545,19 @@
             }
         }
 
-        function toggleMeasurementInput() {
-            let type = document.getElementById('cust-measure-type').value;
-            let box = document.getElementById('manual-measure-box');
-            if(type === 'Manual') box.classList.remove('hidden');
-            else box.classList.add('hidden');
-        }
-
         function calculateFinancials() {
-            let advance = Number(document.getElementById('cust-advance').value || 0);
-            let materialCost = Number(document.getElementById('cust-material-cost').value || 0);
-            let remainingAdvance = advance - materialCost;
-            document.getElementById('advance-hint').innerText = `Remaining from Advance after Material Cost: ₹${remainingAdvance}`;
+            const adv = parseFloat(document.getElementById('cust-advance').value) || 0;
+            const mat = parseFloat(document.getElementById('cust-mat-cost').value) || 0;
+            const hint = adv - mat;
+            document.getElementById('advance-hint').innerText = `Advance balance after material cost: ₹${hint >= 0 ? hint : 0}`;
         }
 
-        function openCustomerModal(id = null) {
-            document.getElementById('customer-modal').classList.remove('hidden');
-            document.getElementById('customer-form').reset();
-            document.getElementById('cust-id').value = '';
-            populateStoreSuggestions();
-            populateEmployeeDropdown();
-            if(id) {
-                let c = db.customers.find(cust => cust.id === id);
-                if(c) {
-                    document.getElementById('customer-modal-title').innerText = 'Edit Customer & Order';
-                    document.getElementById('cust-id').value = c.id;
-                    document.getElementById('cust-platform').value = c.platform;
-                    document.getElementById('cust-name').value = c.name;
-                    document.getElementById('cust-whatsapp').value = c.whatsapp;
-                    document.getElementById('cust-address').value = c.address;
-                    document.getElementById('cust-delivery-date').value = c.deliveryDate;
-                    document.getElementById('cust-item-code').value = c.itemCode;
-                    document.getElementById('cust-dress-name').value = c.dressName;
-                    document.getElementById('cust-employee').value = c.employee;
-                    document.getElementById('cust-total-cost').value = c.totalCost;
-                    document.getElementById('cust-advance').value = c.advance;
-                    document.getElementById('cust-material-cost').value = c.materialCost;
-                    document.getElementById('cust-delivery-charge').value = c.deliveryCharge;
-                    document.getElementById('cust-stitching-charge').value = c.stitchingCharge;
-                    document.getElementById('cust-measure-type').value = c.measureType;
-                    document.getElementById('cust-manual-measure').value = c.manualMeasure || '';
-                    toggleMeasurementInput();
-                    calculateFinancials();
-                }
-            } else {
-                document.getElementById('customer-modal-title').innerText = 'Add Customer & Order';
-            }
-        }
-
+        // Save Handlers
         function saveCustomer(e) {
             e.preventDefault();
-            let id = document.getElementById('cust-id').value;
-            let customerData = {
-                id: id || Date.now().toString(),
+            const id = document.getElementById('cust-id').value;
+            const data = {
+                id: id ? parseInt(id) : Date.now(),
                 platform: document.getElementById('cust-platform').value,
                 name: document.getElementById('cust-name').value,
                 whatsapp: document.getElementById('cust-whatsapp').value,
@@ -716,152 +565,360 @@
                 deliveryDate: document.getElementById('cust-delivery-date').value,
                 itemCode: document.getElementById('cust-item-code').value,
                 dressName: document.getElementById('cust-dress-name').value,
+                totalCost: parseFloat(document.getElementById('cust-total-cost').value) || 0,
+                advance: parseFloat(document.getElementById('cust-advance').value) || 0,
+                matCost: parseFloat(document.getElementById('cust-mat-cost').value) || 0,
+                delChg: parseFloat(document.getElementById('cust-del-chg').value) || 0,
                 employee: document.getElementById('cust-employee').value,
-                totalCost: document.getElementById('cust-total-cost').value,
-                advance: document.getElementById('cust-advance').value,
-                materialCost: document.getElementById('cust-material-cost').value,
-                deliveryCharge: document.getElementById('cust-delivery-charge').value,
-                stitchingCharge: document.getElementById('cust-stitching-charge').value,
-                measureType: document.getElementById('cust-measure-type').value,
-                manualMeasure: document.getElementById('cust-manual-measure').value,
-                status: id ? db.customers.find(c => c.id === id).status : 'pending',
-                completedDate: id ? db.customers.find(c => c.id === id).completedDate : null
+                stitchPay: parseFloat(document.getElementById('cust-stitch-pay').value) || 0,
+                measureType: document.querySelector('input[name="meas-type"]:checked').value,
+                measurements: document.getElementById('cust-measurements').value,
+                status: 'Pending'
             };
 
             if(id) {
-                let index = db.customers.findIndex(c => c.id === id);
-                db.customers[index] = customerData;
+                const idx = db.customers.findIndex(c => c.id == id);
+                data.status = db.customers[idx].status; // retain status
+                db.customers[idx] = data;
             } else {
-                db.customers.push(customerData);
+                db.customers.push(data);
             }
+            closeModal('modal-customer');
             saveData();
-            closeModals();
-            renderCustomers();
         }
 
-        function renderCustomers() {
-            let html = '';
-            let filtered = db.customers.filter(c => c.status === currentCustomerSubTab);
+        function saveStoreItem(e) {
+            e.preventDefault();
+            const id = document.getElementById('store-id').value;
+            const fileInput = document.getElementById('store-image');
             
-            if(currentCustomerSubTab === 'completed') {
-                filtered.sort((a,b) => new Date(b.completedDate || 0) - new Date(a.completedDate || 0));
+            let imageUrl = 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=300';
+            if(fileInput.files && fileInput.files[0]) {
+                imageUrl = URL.createObjectURL(fileInput.files[0]);
             }
 
-            filtered.forEach(c => {
-                html += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="p-4 font-bold text-gray-800 cursor-pointer text-blue-600" onclick="viewCustomerProfile('${c.id}')">${c.name}</td>
-                        <td class="p-4"><span class="px-2 py-1 rounded text-xs font-semibold ${c.platform === 'LEDI' ? 'bg-blue-100 text-ledyBlue' : 'bg-purple-100 text-purple-800'}">${c.platform}</span></td>
-                        <td class="p-4">${c.dressName} (${c.itemCode})</td>
-                        <td class="p-4">${c.deliveryDate}</td>
-                        <td class="p-4">${c.employee}</td>
-                        <td class="p-4">₹${c.totalCost} / ₹${c.advance}</td>
-                        <td class="p-4">
-                            ${c.status === 'pending' ? 
-                                `<button onclick="markCompleted('${c.id}')" class="px-3 py-1 bg-green-600 text-white rounded text-xs font-semibold">Mark Completed</button>` : 
-                                `<span class="text-green-600 font-semibold text-xs">Completed</span>`
-                            }
-                        </td>
-                        <td class="p-4 text-center space-x-2">
-                            <button onclick="openCustomerModal('${c.id}')" class="text-blue-600"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteCustomer('${c.id}')" class="text-red-600"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            });
-            document.getElementById('customer-table-body').innerHTML = html || `<tr><td colspan="8" class="p-4 text-center text-gray-500">No ${currentCustomerSubTab} orders found.</td></tr>`;
+            const data = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('store-name').value,
+                code: document.getElementById('store-code').value,
+                price: parseFloat(document.getElementById('store-price').value) || 0,
+                image: imageUrl
+            };
+
+            if(id) {
+                const idx = db.store.findIndex(s => s.id == id);
+                if(!fileInput.files[0]) data.image = db.store[idx].image;
+                db.store[idx] = data;
+            } else {
+                db.store.push(data);
+            }
+            closeModal('modal-store');
+            saveData();
         }
 
-        function markCompleted(id) {
-            let index = db.customers.findIndex(c => c.id === id);
-            if(index !== -1) {
-                db.customers[index].status = 'completed';
-                db.customers[index].completedDate = new Date().toISOString().split('T')[0];
-                saveData();
-                renderCustomers();
+        function saveEmployee(e) {
+            e.preventDefault();
+            const id = document.getElementById('emp-id').value;
+            const data = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('emp-name').value,
+                role: document.getElementById('emp-role').value
+            };
+            if(id) {
+                const idx = db.employees.findIndex(emp => emp.id == id);
+                db.employees[idx] = data;
+            } else {
+                db.employees.push(data);
             }
+            closeModal('modal-employee');
+            saveData();
         }
 
         function deleteCustomer(id) {
-            if(confirm('Delete this customer order?')) {
+            if(confirm('Are you sure you want to delete this order?')) {
                 db.customers = db.customers.filter(c => c.id !== id);
                 saveData();
-                renderCustomers();
             }
         }
 
-        function viewCustomerProfile(id) {
-            let c = db.customers.find(cust => cust.id === id);
-            if(!c) return;
+        function deleteStoreItem(id) {
+            if(confirm('Delete this dress item?')) {
+                db.store = db.store.filter(s => s.id !== id);
+                saveData();
+            }
+        }
 
-            let custAllOrders = db.customers.filter(cust => cust.name.toLowerCase() === c.name.toLowerCase());
-            let totalRev = 0, totalProf = 0, totalOrdCount = custAllOrders.length;
-            custAllOrders.forEach(ord => {
-                if(ord.status === 'completed') {
-                    totalRev += Number(ord.totalCost);
-                    let exp = Number(ord.materialCost) + Number(ord.deliveryCharge) + Number(ord.stitchingCharge);
-                    let net = Number(ord.totalCost) - exp;
-                    totalProf += net > 300 ? net - 300 : 0;
+        function deleteEmployee(id) {
+            if(confirm('Delete employee?')) {
+                db.employees = db.employees.filter(e => e.id !== id);
+                saveData();
+            }
+        }
+
+        function toggleOrderStatus(id) {
+            const cust = db.customers.find(c => c.id === id);
+            if(cust) {
+                cust.status = cust.status === 'Pending' ? 'Completed' : 'Pending';
+                saveData();
+            }
+        }
+
+        function editCustomer(id) {
+            const c = db.customers.find(x => x.id === id);
+            if(!c) return;
+            document.getElementById('cust-id').value = c.id;
+            document.getElementById('cust-platform').value = c.platform;
+            document.getElementById('cust-name').value = c.name;
+            document.getElementById('cust-whatsapp').value = c.whatsapp;
+            document.getElementById('cust-delivery-date').value = c.deliveryDate;
+            document.getElementById('cust-address').value = c.address;
+            document.getElementById('cust-item-code').value = c.itemCode;
+            document.getElementById('cust-dress-name').value = c.dressName;
+            document.getElementById('cust-total-cost').value = c.totalCost;
+            document.getElementById('cust-advance').value = c.advance;
+            document.getElementById('cust-mat-cost').value = c.matCost;
+            document.getElementById('cust-del-chg').value = c.delChg;
+            populateEmployeeDropdown();
+            document.getElementById('cust-employee').value = c.employee;
+            document.getElementById('cust-stitch-pay').value = c.stitchPay;
+            document.getElementById('cust-measurements').value = c.measurements;
+            document.getElementById('customer-modal-title').innerText = 'Edit Customer Order';
+            openModal('modal-customer');
+        }
+
+        function viewCustomerDetails(id) {
+            const c = db.customers.find(x => x.id === id);
+            if(!c) return;
+            const content = `
+                <p><strong>Name:</strong> ${c.name}</p>
+                <p><strong>Platform:</strong> ${c.platform}</p>
+                <p><strong>WhatsApp:</strong> ${c.whatsapp}</p>
+                <p><strong>Address:</strong> ${c.address}</p>
+                <p><strong>Dress Name:</strong> ${c.dressName} (${c.itemCode})</p>
+                <p><strong>Total Cost:</strong> ₹${c.totalCost}</p>
+                <p><strong>Assigned Employee:</strong> ${c.employee}</p>
+                <p><strong>Measurements:</strong> ${c.measurements}</p>
+                <p><strong>Status:</strong> ${c.status}</p>
+            `;
+            document.getElementById('cust-details-content').innerHTML = content;
+            openModal('modal-view-cust');
+        }
+
+        function viewEmployeeDetails(empName) {
+            const empCusts = db.customers.filter(c => c.employee === empName);
+            const pending = empCusts.filter(c => c.status === 'Pending');
+            let html = `<div class="space-y-3">`;
+            pending.forEach(p => {
+                html += `<div class="bg-gray-50 p-3 rounded-xl text-sm">
+                    <p><strong>Customer:</strong> ${p.name} (${p.whatsapp})</p>
+                    <p><strong>Dress:</strong> ${p.dressName}</p>
+                    <p><strong>Measurements:</strong> ${p.measurements}</p>
+                    <p><strong>Delivery Date:</strong> ${p.deliveryDate}</p>
+                </div>`;
+            });
+            if(pending.length === 0) html += `<p class="text-sm text-gray-500">No pending orders for this employee.</p>`;
+            html += `</div>`;
+            document.getElementById('cust-details-content').innerHTML = html;
+            openModal('modal-view-cust');
+        }
+
+        // Main Rendering Engine
+        function renderAll() {
+            let totalRev = 0, totalProfit = 0, ownerEarning = 0, ownerOrdersCount = 0;
+            let ledyRev = 0, ledyProfit = 0, ledyExp = 0, ledyComp = 0, ledyPend = 0;
+            let bebiRev = 0, bebiProfit = 0, bebiExp = 0, bebiComp = 0, bebiPend = 0;
+
+            db.customers.forEach(c => {
+                const expenses = c.matCost + c.delChg + c.stitchPay;
+                const netAfterExp = c.totalCost - expenses;
+                
+                // Owner earning logic: ₹300 per order if net >= 300, else net amount
+                let oEarn = netAfterExp >= 300 ? 300 : (netAfterExp > 0 ? netAfterExp : 0);
+                let bProfit = netAfterExp - oEarn;
+                if(bProfit < 0) bProfit = 0;
+
+                totalRev += c.totalCost;
+                totalProfit += bProfit;
+                ownerEarning += oEarn;
+                if(oEarn > 0) ownerOrdersCount++;
+
+                if(c.platform === 'LEDY') {
+                    ledyRev += c.totalCost;
+                    ledyExp += expenses;
+                    if(c.status === 'Completed') { ledyComp++; ledyProfit += bProfit; }
+                    else { ledyPend++; }
+                } else {
+                    bebiRev += c.totalCost;
+                    bebiExp += expenses;
+                    if(c.status === 'Completed') { bebiComp++; bebiProfit += bProfit; }
+                    else { bebiPend++; }
                 }
             });
 
-            let content = `
-                <p><strong>Name:</strong> ${c.name}</p>
-                <p><strong>WhatsApp:</strong> ${c.whatsapp}</p>
-                <p><strong>Address:</strong> ${c.address}</p>
-                <p><strong>Total Orders Given:</strong> ${totalOrdCount}</p>
-                <p><strong>Total Revenue Generated:</strong> ₹${totalRev}</p>
-                <p><strong>Total Profit Generated:</strong> ₹${totalProf}</p>
-                <hr class="my-2">
-                <p class="font-semibold text-gray-800">Latest Order Details:</p>
-                <p><strong>Platform:</strong> ${c.platform}</p>
-                <p><strong>Item Code:</strong> ${c.itemCode} (${c.dressName})</p>
-                <p><strong>Delivery Date:</strong> ${c.deliveryDate}</p>
-                <p><strong>Assigned Employee:</strong> ${c.employee}</p>
-                <p><strong>Measurements:</strong> ${c.measureType} ${c.manualMeasure ? ' - ' + c.manualMeasure : ''}</p>
-            `;
-            document.getElementById('profile-content').innerHTML = content;
-            document.getElementById('profile-modal').classList.remove('hidden');
+            // Update Dashboard Metrics
+            document.getElementById('dash-total-rev').innerText = `₹${totalRev}`;
+            document.getElementById('dash-total-profit').innerText = `₹${totalProfit}`;
+            document.getElementById('dash-owner-earning').innerText = `₹${ownerEarning}`;
+            document.getElementById('dash-owner-orders-count').innerText = `From ${ownerOrdersCount} orders`;
+            
+            const completedCount = db.customers.filter(c => c.status === 'Completed').length;
+            const pendingCount = db.customers.filter(c => c.status === 'Pending').length;
+            document.getElementById('dash-completed-orders').innerText = completedCount;
+            document.getElementById('dash-pending-orders').innerText = pendingCount;
+
+            document.getElementById('ledy-rev').innerText = `₹${ledyRev}`;
+            document.getElementById('ledy-profit').innerText = `₹${ledyProfit}`;
+            document.getElementById('ledy-exp').innerText = `₹${ledyExp}`;
+            document.getElementById('ledy-completed').innerText = ledyComp;
+            document.getElementById('ledy-pending').innerText = ledyPend;
+
+            document.getElementById('bebi-rev').innerText = `₹${bebiRev}`;
+            document.getElementById('bebi-profit').innerText = `₹${bebiProfit}`;
+            document.getElementById('bebi-exp').innerText = `₹${bebiExp}`;
+            document.getElementById('bebi-completed').innerText = bebiComp;
+            document.getElementById('bebi-pending').innerText = bebiPend;
+
+            // Render Upcoming Deliveries (Next 2 pending based on date)
+            const pendingList = db.customers.filter(c => c.status === 'Pending').sort((a,b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
+            const upcomingHtml = pendingList.slice(0, 2).map(c => `
+                <div class="bg-gray-50 p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-gray-100 transition" onclick="viewCustomerDetails(${c.id})">
+                    <div>
+                        <h4 class="font-bold text-gray-800">${c.name}</h4>
+                        <p class="text-xs text-gray-500 mt-0.5">Dress: ${c.dressName} (${c.platform})</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs bg-purple-100 text-purple-700 px-2.5 py-1 rounded-full font-semibold">${c.deliveryDate}</span>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('upcoming-deliveries-list').innerHTML = upcomingHtml || '<p class="text-xs text-gray-400">No pending deliveries</p>';
+
+            // Render Customer Lists (Pending & Completed)
+            document.getElementById('pending-orders-container').innerHTML = pendingList.map(c => `
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs px-2 py-0.5 rounded-md font-semibold ${c.platform === 'LEDY' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}">${c.platform}</span>
+                            <h4 class="font-bold text-gray-900 mt-1 cursor-pointer hover:text-purple-600" onclick="viewCustomerDetails(${c.id})">${c.name}</h4>
+                            <p class="text-xs text-gray-500">📞 ${c.whatsapp}</p>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="editCustomer(${c.id})" class="p-2 text-gray-400 hover:text-purple-600"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteCustomer(${c.id})" class="p-2 text-gray-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-600 grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-xl">
+                        <div>Dress: <strong>${c.dressName}</strong></div>
+                        <div>Delivery: <strong>${c.deliveryDate}</strong></div>
+                        <div>Total: <strong>₹${c.totalCost}</strong></div>
+                        <div>Advance: <strong>₹${c.advance}</strong></div>
+                    </div>
+                    <button onclick="toggleOrderStatus(${c.id})" class="w-full bg-emerald-600 text-white py-2 rounded-xl text-xs font-semibold hover:bg-emerald-700 transition">Mark as Completed</button>
+                </div>
+            `).join('') || '<p class="text-sm text-gray-400">No pending orders.</p>';
+
+            const completedList = db.customers.filter(c => c.status === 'Completed').sort((a,b) => new Date(b.deliveryDate) - new Date(a.deliveryDate));
+            document.getElementById('completed-orders-container').innerHTML = completedList.map(c => `
+                <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-xs px-2 py-0.5 rounded-md font-semibold bg-emerald-100 text-emerald-700">Completed</span>
+                            <h4 class="font-bold text-gray-900 mt-1 cursor-pointer hover:text-purple-600" onclick="viewCustomerDetails(${c.id})">${c.name}</h4>
+                            <p class="text-xs text-gray-500">📞 ${c.whatsapp}</p>
+                        </div>
+                        <div class="flex gap-1">
+                            <button onclick="editCustomer(${c.id})" class="p-2 text-gray-400 hover:text-purple-600"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deleteCustomer(${c.id})" class="p-2 text-gray-400 hover:text-red-500"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-600 grid grid-cols-2 gap-2 bg-gray-50 p-3 rounded-xl">
+                        <div>Dress: <strong>${c.dressName}</strong></div>
+                        <div>Revenue: <strong>₹${c.totalCost}</strong></div>
+                    </div>
+                </div>
+            `).join('') || '<p class="text-sm text-gray-400">No completed orders yet.</p>';
+
+            // Render Item Store
+            document.getElementById('item-store-grid').innerHTML = db.store.map(s => `
+                <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-xs space-y-3 pb-4">
+                    <img src="${s.image}" class="w-full h-40 object-cover" alt="Dress">
+                    <div class="px-4 space-y-1">
+                        <span class="text-xs font-bold text-purple-600">${s.code}</span>
+                        <h4 class="font-bold text-gray-900">${s.name}</h4>
+                        <p class="text-sm font-semibold text-emerald-600">₹${s.price}</p>
+                    </div>
+                    <div class="px-4 flex justify-end gap-2 pt-2 border-t border-gray-100">
+                        <button onclick="deleteStoreItem(${s.id})" class="text-xs text-red-500 font-semibold px-3 py-1 bg-red-50 rounded-lg">Delete</button>
+                    </div>
+                </div>
+            `).join('') || '<p class="text-sm text-gray-400">Store is empty.</p>';
+
+            // Render Employees
+            document.getElementById('employee-list-container').innerHTML = db.employees.map(emp => {
+                const empCusts = db.customers.filter(c => c.employee === emp.name);
+                const earned = empCusts.reduce((acc, curr) => acc + curr.stitchPay, 0);
+                const completedCount = empCusts.filter(c => c.status === 'Completed').length;
+                const pendingCount = empCusts.filter(c => c.status === 'Pending').length;
+
+                return `
+                    <div class="bg-white p-5 rounded-2xl border border-gray-100 shadow-xs space-y-3">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-gray-900 text-base cursor-pointer hover:text-purple-600" onclick="viewEmployeeDetails('${emp.name}')">${emp.name}</h4>
+                                <p class="text-xs text-purple-600 font-medium">${emp.role}</p>
+                            </div>
+                            <button onclick="deleteEmployee(${emp.id})" class="text-xs text-red-500 hover:bg-red-50 p-2 rounded-lg"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2 text-center bg-gray-50 p-3 rounded-xl text-xs">
+                            <div>
+                                <p class="text-gray-400">Earned</p>
+                                <p class="font-bold text-gray-900 mt-0.5">₹${earned}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-400">Completed</p>
+                                <p class="font-bold text-emerald-600 mt-0.5">${completedCount}</p>
+                            </div>
+                            <div>
+                                <p class="text-gray-400">Pending</p>
+                                <p class="font-bold text-amber-600 mt-0.5">${pendingCount}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('') || '<p class="text-sm text-gray-400">No employees added.</p>';
         }
 
-        // Data Analysis
-        function runDataAnalysis() {
-            let from = document.getElementById('filter-from').value;
-            let to = document.getElementById('filter-to').value;
-
-            if(!from || !to) {
-                alert('Please select both From and To dates.');
-                return;
+        function runAnalytics() {
+            const from = document.getElementById('analytics-from').value;
+            const to = document.getElementById('analytics-to').value;
+            
+            let filtered = db.customers;
+            if(from && to) {
+                filtered = db.customers.filter(c => c.deliveryDate >= from && c.deliveryDate <= to);
             }
 
-            let filtered = db.customers.filter(c => c.status === 'completed' && c.completedDate >= from && c.completedDate <= to);
-            let rev = 0, prof = 0, count = filtered.length;
-
+            let rev = 0, profit = 0;
             filtered.forEach(c => {
-                rev += Number(c.totalCost);
-                let exp = Number(c.materialCost) + Number(c.deliveryCharge) + Number(c.stitchingCharge);
-                let net = Number(c.totalCost) - exp;
-                prof += net > 300 ? net - 300 : 0;
+                const exp = c.matCost + c.delChg + c.stitchPay;
+                const net = c.totalCost - exp;
+                let oEarn = net >= 300 ? 300 : (net > 0 ? net : 0);
+                let bProfit = net - oEarn;
+                if(bProfit < 0) bProfit = 0;
+                rev += c.totalCost;
+                profit += bProfit;
             });
 
-            document.getElementById('analysis-results').innerHTML = `
-                <p class="font-bold text-gray-800">Analysis Report (${from} to ${to}):</p>
-                <p class="mt-2">Completed Orders in Range: <span class="font-semibold">${count}</span></p>
-                <p>Total Revenue: <span class="font-semibold text-ledyBlue">₹${rev}</span></p>
-                <p>Total Business Profit: <span class="font-semibold text-green-600">₹${prof}</span></p>
-            `;
+            document.getElementById('analytics-rev').innerText = `₹${rev}`;
+            document.getElementById('analytics-profit').innerText = `₹${profit}`;
+            document.getElementById('analytics-orders').innerText = filtered.length;
         }
 
-        function closeModals() {
-            document.querySelectorAll('.fixed').forEach(el => el.classList.add('hidden'));
-        }
-
-        window.onload = function() {
-            updateDashboard();
-        }
+        // Initialize App on load
+        renderAll();
     </script>
 </body>
 </html>
+
 
 
 
