@@ -10,382 +10,354 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Poppins', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f8fafc; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="text-gray-800 pb-24">
 
-    <!-- Top Navigation Bar -->
-    <header class="bg-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl">K</div>
+    <!-- Top Navigation / Header -->
+    <header class="bg-white sticky top-0 z-50 border-b border-gray-100 shadow-sm">
+        <div class="max-w-md mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="w-9 h-9 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-lg shadow-md">K</div>
                 <div>
-                    <h1 class="text-xl font-bold tracking-wide text-blue-900">KAIZ SOOQ</h1>
-                    <p class="text-xs text-gray-500">LEDI (Blue) & BEBI (Baby Lavender)</p>
+                    <h1 class="text-base font-bold tracking-wide text-gray-900 leading-tight">KAIZ SOOQ</h1>
+                    <p class="text-[10px] text-gray-400">LEDI & BEBI Store</p>
                 </div>
             </div>
-            <nav class="hidden md:flex space-x-6 font-medium">
-                <button onclick="switchTab('dashboard')" class="nav-link text-blue-600 hover:text-blue-800 cursor-pointer"><i class="fa-solid fa-chart-pie"></i> Dashboard</button>
-                <button onclick="switchTab('customers')" class="nav-link text-gray-600 hover:text-blue-800 cursor-pointer"><i class="fa-solid fa-users"></i> Customers</button>
-                <button onclick="switchTab('store')" class="nav-link text-gray-600 hover:text-blue-800 cursor-pointer"><i class="fa-solid fa-store"></i> Item Store</button>
-                <button onclick="switchTab('employees')" class="nav-link text-gray-600 hover:text-blue-800 cursor-pointer"><i class="fa-solid fa-user-tie"></i> Employees</button>
-                <button onclick="switchTab('expenses')" class="nav-link text-gray-600 hover:text-blue-800 cursor-pointer"><i class="fa-solid fa-wallet"></i> Expenses</button>
-                <button onclick="switchTab('analytics')" class="nav-link text-gray-600 hover:text-blue-800 cursor-pointer"><i class="fa-solid fa-chart-line"></i> Analytics</button>
-            </nav>
+            <div class="flex items-center space-x-3 text-gray-600">
+                <button onclick="switchTab('dashboard')" class="p-2 rounded-full hover:bg-gray-100"><i class="fa-solid fa-chart-pie text-sm"></i></button>
+                <button onclick="switchTab('expenses')" class="p-2 rounded-full hover:bg-gray-100"><i class="fa-solid fa-wallet text-sm"></i></button>
+            </div>
         </div>
     </header>
 
-    <!-- Mobile Bottom Navigation -->
-    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white shadow-lg border-t border-gray-200 flex justify-around py-3 z-50">
-        <button onclick="switchTab('dashboard')" class="text-blue-600 text-center"><i class="fa-solid fa-chart-pie text-lg"></i><span class="block text-[10px]">Dashboard</span></button>
-        <button onclick="switchTab('customers')" class="text-gray-600 text-center"><i class="fa-solid fa-users text-lg"></i><span class="block text-[10px]">Customers</span></button>
-        <button onclick="switchTab('store')" class="text-gray-600 text-center"><i class="fa-solid fa-store text-lg"></i><span class="block text-[10px]">Store</span></button>
-        <button onclick="switchTab('employees')" class="text-gray-600 text-center"><i class="fa-solid fa-user-tie text-lg"></i><span class="block text-[10px]">Employees</span></button>
-        <button onclick="switchTab('expenses')" class="text-gray-600 text-center"><i class="fa-solid fa-wallet text-lg"></i><span class="block text-[10px]">Expenses</span></button>
-        <button onclick="switchTab('analytics')" class="text-gray-600 text-center"><i class="fa-solid fa-chart-line text-lg"></i><span class="block text-[10px]">Analytics</span></button>
-    </div>
-
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 py-6 mb-16 md:mb-6">
+    <main class="max-w-md mx-auto px-4 py-4 space-y-5">
+
+        <!-- Search Bar -->
+        <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400"><i class="fa-solid fa-search text-sm"></i></span>
+            <input type="text" id="customer-search" oninput="renderCustomers()" placeholder="Search customer, dress, or code..." class="w-full pl-11 pr-4 py-3 bg-gray-100 rounded-2xl text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-emerald-600 transition shadow-inner">
+        </div>
+
+        <!-- Banner Card -->
+        <div class="bg-gradient-to-r from-emerald-800 to-emerald-950 text-white p-5 rounded-3xl shadow-lg relative overflow-hidden">
+            <div class="relative z-10 space-y-2">
+                <span class="bg-emerald-700/60 text-emerald-100 text-[10px] px-2.5 py-1 rounded-full font-medium">✨ WhatsApp Automation Active</span>
+                <h3 class="text-xl font-bold">Smart Order Management</h3>
+                <p class="text-xs text-emerald-200">Track orders, profits, tailor works & instant WhatsApp updates.</p>
+                <div class="pt-2 flex space-x-2">
+                    <button onclick="openCustomerModal()" class="bg-white text-emerald-950 px-4 py-2 rounded-xl text-xs font-bold shadow hover:bg-emerald-50 transition"><i class="fa-solid fa-user-plus"></i> Add Customer</button>
+                </div>
+            </div>
+        </div>
 
         <!-- 1. DASHBOARD TAB -->
-        <section id="tab-dashboard" class="space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white p-5 rounded-xl shadow border-l-4 border-blue-600">
-                    <p class="text-sm text-gray-500 font-medium">Total Business Revenue</p>
-                    <h3 class="text-2xl font-bold text-gray-800 mt-1" id="dash-total-revenue">₹0</h3>
+        <section id="tab-dashboard" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-400 font-medium">Total Revenue</p>
+                    <h3 class="text-lg font-bold text-gray-900 mt-1" id="dash-total-revenue">₹0</h3>
                 </div>
-                <div class="bg-white p-5 rounded-xl shadow border-l-4 border-green-600">
-                    <p class="text-sm text-gray-500 font-medium">Net Business Profit (After Exp)</p>
-                    <h3 class="text-2xl font-bold text-green-600 mt-1" id="dash-total-profit">₹0</h3>
-                    <p class="text-xs text-gray-400 mt-1">Gross Profit: <span id="dash-gross-profit">₹0</span> | Expenses: <span id="dash-total-expenses" class="text-red-500">₹0</span></p>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow border-l-4 border-purple-600">
-                    <p class="text-sm text-gray-500 font-medium">Owner Earning Amount</p>
-                    <h3 class="text-2xl font-bold text-purple-600 mt-1" id="dash-owner-earning">₹0</h3>
-                    <p class="text-xs text-gray-400 mt-1">From <span id="dash-owner-orders">0</span> orders</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl shadow border-l-4 border-amber-500">
-                    <p class="text-sm text-gray-500 font-medium">Order Status</p>
-                    <p class="text-sm font-semibold mt-1">Completed: <span id="dash-completed-orders" class="text-green-600 font-bold">0</span></p>
-                    <p class="text-sm font-semibold">Pending: <span id="dash-pending-orders" class="text-amber-600 font-bold">0</span></p>
+                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                    <p class="text-xs text-gray-400 font-medium">Gross Profit (Before Exp)</p>
+                    <h3 class="text-lg font-bold text-purple-600 mt-1" id="dash-gross-profit">₹0</h3>
                 </div>
             </div>
 
-            <!-- Platform Wise Stats (LEDI vs BEBI) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- LEDI (Blue) -->
-                <div class="bg-blue-50 border border-blue-200 p-5 rounded-xl shadow">
-                    <h4 class="text-lg font-bold text-blue-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-shirt"></i> LEDI (Blue Platform)</span>
-                        <span class="text-xs bg-blue-200 text-blue-800 px-2 py-1 rounded">Lady Theme</span>
-                    </h4>
-                    <div class="grid grid-cols-3 gap-3 mt-4">
-                        <div class="bg-white p-3 rounded shadow-sm text-center">
-                            <span class="text-xs text-gray-500">Revenue</span>
-                            <p class="font-bold text-blue-700" id="ledi-revenue">₹0</p>
-                        </div>
-                        <div class="bg-white p-3 rounded shadow-sm text-center">
-                            <span class="text-xs text-gray-500">Profit</span>
-                            <p class="font-bold text-green-600" id="ledi-profit">₹0</p>
-                        </div>
-                        <div class="bg-white p-3 rounded shadow-sm text-center">
-                            <span class="text-xs text-gray-500">Pending/Completed</span>
-                            <p class="font-bold text-gray-700"><span id="ledi-pending">0</span> / <span id="ledi-completed">0</span></p>
-                        </div>
+            <!-- Net Profit Card (After Expenses) -->
+            <div class="bg-gradient-to-r from-purple-800 to-indigo-950 text-white p-4 rounded-2xl shadow-md">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-xs text-purple-200 font-medium">Net Profit (After Business Expenses)</p>
+                        <h3 class="text-xl font-bold mt-1" id="dash-net-profit">₹0</h3>
                     </div>
-                </div>
-
-                <!-- BEBI (Lavender) -->
-                <div class="bg-purple-50 border border-purple-200 p-5 rounded-xl shadow">
-                    <h4 class="text-lg font-bold text-purple-900 flex items-center justify-between">
-                        <span><i class="fa-solid fa-baby-carriage"></i> BEBI (Baby Lavender)</span>
-                        <span class="text-xs bg-purple-200 text-purple-800 px-2 py-1 rounded">Baby Theme</span>
-                    </h4>
-                    <div class="grid grid-cols-3 gap-3 mt-4">
-                        <div class="bg-white p-3 rounded shadow-sm text-center">
-                            <span class="text-xs text-gray-500">Revenue</span>
-                            <p class="font-bold text-purple-700" id="bebi-revenue">₹0</p>
-                        </div>
-                        <div class="bg-white p-3 rounded shadow-sm text-center">
-                            <span class="text-xs text-gray-500">Profit</span>
-                            <p class="font-bold text-green-600" id="bebi-profit">₹0</p>
-                        </div>
-                        <div class="bg-white p-3 rounded shadow-sm text-center">
-                            <span class="text-xs text-gray-500">Pending/Completed</span>
-                            <p class="font-bold text-gray-700"><span id="bebi-pending">0</span> / <span id="bebi-completed">0</span></p>
-                        </div>
+                    <div class="bg-white/20 p-3 rounded-xl">
+                        <i class="fa-solid fa-chart-line text-lg text-white"></i>
                     </div>
                 </div>
             </div>
 
-            <!-- Next Upcoming Deliveries -->
-            <div class="bg-white p-5 rounded-xl shadow">
-                <h4 class="font-bold text-gray-800 mb-4"><i class="fa-solid fa-truck-fast text-blue-600"></i> Next 2 Upcoming Deliveries</h4>
-                <div id="upcoming-deliveries" class="space-y-3">
-                    <p class="text-gray-400 text-sm">No upcoming delivery dates available.</p>
+            <!-- Platform Wise Stats -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-blue-50/60 border border-blue-100 p-4 rounded-2xl">
+                    <h4 class="text-xs font-bold text-blue-900 mb-2"><i class="fa-solid fa-shirt"></i> LEDI (Blue)</h4>
+                    <p class="text-xs text-gray-600">Revenue: <span id="ledi-revenue" class="font-bold text-blue-700">₹0</span></p>
+                    <p class="text-xs text-gray-600">Pending: <span id="ledi-pending" class="font-bold">0</span></p>
+                </div>
+                <div class="bg-purple-50/60 border border-purple-100 p-4 rounded-2xl">
+                    <h4 class="text-xs font-bold text-purple-900 mb-2"><i class="fa-solid fa-baby-carriage"></i> BEBI (Lavender)</h4>
+                    <p class="text-xs text-gray-600">Revenue: <span id="bebi-revenue" class="font-bold text-purple-700">₹0</span></p>
+                    <p class="text-xs text-gray-600">Pending: <span id="bebi-pending" class="font-bold">0</span></p>
+                </div>
+            </div>
+
+            <!-- Upcoming Deliveries -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                <h4 class="font-bold text-gray-900 text-sm flex items-center justify-between">
+                    <span><i class="fa-solid fa-truck-fast text-emerald-600"></i> Upcoming Deliveries</span>
+                </h4>
+                <div id="upcoming-deliveries" class="space-y-2">
+                    <p class="text-gray-400 text-xs">No pending deliveries.</p>
                 </div>
             </div>
         </section>
 
         <!-- 2. CUSTOMERS TAB -->
-        <section id="tab-customers" class="hidden space-y-6">
+        <section id="tab-customers" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Customer Management</h2>
-                <button onclick="openCustomerModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow cursor-pointer"><i class="fa-solid fa-user-plus"></i> Add Customer</button>
+                <h2 class="text-base font-bold text-gray-900">Customers & Orders</h2>
+                <button onclick="openCustomerModal()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-plus"></i> Add</button>
             </div>
 
-            <!-- Tabs for Pending / Completed -->
-            <div class="flex space-x-2 border-b border-gray-200">
-                <button onclick="switchCustomerSubTab('pending')" id="btn-cust-pending" class="py-2 px-4 border-b-2 border-blue-600 font-semibold text-blue-600 cursor-pointer">Pending Orders</button>
-                <button onclick="switchCustomerSubTab('completed')" id="btn-cust-completed" class="py-2 px-4 font-semibold text-gray-500 cursor-pointer">Completed Orders</button>
+            <div class="flex space-x-2 bg-gray-200/60 p-1 rounded-xl text-xs font-medium">
+                <button onclick="switchCustomerSubTab('pending')" id="btn-cust-pending" class="flex-1 py-2 rounded-lg bg-white shadow-sm text-emerald-700 font-bold transition">Pending</button>
+                <button onclick="switchCustomerSubTab('completed')" id="btn-cust-completed" class="flex-1 py-2 rounded-lg text-gray-600 transition">Completed</button>
             </div>
 
-            <!-- Customer Lists -->
-            <div id="customer-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="customer-list-container" class="space-y-3">
                 <!-- Dynamically populated -->
             </div>
         </section>
 
         <!-- 3. ITEM STORE TAB -->
-        <section id="tab-store" class="hidden space-y-6">
+        <section id="tab-store" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Item Store (Dresses)</h2>
-                <button onclick="openStoreModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow cursor-pointer"><i class="fa-solid fa-plus"></i> Add New Item</button>
+                <h2 class="text-base font-bold text-gray-900">Item Store</h2>
+                <button onclick="openStoreModal()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-plus"></i> Add Item</button>
             </div>
-
-            <div id="store-items-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            <div id="store-items-grid" class="grid grid-cols-2 gap-3">
                 <!-- Dynamically populated -->
             </div>
         </section>
 
         <!-- 4. EMPLOYEES TAB -->
-        <section id="tab-employees" class="hidden space-y-6">
+        <section id="tab-employees" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Employee Management</h2>
-                <button onclick="openEmployeeModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow cursor-pointer"><i class="fa-solid fa-user-plus"></i> Add Employee</button>
+                <h2 class="text-base font-bold text-gray-900">Tailors / Staff</h2>
+                <button onclick="openEmployeeModal()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-plus"></i> Add</button>
             </div>
-
-            <div id="employee-list-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div id="employee-list-container" class="space-y-3">
                 <!-- Dynamically populated -->
             </div>
         </section>
 
         <!-- 5. EXPENSES TAB -->
-        <section id="tab-expenses" class="hidden space-y-6">
+        <section id="tab-expenses" class="hidden space-y-4">
             <div class="flex justify-between items-center">
-                <h2 class="text-xl font-bold text-gray-800">Business Expenses</h2>
-                <button onclick="openExpenseModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow cursor-pointer"><i class="fa-solid fa-plus"></i> Add Expense</button>
+                <h2 class="text-base font-bold text-gray-900">Business Expenses & Assets</h2>
+                <button onclick="openExpenseModal()" class="bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold shadow"><i class="fa-solid fa-plus"></i> Add Expense</button>
             </div>
-
-            <div class="bg-white p-5 rounded-xl shadow">
-                <div id="expense-list-container" class="space-y-3">
-                    <p class="text-gray-400 text-sm">No expenses added yet.</p>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <p class="text-[11px] text-gray-400 mb-2">Includes machinery purchases, material investments, delivery costs, etc.</p>
+                <div id="expense-list-container" class="space-y-2">
+                    <p class="text-gray-400 text-xs">No expenses added yet.</p>
                 </div>
             </div>
         </section>
 
         <!-- 6. ANALYTICS TAB -->
-        <section id="tab-analytics" class="hidden space-y-6">
-            <h2 class="text-xl font-bold text-gray-800">Data Analytics & Reports</h2>
-            <div class="bg-white p-6 rounded-xl shadow space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <section id="tab-analytics" class="hidden space-y-4">
+            <h2 class="text-base font-bold text-gray-900">Analytics & Reports</h2>
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-3">
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">Start Date</label>
-                        <input type="date" id="report-start-date" class="w-full mt-1 p-2 border rounded-lg">
+                        <label class="block text-[11px] font-medium text-gray-600">Start Date</label>
+                        <input type="date" id="report-start-date" class="w-full mt-1 p-2 bg-gray-50 border rounded-xl text-xs">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700">End Date</label>
-                        <input type="date" id="report-end-date" class="w-full mt-1 p-2 border rounded-lg">
+                        <label class="block text-[11px] font-medium text-gray-600">End Date</label>
+                        <input type="date" id="report-end-date" class="w-full mt-1 p-2 bg-gray-50 border rounded-xl text-xs">
                     </div>
                 </div>
-                <button onclick="generateReport()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer">Generate Report</button>
-                <div id="analytics-result" class="mt-4 p-4 bg-gray-50 rounded-lg border">
-                    <p class="text-gray-500 text-sm">Select dates and click generate report to view insights.</p>
+                <button onclick="generateReport()" class="w-full bg-emerald-600 text-white py-2 rounded-xl text-xs font-bold shadow">Generate Report</button>
+                <div id="analytics-result" class="mt-2 p-3 bg-gray-50 rounded-xl border text-xs space-y-1">
+                    <p class="text-gray-400">Select dates to view insights.</p>
                 </div>
             </div>
         </section>
 
     </main>
 
+    <!-- Bottom Navigation Bar -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur border-t border-gray-100 flex justify-around py-2.5 z-50 max-w-md mx-auto shadow-lg">
+        <button onclick="switchTab('dashboard')" class="nav-btn text-emerald-600 text-center flex flex-col items-center"><i class="fa-solid fa-house text-base"></i><span class="text-[10px] mt-0.5 font-medium">Home</span></button>
+        <button onclick="switchTab('customers')" class="nav-btn text-gray-400 text-center flex flex-col items-center"><i class="fa-solid fa-users text-base"></i><span class="text-[10px] mt-0.5 font-medium">Customers</span></button>
+        <button onclick="switchTab('store')" class="nav-btn text-gray-400 text-center flex flex-col items-center"><i class="fa-solid fa-store text-base"></i><span class="text-[10px] mt-0.5 font-medium">Store</span></button>
+        <button onclick="switchTab('employees')" class="nav-btn text-gray-400 text-center flex flex-col items-center"><i class="fa-solid fa-user-tie text-base"></i><span class="text-[10px] mt-0.5 font-medium">Staff</span></button>
+        <button onclick="switchTab('analytics')" class="nav-btn text-gray-400 text-center flex flex-col items-center"><i class="fa-solid fa-chart-line text-base"></i><span class="text-[10px] mt-0.5 font-medium">Reports</span></button>
+    </div>
+
     <!-- Modals -->
     <!-- Customer Modal -->
-    <div id="customer-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50 overflow-y-auto">
-        <div class="bg-white rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h3 class="text-lg font-bold mb-4" id="customer-modal-title">Add New Customer</h3>
-            <form id="customer-form" onsubmit="saveCustomer(event)" class="space-y-4">
+    <div id="customer-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto shadow-2xl space-y-4">
+            <h3 class="text-base font-bold text-gray-900" id="customer-modal-title">Add New Customer</h3>
+            <form id="customer-form" onsubmit="saveCustomer(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="cust-edit-id">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-medium text-gray-600">Platform</label>
+                    <select id="cust-platform" class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
+                        <option value="LEDI">LEDI (Blue)</option>
+                        <option value="BEBI">BEBI (Baby Lavender)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-600">Customer Name</label>
+                    <input type="text" id="cust-name" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-600">WhatsApp Number</label>
+                    <input type="text" id="cust-whatsapp" placeholder="919876543210" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-600">Delivery Date</label>
+                    <input type="date" id="cust-delivery-date" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-600">Item Code</label>
+                    <select id="cust-item-code" onchange="fillItemDetails()" class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
+                        <option value="">Select from Store</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-600">Dress / Ship Name</label>
+                    <input type="text" id="cust-dress-name" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-sm font-medium">Platform</label>
-                        <select id="cust-platform" class="w-full mt-1 p-2 border rounded-lg">
-                            <option value="LEDI">LEDI (Blue)</option>
-                            <option value="BEBI">BEBI (Baby Lavender)</option>
-                        </select>
+                        <label class="block font-medium text-gray-600">Total Cost (₹)</label>
+                        <input type="number" id="cust-total-cost" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium">Customer Name</label>
-                        <input type="text" id="cust-name" required class="w-full mt-1 p-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">WhatsApp Number</label>
-                        <input type="text" id="cust-whatsapp" required class="w-full mt-1 p-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">Delivery Date</label>
-                        <input type="date" id="cust-delivery-date" required class="w-full mt-1 p-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">Item Code (Dress)</label>
-                        <select id="cust-item-code" onchange="fillItemDetails()" class="w-full mt-1 p-2 border rounded-lg">
-                            <option value="">Select from Store</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">Dress Name</label>
-                        <input type="text" id="cust-dress-name" required class="w-full mt-1 p-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">Total Cost (Price)</label>
-                        <input type="number" id="cust-total-cost" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">Advance Amount</label>
-                        <input type="number" id="cust-advance" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2 border rounded-lg">
-                        <p class="text-xs text-blue-600 mt-1" id="advance-material-hint">Balance: ₹0</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">Material Cost</label>
-                        <input type="number" id="cust-material-cost" value="0" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">Delivery Charge</label>
-                        <input type="number" id="cust-delivery-charge" value="0" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">Stitching Charge</label>
-                        <input type="number" id="cust-stitching-charge" value="0" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2 border rounded-lg">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium">Assigned Employee</label>
-                        <select id="cust-employee" class="w-full mt-1 p-2 border rounded-lg">
-                            <!-- Populated dynamically -->
-                        </select>
+                        <label class="block font-medium text-gray-600">Advance Paid (₹)</label>
+                        <input type="number" id="cust-advance" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
                     </div>
                 </div>
-
-                <!-- Measurements -->
-                <div class="border-t pt-4">
-                    <label class="block text-sm font-medium mb-2">Measurements</label>
-                    <div class="flex space-x-4 mb-2">
-                        <label><input type="radio" name="meas-type" value="standard" checked onclick="toggleMeasType('standard')"> Standard</label>
-                        <label><input type="radio" name="meas-type" value="manual" onclick="toggleMeasType('manual')"> Manual</label>
+                <div class="grid grid-cols-3 gap-2">
+                    <div>
+                        <label class="block font-[10px] text-gray-500">Material Cost</label>
+                        <input type="number" id="cust-material-cost" value="0" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2 bg-gray-50 border rounded-xl">
                     </div>
-                    <div id="manual-meas-box" class="hidden grid grid-cols-3 gap-2">
-                        <input type="text" id="meas-chest" placeholder="Chest" class="p-2 border rounded text-sm">
-                        <input type="text" id="meas-waist" placeholder="Waist" class="p-2 border rounded text-sm">
-                        <input type="text" id="meas-length" placeholder="Length" class="p-2 border rounded text-sm">
+                    <div>
+                        <label class="block font-[10px] text-gray-500">Delivery Chg</label>
+                        <input type="number" id="cust-delivery-charge" value="0" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2 bg-gray-50 border rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block font-[10px] text-gray-500">Stitching Chg</label>
+                        <input type="number" id="cust-stitching-charge" value="0" required oninput="calculateOwnerAndProfit()" class="w-full mt-1 p-2 bg-gray-50 border rounded-xl">
                     </div>
                 </div>
-
-                <!-- Calculation Summary -->
-                <div class="bg-gray-100 p-3 rounded text-sm space-y-1">
-                    <p>Owner Earning: <span id="calc-owner" class="font-bold text-purple-600">₹0</span> (₹300 rule applied)</p>
-                    <p>Business Profit: <span id="calc-profit" class="font-bold text-green-600">₹0</span></p>
+                <div>
+                    <label class="block font-medium text-gray-600">Assigned Tailor / Employee</label>
+                    <select id="cust-employee" class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
+                        <!-- Populated dynamically -->
+                    </select>
+                    <p class="text-[10px] text-emerald-600 mt-1"><i class="fa-solid fa-info-circle"></i> Selecting a tailor will enable automated WhatsApp task assignment.</p>
                 </div>
 
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeCustomerModal()" class="px-4 py-2 bg-gray-300 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">Save</button>
+                <div class="bg-gray-100 p-3 rounded-xl space-y-1">
+                    <p>Owner Earning: <span id="calc-owner" class="font-bold text-purple-600">₹0</span></p>
+                    <p>Business Profit: <span id="calc-profit" class="font-bold text-emerald-600">₹0</span></p>
+                </div>
+
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeCustomerModal()" class="flex-1 py-2.5 bg-gray-200 text-gray-700 rounded-xl font-medium">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl font-bold shadow">Save & Send WhatsApp</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Store Modal -->
-    <div id="store-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold mb-4">Add Store Item</h3>
-            <form id="store-form" onsubmit="saveStoreItem(event)" class="space-y-4">
+    <div id="store-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-3">
+            <h3 class="text-base font-bold text-gray-900">Add Store Item</h3>
+            <form id="store-form" onsubmit="saveStoreItem(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="store-edit-id">
                 <div>
-                    <label class="block text-sm font-medium">Dress Name</label>
-                    <input type="text" id="store-name" required class="w-full mt-1 p-2 border rounded-lg">
+                    <label class="block font-medium text-gray-600">Dress Name</label>
+                    <input type="text" id="store-name" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Dress Code</label>
-                    <input type="text" id="store-code" required class="w-full mt-1 p-2 border rounded-lg">
+                    <label class="block font-medium text-gray-600">Dress Code</label>
+                    <input type="text" id="store-code" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Price (₹)</label>
-                    <input type="number" id="store-price" required class="w-full mt-1 p-2 border rounded-lg">
+                    <label class="block font-medium text-gray-600">Price (₹)</label>
+                    <input type="number" id="store-price" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Image (Max 10MB)</label>
-                    <input type="file" id="store-image" accept="image/*" class="w-full mt-1 p-2 border rounded-lg text-sm">
+                    <label class="block font-medium text-gray-600">Image</label>
+                    <input type="file" id="store-image" accept="image/*" class="w-full mt-1 p-2 bg-gray-50 border rounded-xl">
                 </div>
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeStoreModal()" class="px-4 py-2 bg-gray-300 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">Save</button>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeStoreModal()" class="flex-1 py-2.5 bg-gray-200 text-gray-700 rounded-xl font-medium">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl font-bold shadow">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Employee Modal -->
-    <div id="employee-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold mb-4">Add Employee</h3>
-            <form id="employee-form" onsubmit="saveEmployee(event)" class="space-y-4">
+    <div id="employee-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-3">
+            <h3 class="text-base font-bold text-gray-900">Add Tailor / Staff</h3>
+            <form id="employee-form" onsubmit="saveEmployee(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="emp-edit-id">
                 <div>
-                    <label class="block text-sm font-medium">Employee Name</label>
-                    <input type="text" id="emp-name" required class="w-full mt-1 p-2 border rounded-lg">
+                    <label class="block font-medium text-gray-600">Name (e.g. Umma, Anu, Nusrath)</label>
+                    <input type="text" id="emp-name" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
                 </div>
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeEmployeeModal()" class="px-4 py-2 bg-gray-300 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">Save</button>
+                <div>
+                    <label class="block font-medium text-gray-600">WhatsApp Number (with country code)</label>
+                    <input type="text" id="emp-whatsapp" placeholder="919876543210" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
+                </div>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeEmployeeModal()" class="flex-1 py-2.5 bg-gray-200 text-gray-700 rounded-xl font-medium">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl font-bold shadow">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Expense Modal -->
-    <div id="expense-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6">
-            <h3 class="text-lg font-bold mb-4" id="expense-modal-title">Add Business Expense</h3>
-            <form id="expense-form" onsubmit="saveExpense(event)" class="space-y-4">
+    <div id="expense-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-3">
+            <h3 class="text-base font-bold text-gray-900" id="expense-modal-title">Add Business Expense</h3>
+            <form id="expense-form" onsubmit="saveExpense(event)" class="space-y-3 text-xs">
                 <input type="hidden" id="exp-edit-id">
                 <div>
-                    <label class="block text-sm font-medium">Expense Title / Reason</label>
-                    <input type="text" id="exp-title" required placeholder="e.g., Packaging material, Electricity" class="w-full mt-1 p-2 border rounded-lg">
+                    <label class="block font-medium text-gray-600">Expense / Asset Title (e.g. Sewing Machine, Cloth Bulk)</label>
+                    <input type="text" id="exp-title" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Amount (₹)</label>
-                    <input type="number" id="exp-amount" required class="w-full mt-1 p-2 border rounded-lg">
+                    <label class="block font-medium text-gray-600">Amount (₹)</label>
+                    <input type="number" id="exp-amount" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium">Date</label>
-                    <input type="date" id="exp-date" required class="w-full mt-1 p-2 border rounded-lg">
+                    <label class="block font-medium text-gray-600">Date</label>
+                    <input type="date" id="exp-date" required class="w-full mt-1 p-2.5 bg-gray-50 border rounded-xl">
                 </div>
-                <div class="flex justify-end space-x-2 pt-2">
-                    <button type="button" onclick="closeExpenseModal()" class="px-4 py-2 bg-gray-300 rounded-lg text-sm">Cancel</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold">Save</button>
+                <div class="flex space-x-2 pt-2">
+                    <button type="button" onclick="closeExpenseModal()" class="flex-1 py-2.5 bg-gray-200 text-gray-700 rounded-xl font-medium">Cancel</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl font-bold shadow">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
     <!-- Customer Detail Modal -->
-    <div id="customer-detail-modal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-xl max-w-md w-full p-6 space-y-4">
-            <h3 class="text-lg font-bold text-blue-900" id="detail-cust-name">Customer Details</h3>
-            <div id="customer-detail-content" class="text-sm space-y-2 text-gray-600">
+    <div id="customer-detail-modal" class="fixed inset-0 bg-black/40 backdrop-blur-xs hidden flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-3 text-xs">
+            <h3 class="text-base font-bold text-emerald-900" id="detail-cust-name">Customer Details</h3>
+            <div id="customer-detail-content" class="space-y-1.5 text-gray-600">
                 <!-- Details -->
             </div>
-            <div class="flex justify-end pt-2">
-                <button onclick="closeCustomerDetailModal()" class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm">Close</button>
+            <div class="flex space-x-2 pt-2">
+                <button id="modal-whatsapp-btn" onclick="" class="flex-1 py-2 bg-emerald-600 text-white rounded-xl font-bold flex items-center justify-center gap-1.5"><i class="fa-brands fa-whatsapp text-sm"></i> WhatsApp</button>
+                <button onclick="closeCustomerDetailModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-medium">Close</button>
             </div>
         </div>
     </div>
@@ -394,7 +366,16 @@
     <script>
         let customers = JSON.parse(localStorage.getItem('kaiz_customers')) || [];
         let storeItems = JSON.parse(localStorage.getItem('kaiz_store')) || [];
-        let employees = JSON.parse(localStorage.getItem('kaiz_employees')) || [];
+        
+        // Pre-loaded team collaborators setup
+        let defaultEmployees = [
+            { id: '1', name: 'Umma', whatsapp: '' },
+            { id: '2', name: 'Anu', whatsapp: '' },
+            { id: '3', name: 'Nusrath', whatsapp: '' },
+            { id: '4', name: 'Meema (v)', whatsapp: '' }
+        ];
+        let employees = JSON.parse(localStorage.getItem('kaiz_employees')) || defaultEmployees;
+        
         let expenses = JSON.parse(localStorage.getItem('kaiz_expenses')) || [];
 
         let currentCustSubTab = 'pending';
@@ -415,78 +396,62 @@
         function switchTab(tabId) {
             document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            let navButtons = document.querySelectorAll('.fixed.bottom-0 button');
+            navButtons.forEach(btn => btn.className = "nav-btn text-gray-400 text-center flex flex-col items-center");
+            
+            let map = { dashboard: 0, customers: 1, store: 2, employees: 3, analytics: 4 };
+            if(map[tabId] !== undefined) {
+                navButtons[map[tabId]].className = "nav-btn text-emerald-600 text-center flex flex-col items-center";
+            }
         }
 
         function switchCustomerSubTab(subTab) {
             currentCustSubTab = subTab;
             if(subTab === 'pending') {
-                document.getElementById('btn-cust-pending').className = "py-2 px-4 border-b-2 border-blue-600 font-semibold text-blue-600 cursor-pointer";
-                document.getElementById('btn-cust-completed').className = "py-2 px-4 font-semibold text-gray-500 cursor-pointer";
+                document.getElementById('btn-cust-pending').className = "flex-1 py-2 rounded-lg bg-white shadow-sm text-emerald-700 font-bold transition";
+                document.getElementById('btn-cust-completed').className = "flex-1 py-2 rounded-lg text-gray-600 transition";
             } else {
-                document.getElementById('btn-cust-completed').className = "py-2 px-4 border-b-2 border-blue-600 font-semibold text-blue-600 cursor-pointer";
-                document.getElementById('btn-cust-pending').className = "py-2 px-4 font-semibold text-gray-500 cursor-pointer";
+                document.getElementById('btn-cust-completed').className = "flex-1 py-2 rounded-lg bg-white shadow-sm text-emerald-700 font-bold transition";
+                document.getElementById('btn-cust-pending').className = "flex-1 py-2 rounded-lg text-gray-600 transition";
             }
             renderCustomers();
         }
 
         function updateDashboard() {
-            let totalRev = 0, grossProfit = 0, ownerEarning = 0, ownerOrdersCount = 0;
+            let totalRev = 0, grossProfit = 0;
             let completedCount = 0, pendingCount = 0;
-            let lediRev = 0, lediProfit = 0, lediPending = 0, lediCompleted = 0;
-            let bebiRev = 0, bebiProfit = 0, bebiPending = 0, bebiCompleted = 0;
+            let lediRev = 0, lediPending = 0, bebiRev = 0, bebiPending = 0;
 
             customers.forEach(c => {
                 let orderExpenses = Number(c.materialCost) + Number(c.deliveryCharge) + Number(c.stitchingCost);
                 let netAfterExpense = Number(c.totalCost) - orderExpenses;
-                let ownerPart = netAfterExpense > 300 ? 300 : (netAfterExpense > 0 ? netAfterExpense : 0);
-                let profitPart = netAfterExpense > 300 ? netAfterExpense - 300 : 0;
+                let profitPart = netAfterExpense > 300 ? netAfterExpense - 300 : (netAfterExpense > 0 ? netAfterExpense : 0);
 
                 totalRev += Number(c.totalCost);
                 grossProfit += profitPart;
-                ownerEarning += ownerPart;
-                if(ownerPart > 0) ownerOrdersCount++;
 
-                if(c.status === 'completed') {
-                    completedCount++;
-                    if(c.platform === 'LEDI') lediCompleted++;
-                    if(c.platform === 'BEBI') bebiCompleted++;
-                } else {
+                if(c.status === 'completed') completedCount++;
+                else {
                     pendingCount++;
                     if(c.platform === 'LEDI') lediPending++;
                     if(c.platform === 'BEBI') bebiPending++;
                 }
 
-                if(c.platform === 'LEDI') {
-                    lediRev += Number(c.totalCost);
-                    lediProfit += profitPart;
-                } else {
-                    bebiRev += Number(c.totalCost);
-                    bebiProfit += profitPart;
-                }
+                if(c.platform === 'LEDI') lediRev += Number(c.totalCost);
+                else bebiRev += Number(c.totalCost);
             });
 
-            // Calculate total general business expenses
-            let totalGeneralExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
-            let netBusinessProfit = grossProfit - totalGeneralExpenses;
+            let totalBusinessExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+            let netProfitAfterBizExpenses = grossProfit - totalBusinessExpenses;
 
             document.getElementById('dash-total-revenue').innerText = `₹${totalRev}`;
             document.getElementById('dash-gross-profit').innerText = `₹${grossProfit}`;
-            document.getElementById('dash-total-expenses').innerText = `₹${totalGeneralExpenses}`;
-            document.getElementById('dash-total-profit').innerText = `₹${netBusinessProfit}`;
-            document.getElementById('dash-owner-earning').innerText = `₹${ownerEarning}`;
-            document.getElementById('dash-owner-orders').innerText = ownerOrdersCount;
-            document.getElementById('dash-completed-orders').innerText = completedCount;
-            document.getElementById('dash-pending-orders').innerText = pendingCount;
-
+            document.getElementById('dash-net-profit').innerText = `₹${netProfitAfterBizExpenses}`;
             document.getElementById('ledi-revenue').innerText = `₹${lediRev}`;
-            document.getElementById('ledi-profit').innerText = `₹${lediProfit}`;
             document.getElementById('ledi-pending').innerText = lediPending;
-            document.getElementById('ledi-completed').innerText = lediCompleted;
-
             document.getElementById('bebi-revenue').innerText = `₹${bebiRev}`;
-            document.getElementById('bebi-profit').innerText = `₹${bebiProfit}`;
             document.getElementById('bebi-pending').innerText = bebiPending;
-            document.getElementById('bebi-completed').innerText = bebiCompleted;
 
             renderUpcomingDeliveries();
         }
@@ -496,21 +461,20 @@
             let pendingCusts = customers.filter(c => c.status !== 'completed').sort((a,b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
             
             if(pendingCusts.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm">No pending deliveries.</p>`;
+                container.innerHTML = `<p class="text-gray-400 text-xs">No pending deliveries.</p>`;
                 return;
             }
 
             let html = '';
             pendingCusts.slice(0, 2).forEach(c => {
                 html += `
-                    <div onclick="showCustomerDetail('${c.id}')" class="flex justify-between items-center p-3 bg-gray-50 rounded-lg border hover:bg-blue-50 cursor-pointer">
+                    <div onclick="showCustomerDetail('${c.id}')" class="flex justify-between items-center p-3 bg-gray-50 rounded-xl border border-gray-100 hover:bg-emerald-50/50 cursor-pointer">
                         <div>
-                            <p class="font-bold text-gray-800">${c.name} <span class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">${c.platform}</span></p>
-                            <p class="text-xs text-gray-500">Dress: ${c.dressName} (${c.itemCode})</p>
+                            <p class="font-bold text-gray-800 text-xs">${c.name} <span class="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full">${c.platform}</span></p>
+                            <p class="text-[10px] text-gray-500">${c.dressName} (${c.itemCode})</p>
                         </div>
                         <div class="text-right">
-                            <p class="text-xs font-bold text-red-600"><i class="fa-solid fa-calendar"></i> ${c.deliveryDate}</p>
-                            <span class="text-[10px] text-blue-600 underline">View Details</span>
+                            <p class="text-[10px] font-bold text-rose-600"><i class="fa-solid fa-calendar"></i> ${c.deliveryDate}</p>
                         </div>
                     </div>
                 `;
@@ -520,31 +484,44 @@
 
         function renderCustomers() {
             let container = document.getElementById('customer-list-container');
-            let filtered = customers.filter(c => currentCustSubTab === 'completed' ? c.status === 'completed' : c.status !== 'completed');
+            let searchTerm = document.getElementById('customer-search').value.toLowerCase();
+            
+            let filtered = customers.filter(c => {
+                let matchesSubTab = currentCustSubTab === 'completed' ? c.status === 'completed' : c.status !== 'completed';
+                let matchesSearch = c.name.toLowerCase().includes(searchTerm) || 
+                                    c.whatsapp.toLowerCase().includes(searchTerm) || 
+                                    c.dressName.toLowerCase().includes(searchTerm) || 
+                                    c.itemCode.toLowerCase().includes(searchTerm);
+                return matchesSubTab && matchesSearch;
+            });
             
             if(filtered.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm col-span-2">No customers found.</p>`;
+                container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">No customers found.</p>`;
                 return;
             }
 
             let html = '';
             filtered.forEach(c => {
+                let balance = Number(c.totalCost) - Number(c.advance);
                 html += `
-                    <div class="bg-white p-4 rounded-xl shadow border space-y-2">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-2">
                         <div class="flex justify-between items-start">
-                            <h4 class="font-bold text-gray-800 cursor-pointer text-blue-600 hover:underline" onclick="showCustomerDetail('${c.id}')">${c.name}</h4>
-                            <span class="text-xs px-2 py-0.5 rounded ${c.platform === 'LEDI' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">${c.platform}</span>
+                            <h4 class="font-bold text-gray-900 text-xs cursor-pointer text-emerald-700 hover:underline" onclick="showCustomerDetail('${c.id}')">${c.name}</h4>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full ${c.platform === 'LEDI' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'}">${c.platform}</span>
                         </div>
-                        <p class="text-xs text-gray-500">WhatsApp: ${c.whatsapp} | Delivery: ${c.deliveryDate}</p>
-                        <p class="text-xs text-gray-500">Item: ${c.dressName} (${c.itemCode}) | Price: ₹${c.totalCost}</p>
-                        <div class="flex justify-between items-center pt-2 border-t text-xs">
-                            ${c.status !== 'completed' ? 
-                                `<button onclick="markCompleted('${c.id}')" class="bg-green-600 text-white px-2.5 py-1 rounded font-semibold"><i class="fa-solid fa-check"></i> Mark Completed</button>` : 
-                                `<span class="text-green-600 font-bold"><i class="fa-solid fa-circle-check"></i> Completed</span>`
-                            }
+                        <p class="text-[11px] text-gray-500">WhatsApp: <a href="https://wa.me/${c.whatsapp}" target="_blank" class="text-emerald-600 font-semibold underline">${c.whatsapp}</a></p>
+                        <p class="text-[11px] text-gray-500">Dress: ${c.dressName} (${c.itemCode}) | Tailor: <span class="font-bold text-indigo-600">${c.employee || 'Not Assigned'}</span></p>
+                        <p class="text-[11px] text-gray-500">Price: ₹${c.totalCost} | Adv: ₹${c.advance} | Balance: <span class="font-bold text-rose-600">₹${balance}</span></p>
+                        <div class="flex justify-between items-center pt-2 border-t border-gray-100 text-xs">
+                            <div class="flex items-center space-x-2">
+                                ${c.status !== 'completed' ? 
+                                    `<button onclick="markCompleted('${c.id}')" class="bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-[10px] font-semibold"><i class="fa-solid fa-check"></i> Complete & Notify</button>` : 
+                                    `<span class="text-emerald-600 font-bold text-[10px]"><i class="fa-solid fa-circle-check"></i> Completed</span>`
+                                }
+                                <button onclick="sendCustomerWhatsApp('${c.id}')" class="bg-green-600 text-white px-2 py-1 rounded-lg text-[10px]" title="WhatsApp Customer"><i class="fa-brands fa-whatsapp"></i></button>
+                            </div>
                             <div class="space-x-2">
-                                <button onclick="editCustomer('${c.id}')" class="text-blue-600"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteCustomer('${c.id}')" class="text-red-600"><i class="fa-solid fa-trash"></i></button>
+                                <button onclick="deleteCustomer('${c.id}')" class="text-rose-600"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
                     </div>
@@ -556,20 +533,18 @@
         function renderStore() {
             let container = document.getElementById('store-items-grid');
             if(storeItems.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm col-span-4">No store items added yet.</p>`;
+                container.innerHTML = `<p class="text-gray-400 text-xs col-span-2 text-center py-4">No items added.</p>`;
                 return;
             }
             let html = '';
             storeItems.forEach(item => {
                 html += `
-                    <div class="bg-white p-3 rounded-xl shadow border space-y-2">
-                        <img src="${item.image || 'https://via.placeholder.com/150'}" class="w-full h-32 object-cover rounded-lg">
-                        <h4 class="font-bold text-gray-800 text-sm">${item.name}</h4>
-                        <p class="text-xs text-gray-500">Code: ${item.code}</p>
-                        <p class="text-sm font-semibold text-blue-600">₹${item.price}</p>
-                        <div class="flex justify-end space-x-2 pt-1 border-t">
-                            <button onclick="editStoreItem('${item.id}')" class="text-blue-600 text-xs"><i class="fa-solid fa-pen"></i></button>
-                            <button onclick="deleteStoreItem('${item.id}')" class="text-red-600 text-xs"><i class="fa-solid fa-trash"></i></button>
+                    <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 space-y-2">
+                        <img src="${item.image || 'https://via.placeholder.com/150'}" class="w-full h-28 object-cover rounded-xl">
+                        <h4 class="font-bold text-gray-800 text-xs truncate">${item.name}</h4>
+                        <p class="text-[10px] text-gray-500">Code: ${item.code} | <span class="font-bold text-emerald-600">₹${item.price}</span></p>
+                        <div class="flex justify-end space-x-2 pt-1 border-t text-xs">
+                            <button onclick="deleteStoreItem('${item.id}')" class="text-rose-600"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -580,28 +555,24 @@
         function renderEmployees() {
             let container = document.getElementById('employee-list-container');
             if(employees.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm col-span-3">No employees added yet.</p>`;
+                container.innerHTML = `<p class="text-gray-400 text-xs text-center py-4">No employees added.</p>`;
                 return;
             }
             let html = '';
             employees.forEach(emp => {
                 let empCusts = customers.filter(c => c.employee === emp.name);
-                let completedWorks = empCusts.filter(c => c.status === 'completed').length;
-                let pendingWorks = empCusts.filter(c => c.status !== 'completed').length;
                 let totalEarned = empCusts.reduce((sum, c) => sum + Number(c.stitchingCost || 0), 0);
-
+                let pendingWorks = empCusts.filter(c => c.status !== 'completed').length;
                 html += `
-                    <div class="bg-white p-4 rounded-xl shadow border space-y-2">
-                        <h4 class="font-bold text-gray-800 text-base">${emp.name}</h4>
-                        <p class="text-xs text-gray-500">Total Earned (Stitching): <span class="font-bold text-green-600">₹${totalEarned}</span></p>
-                        <p class="text-xs text-gray-500">Completed Works: <span class="font-bold text-blue-600">${completedWorks}</span></p>
-                        <p class="text-xs text-gray-500">Pending Works: <span class="font-bold text-amber-600">${pendingWorks}</span></p>
-                        <div class="flex justify-between items-center pt-2 border-t text-xs">
-                            <button onclick="showEmployeePending('${emp.name}')" class="text-blue-600 underline font-medium">View Measurements</button>
-                            <div class="space-x-2">
-                                <button onclick="editEmployee('${emp.id}')" class="text-blue-600"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteEmployee('${emp.id}')" class="text-red-600"><i class="fa-solid fa-trash"></i></button>
-                            </div>
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 space-y-1.5 text-xs">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-gray-900 text-sm">${emp.name}</h4>
+                            <span class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-full text-[10px]">Pending Works: ${pendingWorks}</span>
+                        </div>
+                        <p class="text-gray-500">WhatsApp: <a href="https://wa.me/${emp.whatsapp}" target="_blank" class="text-emerald-600 underline">${emp.whatsapp || 'Not set'}</a></p>
+                        <p class="text-gray-500">Stitching Earned: <span class="font-bold text-emerald-600">₹${totalEarned}</span></p>
+                        <div class="flex justify-end space-x-2 pt-2 border-t">
+                            <button onclick="deleteEmployee('${emp.id}')" class="text-rose-600"><i class="fa-solid fa-trash"></i> Delete</button>
                         </div>
                     </div>
                 `;
@@ -612,23 +583,20 @@
         function renderExpenses() {
             let container = document.getElementById('expense-list-container');
             if(expenses.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-sm">No expenses added yet.</p>`;
+                container.innerHTML = `<p class="text-gray-400 text-xs text-center py-2">No expenses added.</p>`;
                 return;
             }
             let html = '';
             expenses.forEach(exp => {
                 html += `
-                    <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg border">
+                    <div class="flex justify-between items-center p-2.5 bg-gray-50 rounded-xl border border-gray-100 text-xs">
                         <div>
-                            <p class="font-bold text-gray-800 text-sm">${exp.title}</p>
-                            <p class="text-xs text-gray-500">Date: ${exp.date}</p>
+                            <p class="font-bold text-gray-800">${exp.title}</p>
+                            <p class="text-[10px] text-gray-400">${exp.date}</p>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <span class="font-bold text-red-600">₹${exp.amount}</span>
-                            <div class="space-x-2">
-                                <button onclick="editExpense('${exp.id}')" class="text-blue-600 text-xs"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteExpense('${exp.id}')" class="text-red-600 text-xs"><i class="fa-solid fa-trash"></i></button>
-                            </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="font-bold text-rose-600">₹${exp.amount}</span>
+                            <button onclick="deleteExpense('${exp.id}')" class="text-rose-600"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
                 `;
@@ -641,68 +609,65 @@
             let empSelect = document.getElementById('cust-employee');
             
             let itemHtml = '<option value="">Select Item</option>';
-            storeItems.forEach(i => {
-                itemHtml += `<option value="${i.code}" data-name="${i.name}" data-price="${i.price}">${i.code} - ${i.name}</option>`;
-            });
+            storeItems.forEach(i => { itemHtml += `<option value="${i.code}" data-name="${i.name}" data-price="${i.price}">${i.code} - ${i.name}</option>`; });
             itemSelect.innerHTML = itemHtml;
 
-            let empHtml = '<option value="">Select Employee</option>';
-            employees.forEach(e => {
-                empHtml += `<option value="${e.name}">${e.name}</option>`;
-            });
+            let empHtml = '<option value="">Select Tailor</option>';
+            employees.forEach(e => { empHtml += `<option value="${e.name}" data-whatsapp="${e.whatsapp}">${e.name}</option>`; });
             empSelect.innerHTML = empHtml;
         }
 
-        function openCustomerModal() {
-            document.getElementById('customer-modal').classList.remove('hidden');
-            document.getElementById('customer-form').reset();
-            document.getElementById('cust-edit-id').value = '';
-            document.getElementById('customer-modal-title').innerText = 'Add New Customer';
-        }
+        function openCustomerModal() { document.getElementById('customer-modal').classList.remove('hidden'); document.getElementById('customer-form').reset(); document.getElementById('cust-edit-id').value = ''; }
         function closeCustomerModal() { document.getElementById('customer-modal').classList.add('hidden'); }
-
-        function openStoreModal() {
-            document.getElementById('store-modal').classList.remove('hidden');
-            document.getElementById('store-form').reset();
-            document.getElementById('store-edit-id').value = '';
-        }
+        function openStoreModal() { document.getElementById('store-modal').classList.remove('hidden'); document.getElementById('store-form').reset(); document.getElementById('store-edit-id').value = ''; }
         function closeStoreModal() { document.getElementById('store-modal').classList.add('hidden'); }
-
-        function openEmployeeModal() {
-            document.getElementById('employee-modal').classList.remove('hidden');
-            document.getElementById('employee-form').reset();
-            document.getElementById('emp-edit-id').value = '';
-        }
+        function openEmployeeModal() { document.getElementById('employee-modal').classList.remove('hidden'); document.getElementById('employee-form').reset(); document.getElementById('emp-edit-id').value = ''; }
         function closeEmployeeModal() { document.getElementById('employee-modal').classList.add('hidden'); }
-
-        function openExpenseModal() {
-            document.getElementById('expense-modal').classList.remove('hidden');
-            document.getElementById('expense-form').reset();
-            document.getElementById('exp-edit-id').value = '';
-            document.getElementById('exp-date').value = new Date().toISOString().split('T')[0];
-            document.getElementById('expense-modal-title').innerText = 'Add Business Expense';
-        }
+        function openExpenseModal() { document.getElementById('expense-modal').classList.remove('hidden'); document.getElementById('expense-form').reset(); document.getElementById('exp-edit-id').value = ''; document.getElementById('exp-date').value = new Date().toISOString().split('T')[0]; }
         function closeExpenseModal() { document.getElementById('expense-modal').classList.add('hidden'); }
 
         function showCustomerDetail(id) {
             let c = customers.find(x => x.id === id);
             if(!c) return;
-            let totalCustOrders = customers.filter(x => x.whatsapp === c.whatsapp).length;
-            let totalCustRev = customers.filter(x => x.whatsapp === c.whatsapp).reduce((sum, x) => sum + Number(x.totalCost), 0);
-            
+            let balance = Number(c.totalCost) - Number(c.advance);
             document.getElementById('detail-cust-name').innerText = c.name;
             document.getElementById('customer-detail-content').innerHTML = `
                 <p><strong>WhatsApp:</strong> ${c.whatsapp}</p>
                 <p><strong>Platform:</strong> ${c.platform}</p>
-                <p><strong>Item:</strong> ${c.dressName} (${c.itemCode})</p>
+                <p><strong>Dress:</strong> ${c.dressName} (${c.itemCode})</p>
+                <p><strong>Assigned Tailor:</strong> ${c.employee || 'None'}</p>
+                <p><strong>Total Price:</strong> ₹${c.totalCost}</p>
+                <p><strong>Advance:</strong> ₹${c.advance}</p>
+                <p><strong>Balance Due:</strong> ₹${balance}</p>
                 <p><strong>Delivery Date:</strong> ${c.deliveryDate}</p>
-                <p><strong>Total Orders (Till Date):</strong> ${totalCustOrders}</p>
-                <p><strong>Total Revenue Generated:</strong> ₹${totalCustRev}</p>
-                <p><strong>Status:</strong> ${c.status === 'completed' ? 'Completed' : 'Pending'}</p>
             `;
+            document.getElementById('modal-whatsapp-btn').setAttribute('onclick', `sendCustomerWhatsApp('${c.id}')`);
             document.getElementById('customer-detail-modal').classList.remove('hidden');
         }
         function closeCustomerDetailModal() { document.getElementById('customer-detail-modal').classList.add('hidden'); }
+
+        // WhatsApp Automations
+        function sendCustomerWhatsApp(id) {
+            let c = customers.find(x => x.id === id);
+            if(!c) return;
+            let balance = Number(c.totalCost) - Number(c.advance);
+            let message = `Hello *${c.name}*! 👋\n\nThank you for ordering with *KAIZ SOOQ* (${c.platform})! 🌸\n\n👗 *Dress:* ${c.dressName}\n🔖 *Code:* ${c.itemCode}\n💰 *Price:* ₹${c.totalCost}\n💵 *Advance:* ₹${c.advance}\n📌 *Balance:* ₹${balance}\n📅 *Delivery:* ${c.deliveryDate}\n\nWe will update you soon! ✨`;
+            window.open(`https://wa.me/${c.whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function sendEmployeeTaskWhatsApp(c) {
+            if(!c.employee) return;
+            let emp = employees.find(e => e.name === c.employee);
+            if(!emp || !emp.whatsapp) return;
+
+            let message = `Hello *${emp.name}*! 👋\n\nNew Stitching Task Assigned ✂️:\n\n👤 *Customer:* ${c.name}\n👗 *Dress:* ${c.dressName} (${c.itemCode})\n🧵 *Platform:* ${c.platform}\n📅 *Delivery Date:* ${c.deliveryDate}\n\nPlease check your task list! ✨`;
+            window.open(`https://wa.me/${emp.whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        function sendCompletionWhatsApp(c) {
+            let message = `Hello *${c.name}*! 🎉\n\nGreat news! Your dress (*${c.dressName} - ${c.itemCode}*) is fully completed and ready at *KAIZ SOOQ* (${c.platform})! ✨\n\nKindly clear the balance and collect/ready for dispatch. Thank you! 🌸`;
+            window.open(`https://wa.me/${c.whatsapp}?text=${encodeURIComponent(message)}`, '_blank');
+        }
 
         function saveStoreItem(e) {
             e.preventDefault();
@@ -710,30 +675,17 @@
             let name = document.getElementById('store-name').value;
             let code = document.getElementById('store-code').value;
             let price = document.getElementById('store-price').value;
-            let imageFile = document.getElementById('store-image').files[0];
-
+            let file = document.getElementById('store-image').files[0];
             let reader = new FileReader();
-            reader.onload = function(uploadEvent) {
-                let imageUrl = uploadEvent.target.result;
-                let existingIndex = storeItems.findIndex(i => i.id === id);
-                if(existingIndex >= 0) {
-                    storeItems[existingIndex] = { id, name, code, price, image: imageUrl || storeItems[existingIndex].image };
-                } else {
-                    storeItems.push({ id, name, code, price, image: imageUrl });
-                }
+            reader.onload = function(evt) {
+                let img = evt.target.result;
+                storeItems.push({ id, name, code, price, image: img });
                 saveData();
                 closeStoreModal();
             };
-            if(imageFile) {
-                reader.readAsDataURL(imageFile);
-            } else {
-                let existingIndex = storeItems.findIndex(i => i.id === id);
-                let imageUrl = existingIndex >= 0 ? storeItems[existingIndex].image : '';
-                if(existingIndex >= 0) {
-                    storeItems[existingIndex] = { id, name, code, price, image: imageUrl };
-                } else {
-                    storeItems.push({ id, name, code, price, image: imageUrl });
-                }
+            if(file) reader.readAsDataURL(file);
+            else {
+                storeItems.push({ id, name, code, price, image: '' });
                 saveData();
                 closeStoreModal();
             }
@@ -743,12 +695,8 @@
             e.preventDefault();
             let id = document.getElementById('emp-edit-id').value || Date.now().toString();
             let name = document.getElementById('emp-name').value;
-            let existingIndex = employees.findIndex(i => i.id === id);
-            if(existingIndex >= 0) {
-                employees[existingIndex] = { id, name };
-            } else {
-                employees.push({ id, name });
-            }
+            let whatsapp = document.getElementById('emp-whatsapp').value;
+            employees.push({ id, name, whatsapp });
             saveData();
             closeEmployeeModal();
         }
@@ -756,36 +704,9 @@
         function saveExpense(e) {
             e.preventDefault();
             let id = document.getElementById('exp-edit-id').value || Date.now().toString();
-            let title = document.getElementById('exp-title').value;
-            let amount = document.getElementById('exp-amount').value;
-            let date = document.getElementById('exp-date').value;
-
-            let existingIndex = expenses.findIndex(i => i.id === id);
-            if(existingIndex >= 0) {
-                expenses[existingIndex] = { id, title, amount, date };
-            } else {
-                expenses.push({ id, title, amount, date });
-            }
+            expenses.push({ id, title: document.getElementById('exp-title').value, amount: document.getElementById('exp-amount').value, date: document.getElementById('exp-date').value });
             saveData();
             closeExpenseModal();
-        }
-
-        function deleteExpense(id) {
-            if(confirm('Are you sure you want to delete this expense?')) {
-                expenses = expenses.filter(x => x.id !== id);
-                saveData();
-            }
-        }
-
-        function editExpense(id) {
-            let exp = expenses.find(x => x.id === id);
-            if(!exp) return;
-            openExpenseModal();
-            document.getElementById('exp-edit-id').value = exp.id;
-            document.getElementById('exp-title').value = exp.title;
-            document.getElementById('exp-amount').value = exp.amount;
-            document.getElementById('exp-date').value = exp.date;
-            document.getElementById('expense-modal-title').innerText = 'Edit Business Expense';
         }
 
         function fillItemDetails() {
@@ -798,36 +719,22 @@
             }
         }
 
-        function toggleMeasType(type) {
-            let box = document.getElementById('manual-meas-box');
-            if(type === 'manual') box.classList.remove('hidden');
-            else box.classList.add('hidden');
-        }
-
         function calculateOwnerAndProfit() {
-            let totalCost = Number(document.getElementById('cust-total-cost').value) || 0;
-            let advance = Number(document.getElementById('cust-advance').value) || 0;
-            let materialCost = Number(document.getElementById('cust-material-cost').value) || 0;
-            let deliveryCharge = Number(document.getElementById('cust-delivery-charge').value) || 0;
-            let stitchingCost = Number(document.getElementById('cust-stitching-charge').value) || 0;
-
-            let balanceAdvance = advance - materialCost;
-            document.getElementById('advance-material-hint').innerText = `Advance - Material Cost Balance: ₹${balanceAdvance}`;
-
-            let totalExpenses = materialCost + deliveryCharge + stitchingCost;
-            let netRemaining = totalCost - totalExpenses;
-
-            let ownerAmount = netRemaining > 300 ? 300 : (netRemaining > 0 ? netRemaining : 0);
-            let businessProfit = netRemaining > 300 ? netRemaining - 300 : 0;
-
-            document.getElementById('calc-owner').innerText = `₹${ownerAmount}`;
-            document.getElementById('calc-profit').innerText = `₹${businessProfit}`;
+            let total = Number(document.getElementById('cust-total-cost').value) || 0;
+            let mat = Number(document.getElementById('cust-material-cost').value) || 0;
+            let del = Number(document.getElementById('cust-delivery-charge').value) || 0;
+            let stit = Number(document.getElementById('cust-stitching-charge').value) || 0;
+            let net = total - (mat + del + stit);
+            let owner = net > 300 ? 300 : (net > 0 ? net : 0);
+            let profit = net > 300 ? net - 300 : 0;
+            document.getElementById('calc-owner').innerText = `₹${owner}`;
+            document.getElementById('calc-profit').innerText = `₹${profit}`;
         }
 
         function saveCustomer(e) {
             e.preventDefault();
             let id = document.getElementById('cust-edit-id').value || Date.now().toString();
-            let customerData = {
+            let data = {
                 id,
                 platform: document.getElementById('cust-platform').value,
                 name: document.getElementById('cust-name').value,
@@ -843,128 +750,48 @@
                 employee: document.getElementById('cust-employee').value,
                 status: 'pending'
             };
-
-            let existingIndex = customers.findIndex(i => i.id === id);
-            if(existingIndex >= 0) {
-                customerData.status = customers[existingIndex].status;
-                customers[existingIndex] = customerData;
-            } else {
-                customers.push(customerData);
-            }
+            customers.push(data);
             saveData();
             closeCustomerModal();
+            
+            // Automation 1: Send WhatsApp to Customer & Tailor
+            sendCustomerWhatsApp(id);
+            if(data.employee) {
+                sendEmployeeTaskWhatsApp(data);
+            }
         }
 
         function markCompleted(id) {
             let c = customers.find(x => x.id === id);
-            if(c) {
-                c.status = 'completed';
-                saveData();
+            if(c) { 
+                c.status = 'completed'; 
+                saveData(); 
+                // Automation 2: Send WhatsApp completion to customer
+                sendCompletionWhatsApp(c);
             }
         }
 
         function deleteCustomer(id) {
-            if(confirm('Are you sure you want to delete this customer?')) {
-                customers = customers.filter(x => x.id !== id);
-                saveData();
-            }
+            if(confirm('Delete customer?')) { customers = customers.filter(x => x.id !== id); saveData(); }
         }
 
-        function editCustomer(id) {
-            let c = customers.find(x => x.id === id);
-            if(!c) return;
-            openCustomerModal();
-            document.getElementById('cust-edit-id').value = c.id;
-            document.getElementById('cust-platform').value = c.platform;
-            document.getElementById('cust-name').value = c.name;
-            document.getElementById('cust-whatsapp').value = c.whatsapp;
-            document.getElementById('cust-delivery-date').value = c.deliveryDate;
-            document.getElementById('cust-item-code').value = c.itemCode;
-            document.getElementById('cust-dress-name').value = c.dressName;
-            document.getElementById('cust-total-cost').value = c.totalCost;
-            document.getElementById('cust-advance').value = c.advance;
-            document.getElementById('cust-material-cost').value = c.materialCost;
-            document.getElementById('cust-delivery-charge').value = c.deliveryCharge;
-            document.getElementById('cust-stitching-charge').value = c.stitchingCost;
-            document.getElementById('cust-employee').value = c.employee;
-            calculateOwnerAndProfit();
-            document.getElementById('customer-modal-title').innerText = 'Edit Customer Details';
-        }
-
-        function deleteStoreItem(id) {
-            if(confirm('Are you sure you want to delete this item?')) {
-                storeItems = storeItems.filter(x => x.id !== id);
-                saveData();
-            }
-        }
-
-        function editStoreItem(id) {
-            let item = storeItems.find(x => x.id === id);
-            if(!item) return;
-            openStoreModal();
-            document.getElementById('store-edit-id').value = item.id;
-            document.getElementById('store-name').value = item.name;
-            document.getElementById('store-code').value = item.code;
-            document.getElementById('store-price').value = item.price;
-        }
-
-        function deleteEmployee(id) {
-            if(changed = confirm('Are you sure you want to delete this employee?')) {
-                employees = employees.filter(x => x.id !== id);
-                saveData();
-            }
-        }
-
-        function editEmployee(id) {
-            let emp = employees.find(x => x.id === id);
-            if(!emp) return;
-            openEmployeeModal();
-            document.getElementById('emp-edit-id').value = emp.id;
-            document.getElementById('emp-name').value = emp.name;
-        }
-
-        function showEmployeePending(empName) {
-            let pendingCusts = customers.filter(c => c.employee === empName && c.status !== 'completed');
-            if(pendingCusts.length === 0) {
-                alert(`No pending works found for ${empName}.`);
-                return;
-            }
-            let msg = `Pending works for ${empName}:\n\n`;
-            pendingCusts.forEach(c => {
-                msg += `- Customer: ${c.name}, Dress: ${c.dressName}, Delivery: ${c.deliveryDate}\n`;
-            });
-            alert(msg);
-        }
+        function deleteStoreItem(id) { storeItems = storeItems.filter(x => x.id !== id); saveData(); }
+        function deleteEmployee(id) { employees = employees.filter(x => x.id !== id); saveData(); }
+        function deleteExpense(id) { expenses = expenses.filter(x => x.id !== id); saveData(); }
 
         function generateReport() {
-            let startDate = document.getElementById('report-start-date').value;
-            let endDate = document.getElementById('report-end-date').value;
-            let resultBox = document.getElementById('analytics-result');
-
-            if(!startDate || !endDate) {
-                resultBox.innerHTML = `<p class="text-red-500 text-sm">Please select both start and end dates.</p>`;
-                return;
-            }
-
-            let filtered = customers.filter(c => c.deliveryDate >= startDate && c.deliveryDate <= endDate);
+            let start = document.getElementById('report-start-date').value;
+            let end = document.getElementById('report-end-date').value;
+            let filtered = customers.filter(c => c.deliveryDate >= start && c.deliveryDate <= end);
             let rev = filtered.reduce((sum, c) => sum + Number(c.totalCost), 0);
-            let completed = filtered.filter(c => c.status === 'completed').length;
-            let pending = filtered.filter(c => c.status !== 'completed').length;
-
-            resultBox.innerHTML = `
-                <h4 class="font-bold text-gray-800 mb-2">Report (${startDate} to ${endDate})</h4>
-                <p>Total Orders: <strong>${filtered.length}</strong></p>
-                <p>Total Revenue: <strong class="text-blue-600">₹${rev}</strong></p>
-                <p>Completed: <strong class="text-green-600">${completed}</strong> | Pending: <strong class="text-amber-600">${pending}</strong></p>
-            `;
+            document.getElementById('analytics-result').innerHTML = `<p>Orders in range: <strong>${filtered.length}</strong></p><p>Revenue: <strong class="text-emerald-600">₹${rev}</strong></p>`;
         }
 
-        window.onload = function() {
-            saveData();
-        };
+        window.onload = function() { saveData(); };
     </script>
 </body>
 </html>
+
 
 
 
