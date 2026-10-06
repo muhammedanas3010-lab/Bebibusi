@@ -1,694 +1,683 @@
 <!DOCTYPE html>
-<html lang="ml">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KAIZSOQ - Business Management App</title>
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-
-    <style>
-        :root {
-            --lady-blue: #1E3A8A;
-            --baby-lavender: #E0E7FF;
-            --accent-color: #3B82F6;
-            --bg-color: #F8FAFC;
-            --text-color: #1E293B;
-            --white: #FFFFFF;
-            --danger: #EF4444;
-            --success: #10B981;
+    <title>KAIZSOOQ - Business Management System</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ladyBlue: '#1E40AF',
+                        babyLavender: '#E0E7FF',
+                        deepGreen: '#064E3B',
+                        accentGreen: '#10B981'
+                    }
+                }
+            }
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        
-        .phone-container {
-            width: 100%; max-width: 420px; height: 100vh; max-height: 850px;
-            background: var(--white); border-radius: 40px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-            display: flex; flex-direction: column; overflow: hidden; position: relative; border: 12px solid #1e293b;
-        }
-        
-        header {
-            background: var(--lady-blue); color: var(--white); padding: 20px;
-            display: flex; justify-content: space-between; align-items: center; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
-        }
-        header h1 { font-size: 1.1rem; font-weight: bold; letter-spacing: 0.5px; }
-        
-        .content-area { flex: 1; overflow-y: auto; padding: 15px; background: var(--baby-lavender); }
-        
-        .card { background: var(--white); padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .card h3 { font-size: 1rem; margin-bottom: 10px; color: var(--lady-blue); }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        .btn {
-            background: var(--lady-blue); color: var(--white); border: none; padding: 10px 15px;
-            border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold; width: 100%;
-            transition: opacity 0.2s; margin-top: 5px;
-        }
-        .btn:hover { opacity: 0.9; }
-        .btn-danger { background: var(--danger); }
-        .btn-success { background: var(--success); }
-        
-        input, select, textarea {
-            width: 100%; padding: 10px; margin: 5px 0 12px 0; border: 1px solid #CBD5E1;
-            border-radius: 8px; font-size: 0.9rem; outline: none;
-        }
-        
-        nav {
-            display: flex; justify-content: space-around; background: var(--lady-blue);
-            padding: 12px 0; border-top-left-radius: 20px; border-top-right-radius: 20px;
-        }
-        nav button {
-            background: none; border: none; color: var(--white); font-size: 0.75rem;
-            cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; opacity: 0.7;
-        }
-        nav button.active { opacity: 1; font-weight: bold; color: var(--baby-lavender); }
-        
-        .page { display: none; }
-        .page.active { display: block; }
-        
-        .list-item {
-            background: #F1F5F9; padding: 10px; border-radius: 8px; margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem;
-        }
-        .hint { font-size: 0.75rem; color: #64748B; margin-top: -8px; margin-bottom: 10px; display: block; }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 font-sans">
 
-<div class="phone-container">
-    <header>
-        <h1>KAIZSOQ (LEDI & BEBI)</h1>
-        <span id="current-date" style="font-size: 0.8rem;"></span>
-    </header>
-
-    <div class="content-area">
-        <!-- 1. DASHBOARD PAGE -->
-        <div id="page-dashboard" class="page active">
-            <div class="card">
-                <h3>ടോട്ടൽ ബിസിനസ് റെവന്യൂ & പ്രോഫിറ്റ്</h3>
-                <p>Total Revenue: <b id="dash-total-rev">₹0</b></p>
-                <p>Total Profit: <b id="dash-total-profit">₹0</b></p>
-                <p>Owner Earnings: <b id="dash-owner-earn">₹0</b> (From <span id="dash-owner-orders">0</span> orders)</p>
+    <!-- App Container -->
+    <div id="app" class="max-w-md mx-auto bg-white min-h-screen shadow-2xl flex flex-col relative pb-20">
+        
+        <!-- Header -->
+        <header class="bg-deepGreen text-white p-4 flex justify-between items-center rounded-b-3xl shadow-md">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-full bg-ladyBlue flex items-center justify-center font-bold text-lg text-white">KS</div>
+                <div>
+                    <h1 class="font-bold text-lg">KAIZSOOQ</h1>
+                    <p class="text-xs text-emerald-200">Lady & Baby Platform</p>
+                </div>
             </div>
+            <button onclick="switchTab('analytics')" class="bg-emerald-800 p-2 rounded-full text-white hover:bg-emerald-700">
+                <i class="fa-solid fa-chart-line"></i>
+            </button>
+        </header>
 
-            <div class="card">
-                <h3>LEDI & BEBI Breakdown</h3>
-                <div class="grid-2">
-                    <div>
-                        <h4 style="color:var(--lady-blue); font-size:0.9rem;">LEDI</h4>
-                        <p>Rev: <span id="ledi-rev">₹0</span></p>
-                        <p>Profit: <span id="ledi-profit">₹0</span></p>
-                        <p>Exp: <span id="ledi-exp">₹0</span></p>
+        <!-- Main Content Area -->
+        <main class="p-4 flex-grow overflow-y-auto">
+            
+            <!-- 1. DASHBOARD TAB -->
+            <section id="tab-dashboard" class="tab-content space-y-4">
+                <!-- Wallet / Business Overview -->
+                <div class="bg-gradient-to-r from-deepGreen to-emerald-900 text-white p-5 rounded-2xl shadow-lg">
+                    <p class="text-xs text-emerald-300">Total Business Revenue</p>
+                    <h2 id="dash-total-revenue" class="text-2xl font-bold mt-1">₹0.00</h2>
+                    <div class="mt-3 flex justify-between text-xs border-t border-emerald-800 pt-3">
+                        <div>
+                            <span class="text-emerald-300">Profit:</span> <span id="dash-total-profit" class="font-semibold">₹0.00</span>
+                        </div>
+                        <div>
+                            <span class="text-emerald-300">Owner Earnings:</span> <span id="dash-owner-earnings" class="font-semibold">₹0.00</span>
+                        </div>
                     </div>
-                    <div>
-                        <h4 style="color:#D946EF; font-size:0.9rem;">BEBI</h4>
-                        <p>Rev: <span id="bebi-rev">₹0</span></p>
-                        <p>Profit: <span id="bebi-profit">₹0</span></p>
-                        <p>Exp: <span id="bebi-exp">₹0</span></p>
+                </div>
+
+                <!-- Category Split (Lady & Baby) -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-ladyBlue text-white p-4 rounded-xl shadow">
+                        <h3 class="font-bold text-sm mb-1"><i class="fa-solid fa-person-dress"></i> Lady Platform</h3>
+                        <p class="text-xs text-blue-200">Rev: <span id="dash-lady-rev">₹0</span></p>
+                        <p class="text-xs text-blue-200">Profit: <span id="dash-lady-profit">₹0</span></p>
+                        <p class="text-xs text-blue-200 mt-2">Orders: <span id="dash-lady-completed">0</span> Done / <span id="dash-lady-pending">0</span> Pend</p>
+                    </div>
+                    <div class="bg-indigo-100 text-indigo-900 p-4 rounded-xl shadow border border-indigo-200">
+                        <h3 class="font-bold text-sm mb-1"><i class="fa-solid fa-child"></i> Baby Platform</h3>
+                        <p class="text-xs text-indigo-700">Rev: <span id="dash-baby-rev">₹0</span></p>
+                        <p class="text-xs text-indigo-700">Profit: <span id="dash-baby-profit">₹0</span></p>
+                        <p class="text-xs text-indigo-700 mt-2">Orders: <span id="dash-baby-completed">0</span> Done / <span id="dash-baby-pending">0</span> Pend</p>
                     </div>
                 </div>
-            </div>
 
-            <div class="card">
-                <h3>ഓർഡർ സ്റ്റാറ്റസ്</h3>
-                <p>ടോട്ടൽ കംപ്ലീറ്റഡ് ഓർഡറുകൾ: <b id="total-completed-orders">0</b></p>
-                <p>പെൻഡിങ് ഓർഡറുകൾ: <b id="total-pending-orders">0</b></p>
-                <div class="grid-2" style="margin-top: 8px; font-size: 0.8rem;">
-                    <div>LEDI Comp/Pend: <span id="ledi-cp">0 / 0</span></div>
-                    <div>BEBI Comp/Pend: <span id="bebi-cp">0 / 0</span></div>
+                <!-- Quick Action Buttons -->
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="switchTab('customers')" class="bg-emerald-50 text-deepGreen border border-emerald-300 p-3 rounded-xl text-center font-semibold text-xs shadow-sm hover:bg-emerald-100">
+                        <i class="fa-solid fa-user-plus text-base mb-1 block"></i> Add Customer
+                    </button>
+                    <button onclick="switchTab('store')" class="bg-emerald-50 text-deepGreen border border-emerald-300 p-3 rounded-xl text-center font-semibold text-xs shadow-sm hover:bg-emerald-100">
+                        <i class="fa-solid fa-store text-base mb-1 block"></i> Item Store
+                    </button>
+                    <button onclick="switchTab('employees')" class="bg-emerald-50 text-deepGreen border border-emerald-300 p-3 rounded-xl text-center font-semibold text-xs shadow-sm hover:bg-emerald-100">
+                        <i class="fa-solid fa-users text-base mb-1 block"></i> Add Employee
+                    </button>
                 </div>
-            </div>
 
-            <div class="card">
-                <h3>അടുത്ത ഡെലിവറികൾ</h3>
-                <div id="next-deliveries-list">
-                    <p style="font-size: 0.85rem; color: #64748B;">പെൻഡിങ് ഡെലിവറികൾ ഒന്നുമില്ല.</p>
+                <!-- Order Stats & Next Deliveries -->
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-2">
+                    <h4 class="font-bold text-sm text-gray-700">Order Overview</h4>
+                    <div class="flex justify-between text-xs text-gray-600">
+                        <span>Completed Orders: <strong id="dash-completed-count">0</strong></span>
+                        <span>Pending Orders: <strong id="dash-pending-count">0</strong></span>
+                    </div>
+                    <div class="mt-3">
+                        <p class="text-xs font-bold text-deepGreen mb-1">Next Deliveries:</p>
+                        <div id="dash-next-deliveries" class="space-y-1 text-xs text-gray-600">
+                            <p class="italic text-gray-400">No upcoming deliveries</p>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="card">
-                <h3>ക്വിക്ക് ആക്ഷൻസ്</h3>
-                <div class="grid-2">
-                    <button class="btn" onclick="switchPage('customers')">ആഡ് കസ്റ്റമർ</button>
-                    <button class="btn" onclick="switchPage('items')">ഐറ്റം സ്റ്റോർ</button>
+            <!-- 2. ITEM STORE TAB -->
+            <section id="tab-store" class="tab-content hidden space-y-4">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-sm mb-3 text-deepGreen"><i class="fa-solid fa-shirt"></i> Add New Dress / Item</h3>
+                    <form id="item-form" onsubmit="saveItem(event)" class="space-y-3">
+                        <input type="text" id="item-name" placeholder="Dress Name" required class="w-full text-xs p-2 border rounded-lg">
+                        <input type="text" id="item-code" placeholder="Dress Code (e.g. D101)" required class="w-full text-xs p-2 border rounded-lg">
+                        <input type="number" id="item-price" placeholder="Price (₹)" required class="w-full text-xs p-2 border rounded-lg">
+                        <div>
+                            <label class="text-xs text-gray-500 block mb-1">Upload Image (Max 10MB):</label>
+                            <input type="file" id="item-image" accept="image/*" class="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-deepGreen hover:file:bg-emerald-100">
+                        </div>
+                        <button type="submit" class="w-full bg-deepGreen text-white py-2 rounded-lg text-xs font-bold">Save Item</button>
+                    </form>
                 </div>
-                <button class="btn" onclick="switchPage('employees')" style="margin-top: 8px;">ആഡ് എംപ്ലോയി</button>
-            </div>
-        </div>
 
-        <!-- 2. ITEM STORE PAGE -->
-        <div id="page-items" class="page">
-            <div class="card">
-                <h3>പുതിയ ഡ്രസ്സ്/ഐറ്റം ആഡ് ചെയ്യുക</h3>
-                <form id="item-form" onsubmit="saveItem(event)">
-                    <input type="text" id="item-name" placeholder="ഡ്രസ്സിന്റെ പേര്" required>
-                    <input type="text" id="item-code" placeholder="ഐറ്റം കോഡ് (ഉദാ: KZS01)" required>
-                    <input type="number" id="item-price" placeholder="വില (Price)" required>
-                    <label style="font-size:0.8rem;">ഫോട്ടോ (Max 10MB):</label>
-                    <input type="file" id="item-image" accept="image/*" required>
-                    <button type="submit" class="btn">ഐറ്റം സേവ് ചെയ്യുക</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h3>ഐറ്റം സ്റ്റോർ ലിസ്റ്റ് & സെയിൽസ് കൗണ്ട്</h3>
-                <div id="item-list-container"></div>
-            </div>
-        </div>
-
-        <!-- 3. EMPLOYEE PAGE -->
-        <div id="page-employees" class="page">
-            <div class="card">
-                <h3>എംപ്ലോയിയെ ചേർക്കുക</h3>
-                <form id="employee-form" onsubmit="saveEmployee(event)">
-                    <input type="text" id="emp-name" placeholder="എംപ്ലോയിയുടെ പേര്" required>
-                    <button type="submit" class="btn">എംപ്ലോയി സേവ് ചെയ്യുക</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h3>എംപ്ലോയി ലിസ്റ്റ്</h3>
-                <div id="employee-list-container"></div>
-            </div>
-        </div>
-
-        <!-- 4. CUSTOMERS & ORDERS PAGE -->
-        <div id="page-customers" class="page">
-            <div class="card">
-                <h3>കസ്റ്റമർ / ഓർഡർ രജിസ്റ്റർ</h3>
-                <form id="customer-form" onsubmit="saveCustomerOrder(event)">
-                    <input type="text" id="cust-name" placeholder="കസ്റ്റമറുടെ പേര്" required>
-                    <input type="text" id="cust-whatsapp" placeholder="വാട്സാപ്പ് നമ്പർ" required>
-                    <textarea id="cust-address" placeholder="അഡ്രസ്സ്" rows="2" required></textarea>
-                    
-                    <label style="font-size:0.8rem;">പ്ലാറ്റ്‌ഫോം:</label>
-                    <select id="cust-platform">
-                        <option value="LEDI">LEDI (ലേഡി ബ്ലൂ)</option>
-                        <option value="BEBI">BEBI (ബേബി ലാവെൻഡർ)</option>
-                    </select>
-
-                    <input type="date" id="cust-delivery-date" required>
-                    <input type="text" id="cust-item-code" placeholder="ഐറ്റം കോഡ് (Item Store suggestion match)" required>
-                    <input type="text" id="cust-dress-name" placeholder="ഡ്രസ്സിന്റെ പേര്" required>
-                    <input type="number" id="cust-price" placeholder="പറഞ്ഞ പ്രൈസ് (Price)" required>
-                    <input type="number" id="cust-advance" placeholder="അഡ്വാൻസ് എമൗണ്ട്" oninput="calculateAdvanceHint()" required>
-                    <span id="advance-hint" class="hint"></span>
-
-                    <input type="number" id="cust-material-cost" placeholder="മെറ്റീരിയൽ കോസ്റ്റ്" required>
-                    <input type="number" id="cust-delivery-charge" placeholder="ഡെലിവറി ചാർജ്" required>
-                    
-                    <label style="font-size:0.8rem;">ജോലി ചെയ്യുന്ന എംപ്ലോയി:</label>
-                    <select id="cust-emp-select" required></select>
-
-                    <input type="number" id="cust-stitching-charge" placeholder="എംപ്ലോയി സ്റ്റിച്ചിംഗ് ചാർജ് (Stitching/Work Pay)" required>
-
-                    <label style="font-size:0.8rem;">മെഷർമെന്റ് തരം:</label>
-                    <select id="cust-meas-type" onchange="toggleMeasurementInput()">
-                        <option value="Standard">Standard (ഫിക്ഡ്)</option>
-                        <option value="Manual">Manual (മാനുവൽ രേഖപ്പെടുത്തുക)</option>
-                    </select>
-                    <textarea id="cust-measurements" placeholder="മെഷർമെന്റ് വിവരങ്ങൾ ഇവിടെ എഴുതുക..." rows="2"></textarea>
-
-                    <input type="number" id="cust-extra-expense" placeholder="അഡീഷണൽ എക്സ്പെൻസ് (വല്ലതുമുണ്ടെങ്കിൽ)" value="0">
-
-                    <button type="submit" class="btn">ഓർഡർ സേവ് ചെയ്യുക</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h3>ഓർഡറുകൾ (Pending & Completed)</h3>
-                <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <button class="btn" onclick="filterOrderTab('pending')" style="background:#3B82F6;">പെൻഡിങ്</button>
-                    <button class="btn" onclick="filterOrderTab('completed')" style="background:#10B981;">കംപ്ലീറ്റഡ്</button>
+                <div class="space-y-2">
+                    <h4 class="font-bold text-xs text-gray-700">Available Items & Sales Count</h4>
+                    <div id="store-items-list" class="space-y-2">
+                        <!-- Dynamically populated items -->
+                    </div>
                 </div>
-                <div id="orders-list-container"></div>
-            </div>
-        </div>
+            </section>
 
-        <!-- 5. DATA ANALYSIS PAGE -->
-        <div id="page-analytics" class="page">
-            <div class="card">
-                <h3>ഡാറ്റ അനാലിസിസ് & സ്റ്റാറ്റസ്</h3>
-                <label style="font-size:0.8rem;">ആരംഭ തീയതി:</label>
-                <input type="date" id="filter-start-date">
-                <label style="font-size:0.8rem;">അവസാന തീയതി:</label>
-                <input type="date" id="filter-end-date">
-                <button class="btn" onclick="runAnalytics()">അനാലിസിസ് കാണുക</button>
-                
-                <div id="analytics-result" style="margin-top: 15px; font-size: 0.85rem;"></div>
-            </div>
-        </div>
+            <!-- 3. EMPLOYEES TAB -->
+            <section id="tab-employees" class="tab-content hidden space-y-4">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-sm mb-3 text-deepGreen"><i class="fa-solid fa-user-tie"></i> Add Employee</h3>
+                    <form id="employee-form" onsubmit="saveEmployee(event)" class="space-y-3">
+                        <input type="text" id="emp-name" placeholder="Employee Name" required class="w-full text-xs p-2 border rounded-lg">
+                        <button type="submit" class="w-full bg-deepGreen text-white py-2 rounded-lg text-xs font-bold">Add Employee</button>
+                    </form>
+                </div>
+
+                <div class="space-y-2">
+                    <h4 class="font-bold text-xs text-gray-700">Employee List & Performance</h4>
+                    <div id="employee-list" class="space-y-2">
+                        <!-- Dynamically populated employees -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. CUSTOMERS & ORDERS TAB -->
+            <section id="tab-customers" class="tab-content hidden space-y-4">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
+                    <h3 class="font-bold text-sm mb-3 text-deepGreen"><i class="fa-solid fa-address-book"></i> Add Customer & Order</h3>
+                    <form id="order-form" onsubmit="saveOrder(event)" class="space-y-3">
+                        <input type="text" id="cust-name" placeholder="Customer Name" required class="w-full text-xs p-2 border rounded-lg">
+                        <input type="text" id="cust-whatsapp" placeholder="WhatsApp Number" required class="w-full text-xs p-2 border rounded-lg">
+                        <textarea id="cust-address" placeholder="Address" required class="w-full text-xs p-2 border rounded-lg"></textarea>
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-xs text-gray-500">Delivery Date</label>
+                                <input type="date" id="cust-delivery-date" required class="w-full text-xs p-2 border rounded-lg">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500">Item Code (Store Suggestion)</label>
+                                <select id="cust-item-code" onchange="autofillItemDetails()" class="w-full text-xs p-2 border rounded-lg">
+                                    <option value="">Select Item</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <input type="text" id="cust-dress-name" placeholder="Dress Name" readonly class="w-full text-xs p-2 bg-gray-100 border rounded-lg">
+                        
+                        <div class="grid grid-cols-2 gap-2">
+                            <input type="number" id="cust-price" placeholder="Agreed Price (₹)" oninput="calculateFinancials()" required class="text-xs p-2 border rounded-lg">
+                            <input type="number" id="cust-advance" placeholder="Advance Paid (₹)" oninput="calculateFinancials()" required class="text-xs p-2 border rounded-lg">
+                        </div>
+                        <p id="advance-hint" class="text-xs text-emerald-600 font-medium"></p>
+
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="cust-material-cost" placeholder="Mat. Cost (₹)" oninput="calculateFinancials()" required class="text-xs p-2 border rounded-lg">
+                            <input type="number" id="cust-stitching-charge" placeholder="Stitch Chg (₹)" oninput="calculateFinancials()" required class="text-xs p-2 border rounded-lg">
+                            <input type="number" id="cust-delivery-charge" placeholder="Del. Chg (₹)" oninput="calculateFinancials()" required class="text-xs p-2 border rounded-lg">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-xs text-gray-500">Assign Employee</label>
+                                <select id="cust-employee" required class="w-full text-xs p-2 border rounded-lg">
+                                    <option value="">Select Employee</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-500">Measurement Type</label>
+                                <select id="cust-measurement-type" onchange="toggleMeasurementInput()" class="w-full text-xs p-2 border rounded-lg">
+                                    <option value="Standard">Standard</option>
+                                    <option value="Manual">Manual Entry</option>
+                                </select>
+                            </div>
+                        </div>
+                        <input type="text" id="cust-measurements" placeholder="Manual Measurements Details" class="w-full text-xs p-2 border rounded-lg hidden">
+
+                        <!-- Additional Expense handling based on English instructions -->
+                        <input type="number" id="cust-extra-expense" placeholder="Additional Expense (₹) [Optional]" value="0" oninput="calculateFinancials()" class="w-full text-xs p-2 border rounded-lg">
+
+                        <button type="submit" class="w-full bg-deepGreen text-white py-2 rounded-lg text-xs font-bold">Save Order</button>
+                    </form>
+                </div>
+
+                <!-- Orders Filter Windows -->
+                <div class="space-y-2">
+                    <div class="flex space-x-2 border-b pb-2">
+                        <button onclick="switchOrderTab('pending')" id="btn-order-pending" class="flex-1 py-1 text-xs font-bold bg-deepGreen text-white rounded-lg">Pending Orders</button>
+                        <button onclick="switchOrderTab('completed')" id="btn-order-completed" class="flex-1 py-1 text-xs font-bold bg-gray-200 text-gray-700 rounded-lg">Completed Orders</button>
+                    </div>
+                    <div id="orders-container" class="space-y-2">
+                        <!-- Populated orders -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. ANALYTICS TAB -->
+            <section id="tab-analytics" class="tab-content hidden space-y-4">
+                <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-3">
+                    <h3 class="font-bold text-sm text-deepGreen"><i class="fa-solid fa-chart-pie"></i> Data Analysis</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-xs text-gray-500">From Date</label>
+                            <input type="date" id="filter-from-date" class="w-full text-xs p-2 border rounded-lg">
+                        </div>
+                        <div>
+                            <label class="text-xs text-gray-500">To Date</label>
+                            <input type="date" id="filter-to-date" class="w-full text-xs p-2 border rounded-lg">
+                        </div>
+                    </div>
+                    <button onclick="generateAnalytics()" class="w-full bg-deepGreen text-white py-2 rounded-lg text-xs font-bold">Filter Data</button>
+                </div>
+
+                <div id="analytics-results" class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm space-y-2 text-xs">
+                    <p class="text-gray-500 text-center">Select date range and click filter to analyze business performance.</p>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 flex justify-around py-3 shadow-lg">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="flex flex-col items-center text-deepGreen">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] mt-1 font-medium">Home</span>
+            </button>
+            <button onclick="switchTab('customers')" id="nav-customers" class="flex flex-col items-center text-gray-400 hover:text-deepGreen">
+                <i class="fa-solid fa-clipboard-list text-lg"></i>
+                <span class="text-[10px] mt-1 font-medium">Orders</span>
+            </button>
+            <button onclick="switchTab('store')" id="nav-store" class="flex flex-col items-center text-gray-400 hover:text-deepGreen">
+                <i class="fa-solid fa-store text-lg"></i>
+                <span class="text-[10px] mt-1 font-medium">Store</span>
+            </button>
+            <button onclick="switchTab('employees')" id="nav-employees" class="flex flex-col items-center text-gray-400 hover:text-deepGreen">
+                <i class="fa-solid fa-users text-lg"></i>
+                <span class="text-[10px] mt-1 font-medium">Employee</span>
+            </button>
+        </nav>
+
     </div>
 
-    <nav>
-        <button onclick="switchPage('dashboard')" class="active" id="nav-dashboard"><span>🏠</span> ഡാഷ്‌ബോർഡ്</button>
-        <button onclick="switchPage('items')" id="nav-items"><span>👗</span> ഐറ്റം സ്റ്റോർ</button>
-        <button onclick="switchPage('employees')" id="nav-employees"><span>👩‍‍💼</span> എംപ്ലോയി</button>
-        <button onclick="switchPage('customers')" id="nav-customers"><span>📝</span> കസ്റ്റമർ</button>
-        <button onclick="switchPage('analytics')" id="nav-analytics"><span>📊</span> അനാലിസിസ്</button>
-    </nav>
-</div>
+    <!-- Firebase SDK & Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-<script>
-    // Firebase Configuration Initialization
-    const firebaseConfig = {
-      apiKey: "AIzaSyDwyiRwOCOHNltC2Fc3fTQyPH1HUEDiM6I",
-      authDomain: "clothing-10a0d.firebaseapp.com",
-      projectId: "clothing-10a0d",
-      storageBucket: "clothing-10a0d.firebasestorage.app",
-      messagingSenderId: "1019638870341",
-      appId: "1:1019638870341:web:82c8d3c69321e9ed114e2c"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const dbFirestore = firebase.firestore();
-
-    // App Database Local Cache
-    let db = {
-        items: [],
-        employees: [],
-        customers: []
-    };
-
-    // Fetch initial data from Firebase Firestore
-    function fetchAllDataFromFirebase() {
-        dbFirestore.collection("kaizsoq_data").doc("main_store").get().then((doc) => {
-            if (doc.exists) {
-                db = doc.data();
-                if(!db.items) db.items = [];
-                if(!db.employees) db.employees = [];
-                if(!db.customers) db.customers = [];
-            }
-            updateDashboard();
-            if(document.getElementById('page-items').classList.contains('active')) renderItems();
-            if(document.getElementById('page-employees').classList.contains('active')) renderEmployees();
-            if(document.getElementById('page-customers').classList.contains('active')) {
-                populateEmpDropdown();
-                renderOrders(currentOrderFilter);
-            }
-        }).catch((error) => {
-            console.error("Error getting data:", error);
-        });
-    }
-
-    function saveDataToFirebase() {
-        dbFirestore.collection("kaizsoq_data").doc("main_store").set(db).then(() => {
-            updateDashboard();
-        }).catch((error) => {
-            console.error("Error saving data: ", error);
-        });
-    }
-
-    document.getElementById('current-date').innerText = new Date().toLocaleDateString('ml-IN');
-
-    function switchPage(pageId) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-        
-        document.getElementById('page-' + pageId).classList.add('active');
-        document.getElementById('nav-' + pageId).classList.add('active');
-
-        if(pageId === 'items') renderItems();
-        if(pageId === 'employees') renderEmployees();
-        if(pageId === 'customers') {
-            populateEmpDropdown();
-            renderOrders('pending');
-        }
-        if(pageId === 'dashboard') updateDashboard();
-    }
-
-    // --- ITEM STORE LOGIC ---
-    function saveItem(e) {
-        e.preventDefault();
-        const name = document.getElementById('item-name').value;
-        const code = document.getElementById('item-code').value;
-        const price = parseFloat(document.getElementById('item-price').value);
-        const fileInput = document.getElementById('item-image');
-
-        if(fileInput.files && fileInput.files[0]) {
-            if(fileInput.files[0].size > 10 * 1024 * 1024) {
-                alert('ഫയൽ സൈസ് 10MB-ൽ കുറവായിരിക്കണം!');
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(uploadEvent) {
-                db.items.push({
-                    id: Date.now(),
-                    name, code, price,
-                    image: uploadEvent.target.result,
-                    salesCount: 0
-                });
-                saveDataToFirebase();
-                document.getElementById('item-form').reset();
-                renderItems();
-                alert('ഐറ്റം വിജയകരമായി ഫയർബേസിൽ സേവ് ചെയ്തു!');
-            };
-            reader.readAsDataURL(fileInput.files[0]);
-        }
-    }
-
-    function renderItems() {
-        let container = document.getElementById('item-list-container');
-        container.innerHTML = '';
-        if(db.items.length === 0) {
-            container.innerHTML = '<p style="font-size:0.85rem; color:#64748B;">ഐറ്റങ്ങൾ ഒന്നും ചേർത്തിട്ടില്ല.</p>';
-            return;
-        }
-        db.items.forEach((item, index) => {
-            container.innerHTML += `
-                <div class="list-item">
-                    <img src="${item.image}" width="40" height="40" style="border-radius:6px; object-fit:cover;">
-                    <div>
-                        <b>${item.name}</b> (${item.code})<br>
-                        വില: ₹${item.price} | സെയിൽസ് കൗണ്ട്: <b>${item.salesCount}</b>
-                    </div>
-                    <div>
-                        <button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteItem(${index})">ഡിലീറ്റ്</button>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    function deleteItem(index) {
-        if(confirm('ഈ ഐറ്റം ഡിലീറ്റ് ചെയ്യണമെന്നുറപ്പാണോ?')) {
-            db.items.splice(index, 1);
-            saveDataToFirebase();
-            renderItems();
-        }
-    }
-
-    // --- EMPLOYEE LOGIC ---
-    function saveEmployee(e) {
-        e.preventDefault();
-        const name = document.getElementById('emp-name').value;
-        db.employees.push({
-            id: Date.now(),
-            name,
-            earned: 0,
-            completedWorks: 0,
-            pendingWorks: 0
-        });
-        saveDataToFirebase();
-        document.getElementById('employee-form').reset();
-        renderEmployees();
-        alert('എംപ്ലോയിയെ വിജയകരമായി ചേർത്തു!');
-    }
-
-    function renderEmployees() {
-        let container = document.getElementById('employee-list-container');
-        container.innerHTML = '';
-        if(db.employees.length === 0) {
-            container.innerHTML = '<p style="font-size:0.85rem; color:#64748B;">എംപ്ലോയിമാർ ആരുമില്ല.</p>';
-            return;
-        }
-        db.employees.forEach((emp, index) => {
-            let empOrders = db.customers.filter(c => c.employee === emp.name);
-            let earned = empOrders.reduce((sum, c) => sum + (c.status === 'Completed' ? parseFloat(c.stitchingCharge || 0) : 0), 0);
-            let compCount = empOrders.filter(c => c.status === 'Completed').length;
-            let pendCount = empOrders.filter(c => c.status === 'Pending').length;
-
-            container.innerHTML += `
-                <div class="list-item" style="flex-direction: column; align-items: flex-start;">
-                    <div style="display: flex; width: 100%; align-items: center; justify-content: space-between;">
-                        <b style="color:var(--lady-blue); cursor:pointer;" onclick="showEmpDetails(${index})">${emp.name}</b>
-                        <button class="btn btn-danger" style="padding:4px 8px; font-size:0.7rem;" onclick="deleteEmployee(${index})">ഡിലീറ്റ്</button>
-                    </div>
-                    <div style="font-size: 0.8rem; margin-top: 5px;">
-                        ഏൺ ചെയ്തത്: <b>₹${earned}</b> | കംപ്ലീറ്റഡ്: <b>${compCount}</b> | പെൻഡിങ്: <b>${pendCount}</b>
-                    </div>
-                </div>
-            `;
-        });
-    }
-
-    function deleteEmployee(index) {
-        if(confirm('എംപ്ലോയിയെ ഡിലീറ്റ് ചെയ്യണമെന്നുറപ്പാണോ?')) {
-            db.employees.splice(index, 1);
-            saveDataToFirebase();
-            renderEmployees();
-        }
-    }
-
-    function showEmpDetails(index) {
-        let emp = db.employees[index];
-        let pendingCusts = db.customers.filter(c => c.employee === emp.name && c.status === 'Pending');
-        let details = pendingCusts.map(c => `- ${c.name} | ഡെലിവറി: ${c.deliveryDate} | മെഷർമെന്റ്: ${c.measurements}`).join('\n');
-        alert(`എംപ്ലോയി: ${emp.name}\nപെൻഡിങ് വർക്കുകളുടെ വിവരങ്ങൾ:\n${details || 'പെൻഡിങ് വർക്കുകൾ ഇല്ല.'}`);
-    }
-
-    function populateEmpDropdown() {
-        let select = document.getElementById('cust-emp-select');
-        select.innerHTML = '';
-        db.employees.forEach(emp => {
-            select.innerHTML += `<option value="${emp.name}">${emp.name}</option>`;
-        });
-    }
-
-    // --- CUSTOMER & ORDER LOGIC ---
-    function calculateAdvanceHint() {
-        let adv = parseFloat(document.getElementById('cust-advance').value) || 0;
-        let mat = parseFloat(document.getElementById('cust-material-cost').value) || 0;
-        let hintSpan = document.getElementById('advance-hint');
-        let rem = adv - mat;
-        hintSpan.innerText = `അഡ്വാൻസ് (${adv}) - മെറ്റീരിയൽ കോസ്റ്റ് (${mat}) = ബാക്കി: ₹${rem}`;
-    }
-
-    function toggleMeasurementInput() {
-        let type = document.getElementById('cust-meas-type').value;
-        let textarea = document.getElementById('cust-measurements');
-        if(type === 'Standard') {
-            textarea.value = 'Standard Fixed Measurements Applied';
-            textarea.disabled = true;
-        } else {
-            textarea.value = '';
-            textarea.disabled = false;
-        }
-    }
-
-    function saveCustomerOrder(e) {
-        e.preventDefault();
-        let price = parseFloat(document.getElementById('cust-price').value);
-        let advance = parseFloat(document.getElementById('cust-advance').value);
-        let materialCost = parseFloat(document.getElementById('cust-material-cost').value);
-        let deliveryCharge = parseFloat(document.getElementById('cust-delivery-charge').value);
-        let stitchingCharge = parseFloat(document.getElementById('cust-stitching-charge').value);
-        let extraExpense = parseFloat(document.getElementById('cust-extra-expense').value) || 0;
-        let itemCode = document.getElementById('cust-item-code').value;
-
-        let totalExpenses = stitchingCharge + materialCost + deliveryCharge + extraExpense;
-        let remainingAmount = price - totalExpenses;
-        
-        let ownerAmount = 0;
-        let businessProfit = 0;
-
-        if (remainingAmount > 300) {
-            ownerAmount = 300;
-            businessProfit = remainingAmount - 300;
-        } else if (remainingAmount > 0) {
-            ownerAmount = remainingAmount;
-            businessProfit = 0;
-        } else {
-            ownerAmount = 0;
-            businessProfit = remainingAmount;
-        }
-
-        let newOrder = {
-            id: Date.now(),
-            name: document.getElementById('cust-name').value,
-            whatsapp: document.getElementById('cust-whatsapp').value,
-            address: document.getElementById('cust-address').value,
-            platform: document.getElementById('cust-platform').value,
-            deliveryDate: document.getElementById('cust-delivery-date').value,
-            itemCode: itemCode,
-            dressName: document.getElementById('cust-dress-name').value,
-            price: price,
-            advance: advance,
-            materialCost: materialCost,
-            deliveryCharge: deliveryCharge,
-            employee: document.getElementById('cust-emp-select').value,
-            stitchingCharge: stitchingCharge,
-            measurements: document.getElementById('cust-measurements').value,
-            status: 'Pending',
-            completedDate: null,
-            revenue: price,
-            profit: businessProfit,
-            ownerEarn: ownerAmount,
-            expenses: totalExpenses
+        const firebaseConfig = {
+            apiKey: "AIzaSyDwyiRwOCOHNltC2Fc3fTQyPH1HUEDiM6I",
+            authDomain: "clothing-10a0d.firebaseapp.com",
+            projectId: "clothing-10a0d",
+            storageBucket: "clothing-10a0d.firebasestorage.app",
+            messagingSenderId: "1019638870341",
+            appId: "1:1019638870341:web:82c8d3c69321e9ed114e2c"
         };
 
-        let matchedItem = db.items.find(i => i.code === itemCode);
-        if(matchedItem) {
-            matchedItem.salesCount += 1;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.db = db;
+        window.collection = collection;
+        window.addDoc = addDoc;
+        window.getDocs = getDocs;
+        window.deleteDoc = deleteDoc;
+        window.doc = doc;
+        window.updateDoc = updateDoc;
+
+        // Initial Data Load
+        loadAllData();
+    </script>
+
+    <!-- Application Logic Script -->
+    <script>
+        let currentOrderFilter = 'pending';
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // Update nav styling
+            ['dashboard', 'customers', 'store', 'employees'].forEach(t => {
+                const btn = document.getElementById(`nav-${t}`);
+                if(btn) {
+                    btn.classList.remove('text-deepGreen');
+                    btn.classList.add('text-gray-400');
+                }
+            });
+            if(document.getElementById(`nav-${tabId}`)) {
+                document.getElementById(`nav-${tabId}`).classList.remove('text-gray-400');
+                document.getElementById(`nav-${tabId}`).classList.add('text-deepGreen');
+            }
         }
 
-        db.customers.push(newOrder);
-        saveDataToFirebase();
-        document.getElementById('customer-form').reset();
-        renderOrders('pending');
-        alert('ഓർഡർ വിജയകരമായി ഫയർബേസിൽ സേവ് ചെയ്തു!');
-    }
-
-    let currentOrderFilter = 'pending';
-    function filterOrderTab(tab) {
-        currentOrderFilter = tab;
-        renderOrders(tab);
-    }
-
-    function renderOrders(tab) {
-        let container = document.getElementById('orders-list-container');
-        container.innerHTML = '';
-        
-        let filtered = db.customers.filter(c => tab === 'completed' ? c.status === 'Completed' : c.status === 'Pending');
-        
-        if(tab === 'completed') {
-            filtered.sort((a, b) => new Date(a.completedDate) - new Date(b.completedDate));
+        function switchOrderTab(status) {
+            currentOrderFilter = status;
+            if(status === 'pending') {
+                document.getElementById('btn-order-pending').className = "flex-1 py-1 text-xs font-bold bg-deepGreen text-white rounded-lg";
+                document.getElementById('btn-order-completed').className = "flex-1 py-1 text-xs font-bold bg-gray-200 text-gray-700 rounded-lg";
+            } else {
+                document.getElementById('btn-order-completed').className = "flex-1 py-1 text-xs font-bold bg-deepGreen text-white rounded-lg";
+                document.getElementById('btn-order-pending').className = "flex-1 py-1 text-xs font-bold bg-gray-200 text-gray-700 rounded-lg";
+            }
+            renderOrders();
         }
 
-        if(filtered.length === 0) {
-            container.innerHTML = `<p style="font-size:0.85rem; color:#64748B;">ഓർഡറുകൾ ഒന്നുമില്ല.</p>`;
-            return;
+        function toggleMeasurementInput() {
+            const type = document.getElementById('cust-measurement-type').value;
+            const input = document.getElementById('cust-measurements');
+            if(type === 'Manual') {
+                input.classList.remove('hidden');
+            } else {
+                input.classList.add('hidden');
+            }
         }
 
-        filtered.forEach((cust) => {
-            let originalIndex = db.customers.findIndex(c => c.id === cust.id);
-            container.innerHTML += `
-                <div class="list-item" style="flex-direction: column; align-items: flex-start; gap: 4px;">
-                    <div style="display:flex; justify-content:space-width; width:100%; justify-content:space-between;">
-                        <b style="color:var(--lady-blue); cursor:pointer;" onclick="showCustomerDetails(${originalIndex})">${cust.name} (${cust.platform})</b>
-                        <span>₹${cust.price}</span>
-                    </div>
-                    <div style="font-size:0.75rem; color:#475569;">
-                        ഡ്രസ്സ്: ${cust.dressName} | ഡെലിവറി: ${cust.deliveryDate}<br>
-                        എംപ്ലോയി: ${cust.employee} | പ്രോഫിറ്റ്: ₹${cust.profit} | ഓണർ: ₹${cust.ownerEarn}
-                    </div>
-                    <div style="display:flex; gap:5px; margin-top:5px; width:100%;">
-                        ${cust.status === 'Pending' ? `<button class="btn btn-success" style="padding:4px; font-size:0.7rem; flex:1;" onclick="completeOrder(${originalIndex})">കംപ്ലീറ്റഡ് ആക്കുക</button>` : ''}
-                        <button class="btn btn-danger" style="padding:4px; font-size:0.7rem;" onclick="deleteCustomer(${originalIndex})">ഡിലീറ്റ്</button>
-                    </div>
-                </div>
-            `;
-        });
-    }
+        function calculateFinancials() {
+            const price = parseFloat(document.getElementById('cust-price').value) || 0;
+            const advance = parseFloat(document.getElementById('cust-advance').value) || 0;
+            const matCost = parseFloat(document.getElementById('cust-material-cost').value) || 0;
 
-    function completeOrder(index) {
-        db.customers[index].status = 'Completed';
-        db.customers[index].completedDate = new Date().toISOString();
-        saveDataToFirebase();
-        renderOrders(currentOrderFilter);
-    }
-
-    function deleteCustomer(index) {
-        if(confirm('ഈ കസ്റ്റമർ ഓർഡർ ഡിലീറ്റ് ചെയ്യണമെന്നുറപ്പാണോ?')) {
-            db.customers.splice(index, 1);
-            saveDataToFirebase();
-            renderOrders(currentOrderFilter);
+            const remainingAdvance = advance - matCost;
+            document.getElementById('advance-hint').innerText = `Remaining Advance after Material Cost: ₹${remainingAdvance >= 0 ? remainingAdvance : 0}`;
         }
-    }
 
-    function showCustomerDetails(index) {
-        let cust = db.customers[index];
-        let custAll = db.customers.filter(c => c.whatsapp === cust.whatsapp);
-        let totalRev = custAll.reduce((sum, c) => sum + c.revenue, 0);
-        let totalProf = custAll.reduce((sum, c) => sum + c.profit, 0);
-        
-        alert(`കസ്റ്റമർ: ${cust.name}\nവാട്സാപ്പ്: ${cust.whatsapp}\nആകെ നൽകിയ ഓർഡറുകൾ: ${custAll.length}\nആകെ റെവന്യൂ: ₹${totalRev}\nആകെ പ്രോഫിറ്റ്: ₹${totalProf}`);
-    }
+        // --- DATABASE OPERATIONS (LOCAL STATE & FIREBASE SYNC) ---
+        let itemsData = [];
+        let employeesData = [];
+        let ordersData = [];
 
-    // --- DASHBOARD UPDATE LOGIC ---
-    function updateDashboard() {
-        let totalRev = db.customers.reduce((sum, c) => sum + c.revenue, 0);
-        let totalProfit = db.customers.reduce((sum, c) => sum + c.profit, 0);
-        let ownerEarn = db.customers.reduce((sum, c) => sum + c.ownerEarn, 0);
-        let ownerOrdersCount = db.customers.filter(c => c.ownerEarn > 0).length;
+        async function loadAllData() {
+            try {
+                if(!window.db) return;
+                // Load Items
+                const itemSnap = await window.getDocs(window.collection(window.db, "items"));
+                itemsData = [];
+                itemSnap.forEach(d => itemsData.push({ id: d.id, ...d.data() }));
+                renderStore();
+                populateItemDropdown();
 
-        document.getElementById('dash-total-rev').innerText = `₹${totalRev}`;
-        document.getElementById('dash-total-profit').innerText = `₹${totalProfit}`;
-        document.getElementById('dash-owner-earn').innerText = `₹${ownerEarn}`;
-        document.getElementById('dash-owner-orders').innerText = ownerOrdersCount;
+                // Load Employees
+                const empSnap = await window.getDocs(window.collection(window.db, "employees"));
+                employeesData = [];
+                empSnap.forEach(d => employeesData.push({ id: d.id, ...d.data() }));
+                renderEmployees();
+                populateEmployeeDropdown();
 
-        let lediCusts = db.customers.filter(c => c.platform === 'LEDI');
-        let bebiCusts = db.customers.filter(c => c.platform === 'BEBI');
+                // Load Orders
+                const ordSnap = await window.getDocs(window.collection(window.db, "orders"));
+                ordersData = [];
+                ordSnap.forEach(d => ordersData.push({ id: d.id, ...d.data() }));
+                
+                updateDashboard();
+                renderOrders();
+            } catch(e) {
+                console.error("Error loading data: ", e);
+            }
+        }
 
-        document.getElementById('ledi-rev').innerText = `₹${lediCusts.reduce((s,c)=>s+c.revenue,0)}`;
-        document.getElementById('ledi-profit').innerText = `₹${lediCusts.reduce((s,c)=>s+c.profit,0)}`;
-        document.getElementById('ledi-exp').innerText = `₹${lediCusts.reduce((s,c)=>s+c.expenses,0)}`;
+        async function saveItem(event) {
+            event.preventDefault();
+            const name = document.getElementById('item-name').value;
+            const code = document.getElementById('item-code').value;
+            const price = parseFloat(document.getElementById('item-price').value);
+            const imageInput = document.getElementById('item-image');
+            
+            let imageUrl = "";
+            if(imageInput.files && imageInput.files[0]) {
+                if(imageInput.files[0].size > 10 * 1024 * 1024) {
+                    alert("Image size should be less than 10MB");
+                    return;
+                }
+                imageUrl = URL.createObjectURL(imageInput.files[0]);
+            }
 
-        document.getElementById('bebi-rev').innerText = `₹${bebiCusts.reduce((s,c)=>s+c.revenue,0)}`;
-        document.getElementById('bebi-profit').innerText = `₹${bebiCusts.reduce((s,c)=>s+c.profit,0)}`;
-        document.getElementById('bebi-exp').innerText = `₹${bebiCusts.reduce((s,c)=>s+c.expenses,0)}`;
+            await window.addDoc(window.collection(window.db, "items"), { name, code, price, imageUrl, salesCount: 0 });
+            document.getElementById('item-form').reset();
+            loadAllData();
+        }
 
-        let completedCount = db.customers.filter(c => c.status === 'Completed').length;
-        let pendingCount = db.customers.filter(c => c.status === 'Pending').length;
+        async function deleteItem(id) {
+            if(confirm("Are you sure you want to delete this item?")) {
+                await window.deleteDoc(window.doc(window.db, "items", id));
+                loadAllData();
+            }
+        }
 
-        document.getElementById('total-completed-orders').innerText = completedCount;
-        document.getElementById('total-pending-orders').innerText = pendingCount;
+        async function saveEmployee(event) {
+            event.preventDefault();
+            const name = document.getElementById('emp-name').value;
+            await window.addDoc(window.collection(window.db, "employees"), { name, earnings: 0, completedWork: 0, pendingWork: 0 });
+            document.getElementById('employee-form').reset();
+            loadAllData();
+        }
 
-        let lediComp = lediCusts.filter(c => c.status === 'Completed').length;
-        let lediPend = lediCusts.filter(c => c.status === 'Pending').length;
-        let bebiComp = bebiCusts.filter(c => c.status === 'Completed').length;
-        let bebiPend = bebiCusts.filter(c => c.status === 'Pending').length;
+        async function deleteEmployee(id) {
+            if(confirm("Delete employee?")) {
+                await window.deleteDoc(window.doc(window.db, "employees", id));
+                loadAllData();
+            }
+        }
 
-        document.getElementById('ledi-cp').innerText = `${lediComp} / ${lediPend}`;
-        document.getElementById('bebi-cp').innerText = `${bebiComp} / ${bebiPend}`;
+        function populateItemDropdown() {
+            const select = document.getElementById('cust-item-code');
+            select.innerHTML = '<option value="">Select Item</option>';
+            itemsData.forEach(item => {
+                select.innerHTML += `<option value="${item.code}">${item.code} - ${item.name}</option>`;
+            });
+        }
 
-        let pendingList = db.customers.filter(c => c.status === 'Pending').sort((a,b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
-        let nextListContainer = document.getElementById('next-deliveries-list');
-        nextListContainer.innerHTML = '';
-        
-        if(pendingList.length === 0) {
-            nextListContainer.innerHTML = `<p style="font-size: 0.85rem; color: #64748B;">പെൻഡിങ് ഡെലിവറികൾ ഒന്നുമില്ല.</p>`;
-        } else {
-            pendingList.slice(0, 2).forEach(cust => {
-                let origIdx = db.customers.findIndex(c => c.id === cust.id);
-                nextListContainer.innerHTML += `
-                    <div class="list-item" style="cursor:pointer;" onclick="showCustomerDetails(${origIdx})">
-                        <span><b>${cust.name}</b> (${cust.platform})</span>
-                        <span>ഡെലിവറി: ${cust.deliveryDate}</span>
+        function autofillItemDetails() {
+            const code = document.getElementById('cust-item-code').value;
+            const item = itemsData.find(i => i.code === code);
+            if(item) {
+                document.getElementById('cust-dress-name').value = item.name;
+                document.getElementById('cust-price').value = item.price;
+                calculateFinancials();
+            } else {
+                document.getElementById('cust-dress-name').value = "";
+                document.getElementById('cust-price').value = "";
+            }
+        }
+
+        function populateEmployeeDropdown() {
+            const select = document.getElementById('cust-employee');
+            select.innerHTML = '<option value="">Select Employee</option>';
+            employeesData.forEach(emp => {
+                select.innerHTML += `<option value="${emp.id}">${emp.name}</option>`;
+            });
+        }
+
+        async function saveOrder(event) {
+            event.preventDefault();
+            const name = document.getElementById('cust-name').value;
+            const whatsapp = document.getElementById('cust-whatsapp').value;
+            const address = document.getElementById('cust-address').value;
+            const deliveryDate = document.getElementById('cust-delivery-date').value;
+            const itemCode = document.getElementById('cust-item-code').value;
+            const dressName = document.getElementById('cust-dress-name').value;
+            const price = parseFloat(document.getElementById('cust-price').value);
+            const advance = parseFloat(document.getElementById('cust-advance').value);
+            const materialCost = parseFloat(document.getElementById('cust-material-cost').value);
+            const stitchingCharge = parseFloat(document.getElementById('cust-stitching-charge').value);
+            const deliveryCharge = parseFloat(document.getElementById('cust-delivery-charge').value);
+            const extraExpense = parseFloat(document.getElementById('cust-extra-expense').value) || 0;
+            const employeeId = document.getElementById('cust-employee').value;
+            const measurementType = document.getElementById('cust-measurement-type').value;
+            const measurements = document.getElementById('cust-measurements').value;
+
+            // Financial Calculations as requested
+            // Expenses = materialCost + stitchingCharge + deliveryCharge + extraExpense
+            const totalExpenses = materialCost + stitchingCharge + deliveryCharge + extraExpense;
+            const remainingPriceAfterExpenses = price - totalExpenses;
+
+            let ownerEarning = 0;
+            let businessProfit = 0;
+
+            if(remainingPriceAfterExpenses >= 300) {
+                ownerEarning = 300;
+                businessProfit = remainingPriceAfterExpenses - 300;
+            } else {
+                ownerEarning = remainingPriceAfterExpenses > 0 ? remainingPriceAfterExpenses : 0;
+                businessProfit = 0;
+            }
+
+            const orderObj = {
+                name, whatsapp, address, deliveryDate, itemCode, dressName, price, advance,
+                materialCost, stitchingCharge, deliveryCharge, extraExpense, employeeId,
+                measurementType, measurements, ownerEarning, businessProfit, status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+
+            await window.addDoc(window.collection(window.db, "orders"), orderObj);
+
+            // Update item sales count
+            const item = itemsData.find(i => i.code === itemCode);
+            if(item) {
+                const newCount = (item.salesCount || 0) + 1;
+                await window.updateDoc(window.doc(window.db, "items", item.id), { salesCount: newCount });
+            }
+
+            document.getElementById('order-form').reset();
+            loadAllData();
+            switchOrderTab('pending');
+        }
+
+        async function markOrderComplete(id) {
+            await window.updateDoc(window.doc(window.db, "orders", id), { status: 'completed' });
+            loadAllData();
+        }
+
+        async function deleteOrder(id) {
+            if(confirm("Delete order?")) {
+                await window.deleteDoc(window.doc(window.db, "orders", id));
+                loadAllData();
+            }
+        }
+
+        function renderStore() {
+            const container = document.getElementById('store-items-list');
+            container.innerHTML = '';
+            itemsData.forEach(item => {
+                container.innerHTML += `
+                    <div class="bg-white p-3 rounded-xl border flex justify-between items-center shadow-xs">
+                        <div class="flex items-center space-x-3">
+                            ${item.imageUrl ? `<img src="${item.imageUrl}" class="w-12 h-12 object-cover rounded-lg">` : '<div class="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center text-xs">No Img</div>'}
+                            <div>
+                                <h5 class="font-bold text-xs">${item.name} (${item.code})</h5>
+                                <p class="text-[10px] text-gray-500">Price: ₹${item.price} | Sold Count: <strong>${item.salesCount || 0}</strong></p>
+                            </div>
+                        </div>
+                        <button onclick="deleteItem('${item.id}')" class="text-red-500 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 `;
             });
         }
-    }
 
-    // --- DATA ANALYTICS LOGIC ---
-    function runAnalytics() {
-        let startDate = document.getElementById('filter-start-date').value;
-        let endDate = document.getElementById('filter-end-date').value;
-        let resultDiv = document.getElementById('analytics-result');
+        function renderEmployees() {
+            const container = document.getElementById('employee-list');
+            container.innerHTML = '';
+            employeesData.forEach(emp => {
+                // Calculate assigned orders for this employee
+                const empOrders = ordersData.filter(o => o.employeeId === emp.id);
+                const completed = empOrders.filter(o => o.status === 'completed').length;
+                const pending = empOrders.filter(o => o.status === 'pending').length;
+                const earned = empOrders.reduce((sum, o) => sum + (o.stitchingCharge || 0), 0);
 
-        if(!startDate || !endDate) {
-            resultDiv.innerHTML = '<span style="color:red;">ദയവായി രണ്ട് തീയതികളും തിരഞ്ഞെടുക്കുക.</span>';
-            return;
+                container.innerHTML += `
+                    <div class="bg-white p-3 rounded-xl border shadow-xs space-y-1">
+                        <div class="flex justify-between items-center">
+                            <h5 class="font-bold text-xs text-deepGreen">${emp.name}</h5>
+                            <button onclick="deleteEmployee('${emp.id}')" class="text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                        <p class="text-[10px] text-gray-600">Earned: <strong>₹${earned}</strong> | Completed: <strong>${completed}</strong> | Pending: <strong>${pending}</strong></p>
+                    </div>
+                `;
+            });
         }
 
-        let filtered = db.customers.filter(c => {
-            let d = c.deliveryDate;
-            return d >= startDate && d <= endDate;
-        });
+        function renderOrders() {
+            const container = document.getElementById('orders-container');
+            container.innerHTML = '';
+            
+            let filtered = ordersData.filter(o => o.status === currentOrderFilter);
+            if(currentOrderFilter === 'completed') {
+                filtered.sort((a, b) => new Date(b.deliveryDate) - new Date(a.deliveryDate));
+            }
 
-        let rev = filtered.reduce((s,c) => s + c.revenue, 0);
-        let prof = filtered.reduce((s,c) => s + c.profit, 0);
-        let exp = filtered.reduce((s,c) => s + c.expenses, 0);
+            if(filtered.length === 0) {
+                container.innerHTML = `<p class="text-xs text-gray-400 text-center py-4">No ${currentOrderFilter} orders found.</p>`;
+                return;
+            }
 
-        resultDiv.innerHTML = `
-            <div style="background:#F1F5F9; padding:10px; border-radius:8px;">
-                <p><b>തീയതികൾ:</b> ${startDate} മുതൽ ${endDate} വരെ</p>
-                <p>ടോട്ടൽ ഓർഡറുകൾ: <b>${filtered.length}</b></p>
-                <p>ടോട്ടൽ റെവന്യൂ: <b>₹${rev}</b></p>
-                <p>ടോട്ടൽ എക്സ്പെൻസ്: <b>₹${exp}</b></p>
-                <p>നെറ്റ് പ്രോഫിറ്റ്: <b style="color:green;">₹${prof}</b></p>
-            </div>
-        `;
-    }
+            filtered.forEach(o => {
+                container.innerHTML += `
+                    <div class="bg-white p-3 rounded-xl border shadow-xs space-y-1 text-xs">
+                        <div class="flex justify-between font-bold text-deepGreen">
+                            <span>${o.name} (${o.whatsapp})</span>
+                            <span>₹${o.price}</span>
+                        </div>
+                        <p class="text-gray-500">Dress: ${o.dressName} [Code: ${o.itemCode}]</p>
+                        <p class="text-gray-500">Delivery Date: ${o.deliveryDate}</p>
+                        <p class="text-gray-500">Owner Earn: ₹${o.ownerEarning} | Business Profit: ₹${o.businessProfit}</p>
+                        <div class="flex justify-end space-x-2 pt-2 border-t">
+                            ${o.status === 'pending' ? `<button onclick="markOrderComplete('${o.id}')" class="bg-emerald-600 text-white px-2 py-1 rounded text-[10px] font-bold">Mark Completed</button>` : ''}
+                            <button onclick="deleteOrder('${o.id}')" class="bg-red-100 text-red-600 px-2 py-1 rounded text-[10px] font-bold">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
-    // Load Data from Firebase on Startup
-    fetchAllDataFromFirebase();
-</script>
+        function updateDashboard() {
+            let totalRevenue = 0;
+            let totalProfit = 0;
+            let ownerEarnings = 0;
+            let completedCount = 0;
+            let pendingCount = 0;
 
+            let ladyRev = 0, ladyProfit = 0, ladyComp = 0, ladyPend = 0;
+            let babyRev = 0, babyProfit = 0, babyComp = 0, babyPend = 0;
+
+            ordersData.forEach(o => {
+                totalRevenue += (o.price || 0);
+                totalProfit += (o.businessProfit || 0);
+                ownerEarnings += (o.ownerEarning || 0);
+
+                if(o.status === 'completed') completedCount++;
+                else pendingCount++;
+
+                // Assuming items starting with B are Baby, else Lady for platform segregation
+                if(o.itemCode && o.itemCode.toUpperCase().startsWith('B')) {
+                    babyRev += (o.price || 0);
+                    babyProfit += (o.businessProfit || 0);
+                    if(o.status === 'completed') babyComp++; else babyPend++;
+                } else {
+                    ladyRev += (o.price || 0);
+                    ladyProfit += (o.businessProfit || 0);
+                    if(o.status === 'completed') ladyComp++; else ladyPend++;
+                }
+            });
+
+            document.getElementById('dash-total-revenue').innerText = `₹${totalRevenue}`;
+            document.getElementById('dash-total-profit').innerText = `₹${totalProfit}`;
+            document.getElementById('dash-owner-earnings').innerText = `₹${ownerEarnings}`;
+
+            document.getElementById('dash-lady-rev').innerText = `₹${ladyRev}`;
+            document.getElementById('dash-lady-profit').innerText = `₹${ladyProfit}`;
+            document.getElementById('dash-lady-completed').innerText = ladyComp;
+            document.getElementById('dash-lady-pending').innerText = ladyPend;
+
+            document.getElementById('dash-baby-rev').innerText = `₹${babyRev}`;
+            document.getElementById('dash-baby-profit').innerText = `₹${babyProfit}`;
+            document.getElementById('dash-baby-completed').innerText = babyComp;
+            document.getElementById('dash-baby-pending').innerText = babyPend;
+
+            document.getElementById('dash-completed-count').innerText = completedCount;
+            document.getElementById('dash-pending-count').innerText = pendingCount;
+
+            // Next Deliveries
+            const pendingOrders = ordersData.filter(o => o.status === 'pending').sort((a, b) => new Date(a.deliveryDate) - new Date(b.deliveryDate));
+            const nextDelivContainer = document.getElementById('dash-next-deliveries');
+            nextDelivContainer.innerHTML = '';
+            if(pendingOrders.length === 0) {
+                nextDelivContainer.innerHTML = `<p class="italic text-gray-400">No pending deliveries</p>`;
+            } else {
+                pendingOrders.slice(0, 2).forEach(o => {
+                    nextDelivContainer.innerHTML += `<p>• <strong>${o.name}</strong> - ${o.deliveryDate}</p>`;
+                });
+            }
+        }
+
+        function generateAnalytics() {
+            const fromDate = document.getElementById('filter-from-date').value;
+            const toDate = document.getElementById('filter-to-date').value;
+
+            let filtered = ordersData;
+            if(fromDate && toDate) {
+                filtered = ordersData.filter(o => o.deliveryDate >= fromDate && o.deliveryDate <= toDate);
+            }
+
+            let rev = filtered.reduce((sum, o) => sum + (o.price || 0), 0);
+            let profit = filtered.reduce((sum, o) => sum + (o.businessProfit || 0), 0);
+            let ownerEarn = filtered.reduce((sum, o) => sum + (o.ownerEarning || 0), 0);
+
+            document.getElementById('analytics-results').innerHTML = `
+                <h5 class="font-bold text-deepGreen">Analytics Report (${fromDate || 'Start'} to ${toDate || 'End'})</h5>
+                <p>Total Orders in Range: <strong>${filtered.length}</strong></p>
+                <p>Total Revenue: <strong>₹${rev}</strong></p>
+                <p>Business Profit: <strong>₹${profit}</strong></p>
+                <p>Owner Total Earnings: <strong>₹${ownerEarn}</strong></p>
+            `;
+        }
+    </script>
 </body>
 </html>
+
 
