@@ -84,6 +84,10 @@
                     <span class="text-gray-600">Total Business Expenses Deducted:</span>
                     <span id="dash-total-general-exp" class="font-bold text-red-600">₹0.00</span>
                 </div>
+                <!-- Expenses List with Delete Option -->
+                <div id="expenses-list-container" class="space-y-2 pt-2 border-t">
+                    <!-- Populated via JS -->
+                </div>
             </div>
 
             <!-- Platform Breakdown (LEDI vs BEBI) -->
@@ -632,6 +636,13 @@
             closeModal('modal-expense');
         }
 
+        function deleteExpense(id) {
+            if(confirm('Are you sure you want to delete this expense?')) {
+                appData.expenses = appData.expenses.filter(e => e.id !== id);
+                deleteDataFromCloud('expenses', id);
+            }
+        }
+
         // Item Store Functions with Base64 Image Reader
         function openNewItemModal() {
             document.getElementById('item-modal-title').innerText = "Add New Dress Item";
@@ -1044,6 +1055,21 @@
             document.getElementById('dash-owner-earning').innerText = `₹${totalOwner}`;
             document.getElementById('dash-owner-orders-count').innerText = `from ${customers.length} orders`;
 
+            // Render Expenses List in Dashboard
+            let expListHtml = '';
+            (appData.expenses || []).forEach(exp => {
+                expListHtml += `
+                    <div class="flex justify-between items-center text-xs bg-white p-2 rounded border">
+                        <div>
+                            <p class="font-bold">${exp.title}</p>
+                            <p class="text-[10px] text-gray-500">${exp.date} • ₹${exp.amount}</p>
+                        </div>
+                        <button onclick="deleteExpense('${exp.id}')" class="text-red-600 hover:text-red-800 p-1"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+            document.getElementById('expenses-list-container').innerHTML = expListHtml || '<p class="text-[11px] text-gray-400 italic">No expenses added yet.</p>';
+
             // LEDI vs BEBI breakdown
             const lediCust = customers.filter(c => c.platform === 'LEDI');
             const bebiCust = customers.filter(c => c.platform === 'BEBI');
@@ -1183,6 +1209,7 @@
     </script>
 </body>
 </html>
+
 
 
 
