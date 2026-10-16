@@ -46,7 +46,6 @@
 
         <!-- 1. HOME DASHBOARD TAB -->
         <section id="tab-home" class="space-y-4 tab-content">
-            <!-- Wallet / Overview Card -->
             <div class="bg-brandGreen text-white p-5 rounded-2xl shadow-lg relative overflow-hidden">
                 <div class="absolute right-[-20px] bottom-[-20px] opacity-10 text-8xl"><i class="fa-solid fa-wallet"></i></div>
                 <p class="text-xs text-emerald-200 uppercase tracking-wider">Total Business Revenue</p>
@@ -74,7 +73,7 @@
                 </div>
             </div>
 
-            <!-- General Business Expenses Manager Box -->
+            <!-- General Business Expenses Box -->
             <div class="bg-white p-4 rounded-xl shadow-sm space-y-3 border border-gray-200">
                 <div class="flex justify-between items-center">
                     <h3 class="font-bold text-xs text-gray-700 uppercase"><i class="fa-solid fa-receipt mr-1 text-red-600"></i> Business Expenses</h3>
@@ -84,13 +83,16 @@
                     <span class="text-gray-600">Total Business Expenses Deducted:</span>
                     <span id="dash-total-general-exp" class="font-bold text-red-600">₹0.00</span>
                 </div>
-                <!-- Expenses List with Delete Option -->
-                <div id="expenses-list-container" class="space-y-2 pt-2 border-t">
-                    <!-- Populated via JS -->
+
+                <div class="pt-2">
+                    <h4 class="text-[11px] font-bold text-gray-500 uppercase mb-2">Expense Records</h4>
+                    <div id="expenses-list-container" class="space-y-2 max-h-40 overflow-y-auto">
+                        <p class="text-xs text-gray-400 italic">No expenses added yet.</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Platform Breakdown (LEDI vs BEBI) -->
+            <!-- Platform Breakdown -->
             <div class="grid grid-cols-2 gap-3">
                 <div class="bg-lediBlue border border-blue-200 p-4 rounded-xl shadow-sm">
                     <div class="flex justify-between items-center mb-1">
@@ -171,7 +173,7 @@
             </div>
 
             <div class="flex bg-gray-200 p-1 rounded-xl text-xs font-semibold">
-                <button onclick="switchCustomerSubTab('pending')" id="subtab-cust-pending-btn" class="flex-1 py-2 rounded-lg bg-white shadow-sm text-brandGreen transition">Pending Orders</button>
+                <button onclick="switchCustomerSubTab('pending')" id="subtab-cust-pending-btn" class="flex-1 py-2 rounded-lg bg-white shadow-sm text-brandGreen font-bold transition">Pending Orders</button>
                 <button onclick="switchCustomerSubTab('completed')" id="subtab-cust-completed-btn" class="flex-1 py-2 rounded-lg text-gray-600 transition">Completed Orders</button>
             </div>
 
@@ -266,7 +268,7 @@
     </nav>
 
     <!-- MODALS -->
-    <!-- 1. Customer Modal -->
+    <!-- Customer Modal -->
     <div id="modal-customer" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl w-full max-w-md p-5 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
@@ -381,7 +383,7 @@
         </div>
     </div>
 
-    <!-- 2. Item Store Modal -->
+    <!-- Item Store Modal -->
     <div id="modal-item" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl w-full max-w-md p-5 space-y-4">
             <div class="flex justify-between items-center border-b pb-2">
@@ -405,15 +407,15 @@
                     </div>
                 </div>
                 <div>
-                    <label class="font-semibold text-gray-600">Upload Dress Image (Max 10MB)</label>
+                    <label class="font-semibold text-gray-600">Upload Dress Image</label>
                     <input type="file" id="item-image-file" accept="image/*" class="w-full border rounded-lg p-1.5 mt-1 text-xs">
                 </div>
-                <button type="submit" class="w-full bg-brandGreen text-white py-2.5 rounded-xl font-bold mt-2">Save Item</button>
+                <button type="submit" id="save-item-btn" class="w-full bg-brandGreen text-white py-2.5 rounded-xl font-bold mt-2">Save Item</button>
             </form>
         </div>
     </div>
 
-    <!-- 3. Employee Modal -->
+    <!-- Employee Modal -->
     <div id="modal-employee" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4">
             <div class="flex justify-between items-center border-b pb-2">
@@ -431,7 +433,7 @@
         </div>
     </div>
 
-    <!-- 4. General Expense Modal -->
+    <!-- General Expense Modal -->
     <div id="modal-expense" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl w-full max-w-sm p-5 space-y-4">
             <div class="flex justify-between items-center border-b pb-2">
@@ -456,7 +458,7 @@
         </div>
     </div>
 
-    <!-- 5. Customer Details Modal -->
+    <!-- Customer Details Modal -->
     <div id="modal-customer-detail" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl w-full max-w-md p-5 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
@@ -467,7 +469,7 @@
         </div>
     </div>
 
-    <!-- 6. Employee Details Modal -->
+    <!-- Employee Details Modal -->
     <div id="modal-employee-detail" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl w-full max-w-md p-5 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b pb-2">
@@ -478,7 +480,7 @@
         </div>
     </div>
 
-    <!-- Firebase SDK Setup -->
+    <!-- Firebase SDK Setup (Firestore Only - Free & Fast) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
         import { getFirestore, collection, getDocs, setDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
@@ -494,6 +496,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        
         window.db = db;
         window.FB = { collection, getDocs, setDoc, deleteDoc, doc };
 
@@ -578,7 +581,43 @@
             }
         }
 
-        // Tab Navigation
+        // Fast Client-Side Image Compression Algorithm (Free & Instant)
+        function fastCompressImage(file, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const maxDim = 350; // Lightweight dimension for free Firestore tier
+
+                    if (width > height) {
+                        if (width > maxDim) {
+                            height = Math.round((height * maxDim) / width);
+                            width = maxDim;
+                        }
+                    } else {
+                        if (height > maxDim) {
+                            width = Math.round((width * maxDim) / height);
+                            height = maxDim;
+                        }
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const lightweightBase64 = canvas.toDataURL('image/jpeg', 0.4);
+                    callback(lightweightBase64);
+                };
+            };
+        }
+
+        // Navigation
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
@@ -636,23 +675,28 @@
             closeModal('modal-expense');
         }
 
-        function deleteExpense(id) {
+        function deleteGeneralExpense(id) {
             if(confirm('Are you sure you want to delete this expense?')) {
-                appData.expenses = appData.expenses.filter(e => e.id !== id);
+                appData.expenses = appData.expenses.filter(ex => ex.id !== id);
                 deleteDataFromCloud('expenses', id);
             }
         }
 
-        // Item Store Functions with Base64 Image Reader
+        // Item Store Functions
         function openNewItemModal() {
             document.getElementById('item-modal-title').innerText = "Add New Dress Item";
             document.getElementById('form-item').reset();
             document.getElementById('item-id').value = "";
+            document.getElementById('save-item-btn').innerText = "Save Item";
             openModal('modal-item');
         }
 
         function saveItem(e) {
             e.preventDefault();
+            const saveBtn = document.getElementById('save-item-btn');
+            saveBtn.innerText = "Saving Fast...";
+            saveBtn.disabled = true;
+
             const id = document.getElementById('item-id').value || 'item_' + Date.now();
             const name = document.getElementById('item-name').value;
             const code = document.getElementById('item-code').value;
@@ -664,16 +708,9 @@
             if(existingItem && existingItem.image) imageUrl = existingItem.image;
 
             if(fileInput.files && fileInput.files[0]) {
-                if(fileInput.files[0].size > 10 * 1024 * 1024) {
-                    alert('File size exceeds 10MB limit!');
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function(uploadEvent) {
-                    const base64Image = uploadEvent.target.result;
-                    finishSavingItem(id, name, code, price, base64Image);
-                };
-                reader.readAsDataURL(fileInput.files[0]);
+                fastCompressImage(fileInput.files[0], function(compressedBase64) {
+                    finishSavingItem(id, name, code, price, compressedBase64);
+                });
             } else {
                 finishSavingItem(id, name, code, price, imageUrl);
             }
@@ -688,6 +725,10 @@
                 appData.items.push(itemObj);
             }
             saveDataToCloud('items', id, itemObj);
+
+            const saveBtn = document.getElementById('save-item-btn');
+            saveBtn.innerText = "Save Item";
+            saveBtn.disabled = false;
             closeModal('modal-item');
         }
 
@@ -832,6 +873,8 @@
             let ownerAmt = remainingPrice <= 300 ? remainingPrice : 300;
             let bizProfit = remainingPrice <= 300 ? 0 : remainingPrice - 300;
 
+            const existingCust = appData.customers.find(c => c.id === id);
+
             const customerObj = {
                 id,
                 name: document.getElementById('cust-name').value,
@@ -853,14 +896,12 @@
                 measurementDetails: document.getElementById('cust-measurement-details').value,
                 ownerAmt,
                 bizProfit,
-                status: 'Pending',
-                completedAt: null
+                status: existingCust ? existingCust.status : 'Pending',
+                completedAt: existingCust ? existingCust.completedAt : null
             };
 
             const idx = appData.customers.findIndex(c => c.id === id);
             if(idx >= 0) {
-                customerObj.status = appData.customers[idx].status;
-                customerObj.completedAt = appData.customers[idx].completedAt;
                 appData.customers[idx] = customerObj;
             } else {
                 appData.customers.push(customerObj);
@@ -1053,22 +1094,24 @@
             document.getElementById('dash-gross-profit').innerText = `₹${grossProf}`;
             document.getElementById('dash-total-profit').innerText = `₹${netProfit}`;
             document.getElementById('dash-owner-earning').innerText = `₹${totalOwner}`;
-            document.getElementById('dash-owner-orders-count').innerText = `from ${customers.length} orders`;
 
-            // Render Expenses List in Dashboard
+            // Render Expenses Breakdown List
             let expListHtml = '';
-            (appData.expenses || []).forEach(exp => {
+            (appData.expenses || []).forEach(ex => {
                 expListHtml += `
-                    <div class="flex justify-between items-center text-xs bg-white p-2 rounded border">
+                    <div class="bg-gray-50 p-2 rounded-lg border flex justify-between items-center text-xs">
                         <div>
-                            <p class="font-bold">${exp.title}</p>
-                            <p class="text-[10px] text-gray-500">${exp.date} • ₹${exp.amount}</p>
+                            <p class="font-bold text-gray-800">${ex.title}</p>
+                            <p class="text-[10px] text-gray-500">Date: ${ex.date}</p>
                         </div>
-                        <button onclick="deleteExpense('${exp.id}')" class="text-red-600 hover:text-red-800 p-1"><i class="fa-solid fa-trash"></i></button>
+                        <div class="flex items-center space-x-2">
+                            <span class="font-bold text-red-600">₹${ex.amount}</span>
+                            <button onclick="deleteGeneralExpense('${ex.id}')" class="text-red-500 hover:text-red-700 px-1"><i class="fa-solid fa-trash text-xs"></i></button>
+                        </div>
                     </div>
                 `;
             });
-            document.getElementById('expenses-list-container').innerHTML = expListHtml || '<p class="text-[11px] text-gray-400 italic">No expenses added yet.</p>';
+            document.getElementById('expenses-list-container').innerHTML = expListHtml || '<p class="text-xs text-gray-400 italic">No expenses added yet.</p>';
 
             // LEDI vs BEBI breakdown
             const lediCust = customers.filter(c => c.platform === 'LEDI');
@@ -1179,8 +1222,8 @@
             });
             document.getElementById('customer-pending-container').innerHTML = pendingCustHtml || '<p class="text-xs text-gray-400 italic">No pending orders.</p>';
 
-            // Render Customer Completed List
-            let completedSorted = completedOrders.sort((a,b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
+            // Render Customer Completed List (Sorted Chronologically: Newest completed first)
+            let completedSorted = completedOrders.sort((a, b) => new Date(b.completedAt || 0) - new Date(a.completedAt || 0));
             let completedCustHtml = '';
             completedSorted.forEach(c => {
                 completedCustHtml += `
@@ -1209,6 +1252,7 @@
     </script>
 </body>
 </html>
+
 
 
 
