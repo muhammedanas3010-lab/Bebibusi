@@ -774,10 +774,12 @@
 
         function buildOrderWhatsAppMessage(c) {
             const extrasText = (c.extraItems && c.extraItems.length) ? c.extraItems.join(', ') : 'None';
+            const custName = c.name || 'Customer';
 
             return [
                 `✨ *KAIZ SOOQ (${c.platform}) - Order Details* ✨`,
-                `👤 *Name:* ${c.name}`,
+                `Hello *${custName}*, thank you for shopping with *KAIZ SOOQ*!`,
+                `👤 *Customer Name:* ${custName}`,
                 `📱 *WhatsApp:* ${c.whatsapp}`,
                 `👗 *Dress Name:* ${c.dressName || 'N/A'} ${c.itemCode ? `[${c.itemCode}]` : ''}`,
                 `🎀 *Extra Items:* ${extrasText}`,
@@ -1756,6 +1758,7 @@
     </script>
 </body>
 </html>
+
 
 
 
