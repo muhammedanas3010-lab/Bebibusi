@@ -423,17 +423,19 @@
                     ></textarea>
                 </div>
 
-                <div class="grid grid-cols-2 gap-2">
-                    <div>
-                        <label class="font-semibold text-gray-600">Item Code (Select from Store)</label>
-                        <select id="cust-item-code" onchange="onItemCodeSelect()" class="w-full border rounded-lg p-2 mt-1 bg-white">
-                            <option value="">Select Item Code</option>
-                        </select>
+                <!-- Dress Photo Picker from Store -->
+                <div class="bg-blue-50/50 p-3 rounded-xl border border-blue-200 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="font-bold text-blue-950"><i class="fa-solid fa-image mr-1"></i> Select Dress Photo from Store</label>
+                        <button type="button" onclick="clearSelectedDressItem()" class="text-[10px] text-gray-500 hover:text-gray-700 underline">Clear</button>
                     </div>
-                    <div>
-                        <label class="font-semibold text-gray-600">Dress Name</label>
-                        <input type="text" id="cust-dress-name" class="w-full border rounded-lg p-2 mt-1 bg-gray-50">
-                    </div>
+                    <input type="hidden" id="cust-item-code">
+                    <div id="cust-store-photo-picker" class="flex space-x-2 overflow-x-auto pb-1"></div>
+                </div>
+
+                <div>
+                    <label class="font-semibold text-gray-600">Dress Name</label>
+                    <input type="text" id="cust-dress-name" class="w-full border rounded-lg p-2 mt-1 bg-gray-50">
                 </div>
 
                 <!-- Extra Items -->
@@ -1190,27 +1192,66 @@
             return Array.from(document.querySelectorAll('.extra-item-cb:checked')).map(cb => cb.value);
         }
 
+        function renderStorePhotoPicker(selectedCode = '') {
+            const picker = document.getElementById('cust-store-photo-picker');
+            if (!picker) return;
+
+            if (!appData.items || appData.items.length === 0) {
+                picker.innerHTML = '<p class="text-[11px] text-gray-400 italic">No dresses in store yet.</p>';
+                return;
+            }
+
+            picker.innerHTML = appData.items.map(i => {
+                const isSelected = selectedCode && i.code === selectedCode;
+                const activeClasses = isSelected
+                    ? 'border-brandGreen bg-emerald-50 ring-2 ring-brandGreen/40'
+                    : 'border-gray-200 bg-white hover:border-blue-300';
+                const safeCode = (i.code || '').replace(/'/g, "\\'");
+                return `
+                    <button
+                        type="button"
+                        onclick="selectStoreDressPhoto('${safeCode}')"
+                        class="flex items-center space-x-2 p-1.5 rounded-xl border shrink-0 text-left transition cursor-pointer ${activeClasses}"
+                    >
+                        <img src="${i.image}" alt="${i.name}" class="w-11 h-11 rounded-lg object-cover border bg-gray-100 shrink-0">
+                        <div class="pr-1">
+                            <p class="font-bold text-[11px] text-gray-900 leading-tight max-w-[96px] truncate">${i.name}</p>
+                            <p class="text-[10px] font-semibold text-brandGreen mt-0.5">₹${i.price}</p>
+                        </div>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function selectStoreDressPhoto(code) {
+            document.getElementById('cust-item-code').value = code;
+            renderStorePhotoPicker(code);
+            onItemCodeSelect();
+        }
+
+        function clearSelectedDressItem() {
+            document.getElementById('cust-item-code').value = '';
+            renderStorePhotoPicker('');
+        }
+
         function openNewCustomerModal() {
             document.getElementById('customer-modal-title').innerText = "Add New Customer Order";
             document.getElementById('form-customer').reset();
             document.getElementById('cust-id').value = "";
+            document.getElementById('cust-item-code').value = "";
             document.getElementById('cust-delivery-charge').value = 60;
             document.getElementById('cust-country').value = 'India';
             document.getElementById('pincode-status').innerText = 'Type 6-digit PIN';
             document.getElementById('pincode-office-picker-wrap').classList.add('hidden');
             lastFetchedOffices = [];
             setSelectedExtraItems([]);
-            populateDropdowns();
+            populateDropdowns('');
             calculateFinances();
             openModal('modal-customer');
         }
 
-        function populateDropdowns() {
-            let itemSelect = document.getElementById('cust-item-code');
-            itemSelect.innerHTML = '<option value="">Select Item Code</option>';
-            appData.items.forEach(i => {
-                itemSelect.innerHTML += `<option value="${i.code}">${i.code} - ${i.name}</option>`;
-            });
+        function populateDropdowns(selectedCode = '') {
+            renderStorePhotoPicker(selectedCode);
 
             let empSelect = document.getElementById('cust-employee');
             empSelect.innerHTML = '<option value="">Select Tailor</option>';
@@ -1338,7 +1379,7 @@
             const c = appData.customers.find(cust => cust.id === id);
             if(!c) return;
             document.getElementById('customer-modal-title').innerText = "Edit Customer Order";
-            populateDropdowns();
+            populateDropdowns(c.itemCode || '');
             document.getElementById('cust-id').value = c.id;
             document.getElementById('cust-name').value = c.name;
             document.getElementById('cust-whatsapp').value = c.whatsapp;
@@ -1758,6 +1799,7 @@
     </script>
 </body>
 </html>
+
 
 
 
