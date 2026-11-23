@@ -185,7 +185,7 @@
                     type="text"
                     id="customer-order-search"
                     oninput="refreshUI()"
-                    placeholder="Search name, WhatsApp, dress, PIN, district..."
+                    placeholder="Search name, WhatsApp, dress, colour, PIN..."
                     class="w-full bg-white border border-gray-200 rounded-xl pl-9 pr-8 py-2.5 text-xs shadow-sm focus:outline-none focus:border-brandGreen"
                 >
                 <button
@@ -433,9 +433,37 @@
                     <div id="cust-store-photo-picker" class="flex space-x-2 overflow-x-auto pb-1"></div>
                 </div>
 
-                <div>
-                    <label class="font-semibold text-gray-600">Dress Name</label>
-                    <input type="text" id="cust-dress-name" class="w-full border rounded-lg p-2 mt-1 bg-gray-50">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="font-semibold text-gray-600">Dress Name</label>
+                        <input type="text" id="cust-dress-name" class="w-full border rounded-lg p-2 mt-1 bg-gray-50">
+                    </div>
+                    <div>
+                        <label class="font-semibold text-gray-600">Dress Colour</label>
+                        <input type="text" id="cust-dress-colour" placeholder="Eg: Lavender, Maroon" class="w-full border rounded-lg p-2 mt-1 bg-white">
+                    </div>
+                </div>
+
+                <!-- Quick Colour Swatches -->
+                <div class="bg-gray-50 p-2 rounded-lg border space-y-1.5">
+                    <div class="flex justify-between items-center">
+                        <span class="text-[10px] font-semibold text-gray-600">Quick Colour Select</span>
+                        <span id="selected-colour-badge" class="text-[10px] font-bold text-brandGreen">None</span>
+                    </div>
+                    <div id="dress-colour-swatches" class="flex flex-wrap gap-1.5">
+                        <button type="button" onclick="selectDressColour('Red')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-red-600 border border-black/10"></span><span>Red</span></button>
+                        <button type="button" onclick="selectDressColour('Maroon')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-red-900 border border-black/10"></span><span>Maroon</span></button>
+                        <button type="button" onclick="selectDressColour('Pink')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-pink-400 border border-black/10"></span><span>Pink</span></button>
+                        <button type="button" onclick="selectDressColour('Lavender')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-purple-300 border border-black/10"></span><span>Lavender</span></button>
+                        <button type="button" onclick="selectDressColour('Purple')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-purple-700 border border-black/10"></span><span>Purple</span></button>
+                        <button type="button" onclick="selectDressColour('Blue')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-blue-600 border border-black/10"></span><span>Blue</span></button>
+                        <button type="button" onclick="selectDressColour('Sky Blue')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-sky-300 border border-black/10"></span><span>Sky Blue</span></button>
+                        <button type="button" onclick="selectDressColour('Green')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 border border-black/10"></span><span>Green</span></button>
+                        <button type="button" onclick="selectDressColour('Yellow')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-amber-300 border border-black/10"></span><span>Yellow</span></button>
+                        <button type="button" onclick="selectDressColour('Peach')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-orange-300 border border-black/10"></span><span>Peach</span></button>
+                        <button type="button" onclick="selectDressColour('White')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-white border border-gray-300"></span><span>White</span></button>
+                        <button type="button" onclick="selectDressColour('Black')" class="colour-swatch-btn flex items-center space-x-1 px-2 py-1 rounded-md border bg-white text-[10px] font-semibold hover:bg-gray-100"><span class="w-2.5 h-2.5 rounded-full bg-gray-900 border border-black/10"></span><span>Black</span></button>
+                    </div>
                 </div>
 
                 <!-- Extra Items -->
@@ -661,6 +689,30 @@
             return parts.length ? parts.join(' • ') : 'N/A';
         }
 
+        function syncColourSwatchHighlight(colourVal = '') {
+            const normalized = (colourVal || '').trim().toLowerCase();
+            const badge = document.getElementById('selected-colour-badge');
+            if (badge) {
+                badge.innerText = colourVal.trim() || 'None';
+            }
+            document.querySelectorAll('.colour-swatch-btn').forEach(btn => {
+                const label = (btn.innerText || '').trim().toLowerCase();
+                const active = normalized && label === normalized;
+                btn.classList.toggle('ring-2', active);
+                btn.classList.toggle('ring-brandGreen', active);
+                btn.classList.toggle('bg-emerald-50', active);
+                btn.classList.toggle('border-brandGreen', active);
+            });
+        }
+
+        function selectDressColour(colourName) {
+            const input = document.getElementById('cust-dress-colour');
+            if (input) {
+                input.value = colourName;
+            }
+            syncColourSwatchHighlight(colourName);
+        }
+
         function onPinCodeInput() {
             const raw = document.getElementById('cust-pincode').value.trim();
             const digitsOnly = raw.replace(/\D/g, '');
@@ -784,6 +836,7 @@
                 `👤 *Customer Name:* ${custName}`,
                 `📱 *WhatsApp:* ${c.whatsapp}`,
                 `👗 *Dress Name:* ${c.dressName || 'N/A'} ${c.itemCode ? `[${c.itemCode}]` : ''}`,
+                c.dressColour ? `🎨 *Dress Colour:* ${c.dressColour}` : '',
                 `🎀 *Extra Items:* ${extrasText}`,
                 c.measurements ? `📏 *Measurements:* ${c.measurements}` : '',
                 `💰 *Total Price:* ₹${c.price}`,
@@ -830,6 +883,7 @@
                 c.whatsapp,
                 c.platform,
                 c.dressName,
+                c.dressColour,
                 c.itemCode,
                 c.measurements,
                 c.pincode,
@@ -1239,6 +1293,8 @@
             document.getElementById('form-customer').reset();
             document.getElementById('cust-id').value = "";
             document.getElementById('cust-item-code').value = "";
+            document.getElementById('cust-dress-colour').value = "";
+            syncColourSwatchHighlight('');
             document.getElementById('cust-delivery-charge').value = 60;
             document.getElementById('cust-country').value = 'India';
             document.getElementById('pincode-status').innerText = 'Type 6-digit PIN';
@@ -1330,6 +1386,7 @@
                 measurements: document.getElementById('cust-measurements').value.trim(),
                 itemCode: document.getElementById('cust-item-code').value,
                 dressName: document.getElementById('cust-dress-name').value,
+                dressColour: document.getElementById('cust-dress-colour').value.trim(),
                 extraItems: getSelectedExtraItems(),
                 price,
                 advance: parseFloat(document.getElementById('cust-advance').value) || 0,
@@ -1396,6 +1453,8 @@
             document.getElementById('cust-measurements').value = c.measurements || '';
             document.getElementById('cust-item-code').value = c.itemCode || '';
             document.getElementById('cust-dress-name').value = c.dressName || '';
+            document.getElementById('cust-dress-colour').value = c.dressColour || '';
+            syncColourSwatchHighlight(c.dressColour || '');
             setSelectedExtraItems(c.extraItems || []);
             document.getElementById('cust-price').value = c.price;
             document.getElementById('cust-advance').value = c.advance;
@@ -1445,7 +1504,9 @@
                 </div>
                 <div class="pt-2 space-y-1">
                     <h4 class="font-bold text-xs text-gray-500 uppercase">Current Order Details</h4>
+                    <p><b>Customer Name:</b> ${c.name}</p>
                     <p><b>Dress:</b> ${c.dressName} (${c.itemCode || 'No Code'})</p>
+                    <p><b>Dress Colour:</b> ${c.dressColour || 'Not specified'}</p>
                     <p><b>Extra Items:</b> ${extrasDisplay}</p>
                     <p><b>Measurements:</b> ${c.measurements || 'Not specified'}</p>
                     <p><b>Price / Advance:</b> ₹${c.price} / ₹${c.advance}</p>
@@ -1479,10 +1540,11 @@
                 .sort((a, b) => new Date(a.deliveryDate) - new Date(b.deliveryDate))
                 .forEach(c => {
                     const extras = (c.extraItems && c.extraItems.length) ? ` + ${c.extraItems.join(', ')}` : '';
+                    const colourTag = c.dressColour ? ` (${c.dressColour})` : '';
                     pendingListHtml += `
                         <div class="bg-gray-50 p-2.5 rounded border text-xs space-y-1">
                             <div class="flex justify-between font-bold">
-                                <span>${c.name} (${c.dressName}${extras})</span>
+                                <span>${c.name} (${c.dressName}${colourTag}${extras})</span>
                                 <span class="text-brandGreen">Due: ${c.deliveryDate}</span>
                             </div>
                             <p class="text-[11px] text-gray-700"><b>Measurements:</b> ${c.measurements || 'Not specified'}</p>
@@ -1721,6 +1783,7 @@
             const filteredPending = pendingOrders.filter(c => matchesCustomerSearch(c, searchQuery));
             let pendingCustHtml = '';
             filteredPending.forEach(c => {
+                const colourBadge = c.dressColour ? `<span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200 font-semibold">${c.dressColour}</span>` : '';
                 const extrasBadge = (c.extraItems && c.extraItems.length) ? `<span class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200">+ ${c.extraItems.join(', ')}</span>` : '';
                 const measText = c.measurements ? `<p class="text-[11px] text-purple-900 bg-purple-50/70 px-2 py-1 rounded mt-1"><b>Meas:</b> ${c.measurements}</p>` : '';
                 pendingCustHtml += `
@@ -1728,7 +1791,7 @@
                         <div class="flex justify-between items-start gap-2">
                             <div onclick="showCustomerDetailModal('${c.id}')" class="cursor-pointer flex-1">
                                 <h4 class="font-bold text-sm text-brandGreen">${c.name} <span class="text-xs font-normal text-gray-500">(${c.platform})</span></h4>
-                                <p class="text-xs text-gray-600">Dress: ${c.dressName} [${c.itemCode}] ${extrasBadge}</p>
+                                <p class="text-xs text-gray-600 flex flex-wrap items-center gap-1 mt-0.5"><span>Dress: ${c.dressName} [${c.itemCode}]</span> ${colourBadge} ${extrasBadge}</p>
                                 ${measText}
                                 <p class="text-xs text-gray-500 mt-1"><i class="fa-regular fa-calendar mr-1"></i> Due: <b>${c.deliveryDate}</b> (${getDaysRemainingText(c.deliveryDate)})</p>
                                 <p class="text-[11px] text-gray-500"><i class="fa-solid fa-map-pin mr-1"></i> ${formatRegionSummary(c)} • Tailor: ${c.employee}</p>
@@ -1762,6 +1825,7 @@
                 });
             let completedCustHtml = '';
             completedSorted.forEach(c => {
+                const colourBadge = c.dressColour ? `<span class="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded border border-blue-200 font-semibold">${c.dressColour}</span>` : '';
                 const extrasBadge = (c.extraItems && c.extraItems.length) ? `<span class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded border border-purple-200">+ ${c.extraItems.join(', ')}</span>` : '';
                 const measText = c.measurements ? `<p class="text-[11px] text-purple-900 bg-purple-50/70 px-2 py-1 rounded mt-1"><b>Meas:</b> ${c.measurements}</p>` : '';
                 completedCustHtml += `
@@ -1769,7 +1833,7 @@
                         <div class="flex justify-between items-start gap-2">
                             <div onclick="showCustomerDetailModal('${c.id}')" class="cursor-pointer flex-1">
                                 <h4 class="font-bold text-sm text-gray-800">${c.name} <span class="text-xs font-normal text-gray-500">(${c.platform})</span></h4>
-                                <p class="text-xs text-gray-600">Dress: ${c.dressName} [${c.itemCode}] ${extrasBadge}</p>
+                                <p class="text-xs text-gray-600 flex flex-wrap items-center gap-1 mt-0.5"><span>Dress: ${c.dressName} [${c.itemCode}]</span> ${colourBadge} ${extrasBadge}</p>
                                 ${measText}
                                 <p class="text-[11px] text-gray-500 mt-1">Delivery: ${c.deliveryDate} • ${formatRegionSummary(c)}</p>
                                 <p class="text-xs text-emerald-600 font-semibold"><i class="fa-solid fa-check mr-1"></i> Completed: ${c.completedAt ? new Date(c.completedAt).toLocaleDateString() : c.deliveryDate}</p>
@@ -1799,6 +1863,7 @@
     </script>
 </body>
 </html>
+
 
 
 
